@@ -1,61 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import HermaLogo from './Herma.jpeg';
-// Commented out - no longer using download/auth functionality
-// import handleDownload from './handleDownload';
-import MenuOverlay from './MenuOverlay'; // Import the new menu overlay component
-// import { useAuth } from '../context/AuthContext';
-// import { getSubscriptionStatus } from '../services/stripeService';
+import MenuOverlay from './MenuOverlay';
+import { useHermaAuth } from '../context/HermaAuthContext';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
-  // Commented out - no longer using OS detection for downloads
-  // const [osType, setOsType] = useState('unknown');
-  const [menuOpen, setMenuOpen] = useState(false); // Menu state
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  // Commented out - no longer using auth functionality
-  // const { user } = useAuth();
-  
-  // Safety check for navigate function
+  const { isAuthenticated, user } = useHermaAuth();
+
   const safeNavigate = (path) => {
     if (navigate) {
       navigate(path);
     } else {
-      // Fallback to window.location if navigate is not available
       window.location.href = path;
     }
   };
 
-  // Commented out - no longer detecting OS for downloads
-  // // Detect OS on component mount
-  // useEffect(() => {
-  //   const detectOS = () => {
-  //     const userAgent = window.navigator.userAgent;
-  //     const platform = window.navigator.platform;
-  //
-  //     if (platform.indexOf('Mac') !== -1 ||
-  //         userAgent.indexOf('Macintosh') !== -1 ||
-  //         userAgent.indexOf('MacIntel') !== -1) {
-  //       return 'mac';
-  //     }
-  //
-  //     if (platform.indexOf('Win') !== -1 ||
-  //         userAgent.indexOf('Windows') !== -1) {
-  //       return 'windows';
-  //     }
-  //
-  //     if (platform.indexOf('Linux') !== -1 ||
-  //         userAgent.indexOf('Linux') !== -1) {
-  //       return 'linux';
-  //     }
-  //
-  //     return 'unknown';
-  //   };
-  //
-  //   setOsType(detectOS());
-  // }, []);
-
-  // Handle scroll event to change header appearance
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 20;
@@ -70,7 +32,6 @@ const Header = () => {
     };
   }, [scrolled]);
 
-  // Close menu on window resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -84,7 +45,6 @@ const Header = () => {
     };
   }, []);
 
-  // Make sure menu is closed when component mounts
   useEffect(() => {
     setMenuOpen(false);
   }, []);
@@ -97,74 +57,17 @@ const Header = () => {
     setMenuOpen(false);
   };
 
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    closeMenu();
-  };
-  
-  // Commented out - no longer using download functionality
-  // const handleDownloadClick = () => {
-  //   handleDownload(osType === 'mac' ? 'mac' : 'windows');
-  //   closeMenu();
-  // };
-
   const handleRequestDemo = () => {
     window.open('https://calendly.com/hermalocal/30min', '_blank');
     closeMenu();
   };
 
-  // Commented out - no longer using subscription functionality
-  // // Function to handle subscription button click
-  // const handleSubscriptionClick = async (e) => {
-  //   e.preventDefault();
-  //
-  //   if (!user) {
-  //     // If not logged in, go to login page
-  //     safeNavigate('/login');
-  //     return;
-  //   }
-
-  //   try {
-  //     // Check if user has a subscription
-  //     const subscriptionData = await getSubscriptionStatus(user.uid);
-  //
-  //     if (subscriptionData && subscriptionData.status === 'active') {
-  //       // User has an active subscription, go to subscription page
-  //       safeNavigate('/success');
-  //     } else {
-  //       // User doesn't have a subscription, go to purchase page
-  //       safeNavigate('/upgrade');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error checking subscription status:', error);
-  //     // If there's an error (like 404), assume user doesn't have subscription
-  //     safeNavigate('/upgrade');
-  //   }
-  // };
-
-  // Function to handle navigation and scroll to top
-  const handleNavigation = (path, e) => {
-    e.preventDefault();
-    
-    // Navigate to the page
-    safeNavigate(path);
-    
-    // Scroll to top
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
   return (
     <>
-      <header 
-        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-sm transition-all duration-300 w-full 
-        ${scrolled 
-          ? 'py-2 bg-[var(--primary-bg)]/95 shadow-lg' 
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-sm transition-all duration-300 w-full
+        ${scrolled
+          ? 'py-2 bg-[var(--primary-bg)]/95 shadow-lg'
           : 'py-4 bg-[var(--primary-bg)]/80'
         }`}
       >
@@ -172,16 +75,16 @@ const Header = () => {
           <div className="flex justify-between items-center">
             {/* Logo */}
             <div className="flex items-center relative z-10">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="flex items-center group"
                 aria-label="Home"
               >
-                <div className={`h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-lg mr-2 sm:mr-3 shadow-sm transition-all duration-300 
+                <div className={`h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-lg mr-2 sm:mr-3 shadow-sm transition-all duration-300
                   group-hover:shadow-lg ${scrolled ? 'scale-90' : ''}`}>
-                  <img 
-                    src={HermaLogo} 
-                    alt="Herma Logo" 
+                  <img
+                    src={HermaLogo}
+                    alt="Herma Logo"
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -196,33 +99,27 @@ const Header = () => {
 
             {/* Desktop Navigation and Mobile Menu Toggle */}
             <div className="flex items-center gap-2">
-              {/* Desktop Navigation */}
-              {/* Commented out - navigation items removed */}
-              {/* <nav className="hidden md:flex items-center gap-2">
-                <div className="px-4 py-1.5 bg-[var(--secondary-bg)]/20 rounded-full flex items-center mr-2">
-                <a
-                    href="/upgrade"
-                    className="px-4 py-1 rounded-full text-[var(--text-color)] hover:text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/40 transition-colors duration-200"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavigation('/upgrade', e);
-                    }}
-                  >
-                    Pricing
-                  </a>
+              {/* Auth-aware nav links (desktop) */}
+              <nav className="hidden sm:flex items-center gap-2">
+                {isAuthenticated ? (
                   <Link
-                    to="#about"
-                    className="px-4 py-1 rounded-full text-[var(--text-color)] hover:text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/40 transition-colors duration-200"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      scrollToSection('about');
-                    }}
+                    to="/dashboard"
+                    className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                    style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    About
+                    Dashboard
                   </Link>
-                </div>
-              </nav> */}
-              
+                ) : (
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    Log in
+                  </Link>
+                )}
+              </nav>
+
               {/* Request Demo Button */}
               <button
                 onClick={handleRequestDemo}
@@ -236,7 +133,7 @@ const Header = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
-              
+
               {/* Mobile Menu Button */}
               <button
                 onClick={toggleMenu}
@@ -253,7 +150,7 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Menu Overlay - Completely separate from the header */}
+      {/* Menu Overlay */}
       <MenuOverlay
         isOpen={menuOpen}
         onClose={closeMenu}

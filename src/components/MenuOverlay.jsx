@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Commented out - no longer using download/auth functionality
-// import handleDownload from './handleDownload';
-// import { useAuth } from '../context/AuthContext';
-// import { getSubscriptionStatus } from '../services/stripeService';
+import { useHermaAuth } from '../context/HermaAuthContext';
 
 const MenuOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  // Commented out - no longer using auth functionality
-  // const { user } = useAuth();
-  
-  // Handle ESC key press to close the menu
+  const { isAuthenticated, user, logout } = useHermaAuth();
+
   useEffect(() => {
     const handleEscKey = (event) => {
       if (event.key === 'Escape') {
@@ -27,66 +22,27 @@ const MenuOverlay = ({ isOpen, onClose }) => {
     };
   }, [isOpen, onClose]);
 
-  // Close on outside click
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      onClose();
-    }
-  };
-
-  // Commented out - no longer using download functionality
-  // const handleDownloadClick = () => {
-  //   handleDownload(osType === 'mac' ? 'mac' : 'windows');
-  //   onClose();
-  // };
-
   const handleRequestDemo = () => {
     window.open('https://calendly.com/hermalocal/30min', '_blank');
     onClose();
   };
 
-  // Commented out - no longer using subscription functionality
-  // // Function to handle subscription button click
-  // const handleSubscriptionClick = async (e) => {
-  //   e.preventDefault();
-  //   onClose();
-  //
-  //   if (!user) {
-  //     // If not logged in, go to login page
-  //     navigate('/login');
-  //     return;
-  //   }
-
-  //   try {
-  //     // Check if user has a subscription
-  //     const subscriptionData = await getSubscriptionStatus(user.uid);
-  //
-  //     if (subscriptionData && subscriptionData.status === 'active') {
-  //       // User has an active subscription, go to subscription page
-  //       navigate('/success');
-  //     } else {
-  //       // User doesn't have a subscription, go to purchase page
-  //       navigate('/upgrade');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error checking subscription status:', error);
-  //     // If there's an error (like 404), assume user doesn't have subscription
-  //     navigate('/upgrade');
-  //   }
-  // };
+  const handleLogout = () => {
+    logout();
+    onClose();
+    navigate('/');
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/10 z-50 flex justify-end"
       onClick={handleOverlayClick}
     >
@@ -105,38 +61,67 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Commented out - all navigation items removed */}
-          {/* <nav className="flex flex-col gap-4">
-            <a
-              href="/subscription"
-              className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
-              onClick={handleSubscriptionClick}
-            >
-              Subscription
-            </a>
-            <Link
-              to="#features"
-              className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection('features');
-              }}
-            >
-              Features
-            </Link>
-            <Link
-              to="#about"
-              className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection('about');
-              }}
-            >
-              About
-            </Link>
-          </nav> */}
+          {/* Navigation links */}
+          <nav className="flex flex-col gap-2 mb-6">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  onClick={onClose}
+                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/dashboard/usage"
+                  onClick={onClose}
+                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900/70 transition-colors text-sm"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Usage
+                </Link>
+                <Link
+                  to="/dashboard/api-keys"
+                  onClick={onClose}
+                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900/70 transition-colors text-sm"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  API Keys
+                </Link>
+                <Link
+                  to="/dashboard/billing"
+                  onClick={onClose}
+                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900/70 transition-colors text-sm"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Billing
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={onClose}
+                className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+                style={{ fontFamily: 'var(--font-ui)' }}
+              >
+                Log in
+              </Link>
+            )}
+          </nav>
 
-          <div className="mt-auto pt-4 border-t border-gray-200">
+          <div className="mt-auto pt-4 border-t border-gray-200 space-y-3">
+            {isAuthenticated && user && (
+              <div className="px-4 mb-2">
+                <p className="text-sm font-medium text-blue-900 truncate" style={{ fontFamily: 'var(--font-ui)' }}>
+                  {user.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate" style={{ fontFamily: 'var(--font-ui)' }}>
+                  {user.email}
+                </p>
+              </div>
+            )}
+
             <button
               onClick={handleRequestDemo}
               className="w-full py-3 bg-blue-900 text-white font-medium rounded-lg flex items-center justify-center gap-2"
@@ -147,6 +132,16 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </button>
+
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="w-full py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                style={{ fontFamily: 'var(--font-ui)' }}
+              >
+                Log out
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -155,19 +150,3 @@ const MenuOverlay = ({ isOpen, onClose }) => {
 };
 
 export default MenuOverlay;
-
-// Add this to your global CSS file:
-/*
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out forwards;
-}
-*/

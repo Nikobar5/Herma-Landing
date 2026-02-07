@@ -7,22 +7,25 @@ import Hero from './components/Hero';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import ComplianceSection from './components/ComplianceSection';
-import About from './components/About';
 import Footer from './components/Footer';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Attributions from './pages/Attributions';
 import PurchasePage from './pages/PurchasePage';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Overview from './pages/dashboard/Overview';
+import Usage from './pages/dashboard/Usage';
+import ApiKeys from './pages/dashboard/ApiKeys';
+import Billing from './pages/dashboard/Billing';
+import ProtectedRoute from './components/ProtectedRoute';
+import { HermaAuthProvider } from './context/HermaAuthContext';
 import ReactGA from 'react-ga4';
 import FAQ from './components/FAQ';
 import HowToUse from './components/HowToUse';
 import Contact from './components/Contact';
 import { initializeAnalytics, trackAppUsers } from './utils/analytics';
 import SuccessPage from './components/SuccessPage';
-// Commented out - authentication functionality disabled
-// import AuthButton from './components/AuthButton';
-// import Login from './pages/Login';
-// import { useAuth } from './context/AuthContext';
 
 initializeAnalytics();
 // Initialize with enhanced configuration options
@@ -44,11 +47,11 @@ ReactGA.initialize('G-FSS7V9WPY5', {
 // Enhanced RouteTracker with additional data
 const RouteTracker = () => {
   const location = useLocation();
-  
+
   useEffect(() => {
     // Track app users on each page change
     trackAppUsers();
-    
+
     // Rest of your existing tracking code...
     ReactGA.send({
       hitType: "pageview",
@@ -57,7 +60,7 @@ const RouteTracker = () => {
       location: window.location.href,
       dimension1: window.innerWidth <= 768 ? 'mobile' : 'desktop'
     });
-    
+
     ReactGA.event({
       category: 'Navigation',
       action: 'PageView',
@@ -65,7 +68,7 @@ const RouteTracker = () => {
       value: 1
     });
   }, [location]);
-  
+
   // Enhanced user timing information
   useEffect(() => {
     // Track time on page when user leaves
@@ -80,15 +83,23 @@ const RouteTracker = () => {
         });
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [location]);
-  
+
   return null;
+};
+
+// Conditionally render Footer (hide on dashboard and login pages)
+const ConditionalFooter = () => {
+  const location = useLocation();
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname === '/login';
+  if (hideFooter) return null;
+  return <Footer />;
 };
 
 // Home component to wrap main page content
@@ -104,9 +115,6 @@ const Home = () => {
 };
 
 function App() {
-  // Commented out - authentication functionality disabled
-  // const { user } = useAuth();
-
   // Track app load performance
   useEffect(() => {
     // Report initial page load performance
@@ -114,7 +122,7 @@ function App() {
       if (window.performance) {
         const perfData = window.performance.timing;
         const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
-        
+
         ReactGA.event({
           category: 'Performance',
           action: 'PageLoad',
@@ -127,24 +135,36 @@ function App() {
 
   return (
     <Router>
-      <div className="app">
-        <RouteTracker />
-        <Header />
-        <Routes>
-          {/* Commented out - authentication functionality disabled */}
-          {/* <Route path="/login" element={<Login />} /> */}
-          <Route path="/" element={<Home />} />
-          <Route path="/upgrade" element={<PurchasePage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/attributions" element={<Attributions />} />
-          <Route path="/success" element={<SuccessPage />} />
-          <Route path="/cancel" element={<Home />} />
-        </Routes>
-        <Footer />
-        {/* Commented out - authentication functionality disabled */}
-        {/* <AuthButton /> */}
-      </div>
+      <HermaAuthProvider>
+        <div className="app">
+          <RouteTracker />
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Overview />} />
+              <Route path="usage" element={<Usage />} />
+              <Route path="api-keys" element={<ApiKeys />} />
+              <Route path="billing" element={<Billing />} />
+            </Route>
+            <Route path="/upgrade" element={<PurchasePage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/attributions" element={<Attributions />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/cancel" element={<Home />} />
+          </Routes>
+          <ConditionalFooter />
+        </div>
+      </HermaAuthProvider>
     </Router>
   );
 }
