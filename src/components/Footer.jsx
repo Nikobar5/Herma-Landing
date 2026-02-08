@@ -1,25 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const navigate = useNavigate();
   const [ctaRef, ctaVisible] = useScrollAnimation(0.1);
-
-  // Function to handle navigation and scroll to top
-  const handleNavigation = (path, e) => {
-    e.preventDefault();
-
-    // Navigate to the page
-    navigate(path);
-
-    // Scroll to top
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   const handleBookDemo = () => {
     window.open('https://calendly.com/hermalocal/30min', '_blank');

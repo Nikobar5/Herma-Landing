@@ -4,18 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **Herma Landing**, a React-based landing page for the Herma AI application with integrated Stripe payment processing and Firebase authentication. The project includes:
+This is **Herma Landing**, a React-based landing page and dashboard for the Herma AI application. The project uses a credits-based billing model (no subscriptions).
 
 - **Frontend**: React app with Tailwind CSS styling
-- **Backend Services**: Firebase Functions and alternative Express.js backend
-- **Payment Processing**: Stripe subscription management
-- **Authentication**: Firebase Auth with Google OAuth
-- **Database**: Firestore for user and subscription data
-- **Deployment**: Firebase Hosting
+- **Backend**: Herma API (FastAPI on Railway) — handles auth, billing, API proxy
+- **Payment Processing**: Stripe checkout via backend API (credit packages)
+- **Authentication**: JWT-based auth via Herma API (`HermaAuthContext`)
+- **Deployment**: Docker + Nginx on Railway
 
 ## Development Commands
 
-### Frontend (Main React App)
 ```bash
 # Development server
 npm start
@@ -25,124 +23,90 @@ npm run build
 
 # Run tests
 npm test
-
-# Deploy to Firebase
-npm run deploy
-
-# Deploy all Firebase services
-npm run deploy:all
-```
-
-### Backend Services
-```bash
-# Firebase Functions
-cd functions
-npm run serve          # Local emulator
-npm run deploy         # Deploy functions
-npm run lint           # ESLint
-npm run logs           # View function logs
-
-# Alternative Express Backend
-cd backend
-npm run dev           # Development with nodemon
-npm start            # Production server
 ```
 
 ## Architecture Overview
 
-### Multi-Service Architecture
-The project uses a hybrid architecture with both Firebase Functions and a standalone Express backend for flexibility:
-
-- **Primary**: Firebase Functions (`functions/index.js`) - Production backend
-- **Alternative**: Express.js server (`backend/server.js`) - Development/backup
+### Single Backend Architecture
+All backend functionality is provided by the Herma API (FastAPI) deployed on Railway at `REACT_APP_HERMA_API_URL`.
 
 ### Key Components Structure
 
 **Authentication Flow**:
-- `src/context/AuthContext.js` - Global auth state management
-- `src/firebase/auth.js` - Firebase auth functions
-- `src/pages/Login.jsx` - Login page with checkout redirect
-- `src/components/AuthButton.jsx` - Floating auth interface
+- `src/context/HermaAuthContext.js` — Global auth state (JWT in localStorage)
+- `src/services/hermaApi.js` — API client (login, signup, balance, checkout, etc.)
+- `src/pages/Login.jsx` — Login/signup page
+- `src/components/ProtectedRoute.jsx` — Route guard for authenticated pages
 
-**Payment Pipeline**:
-- `src/components/Hero.jsx` - Main upgrade button and flow initiation
-- `src/services/stripeService.js` - Stripe API integration
-- `src/components/SuccessPage.jsx` - Post-payment success handling
-- `functions/index.js` - Webhook processing and subscription management
+**Payment Pipeline (Credits)**:
+- `src/pages/PurchasePage.jsx` — Credit package selection ($10, $25, $50, $100)
+- `src/services/hermaApi.js` `createCheckout(packageId)` — Creates Stripe checkout session
+- `src/components/SuccessPage.jsx` — Post-payment confirmation with balance display
+- Backend handles Stripe webhooks and credits the account
+
+**Dashboard**:
+- `src/pages/Dashboard.jsx` — Main dashboard layout
+- `src/pages/dashboard/Overview.jsx` — Account overview
+- `src/pages/dashboard/Usage.jsx` — Usage statistics
+- `src/pages/dashboard/ApiKeys.jsx` — API key management
+- `src/pages/dashboard/Billing.jsx` — Billing history and balance
 
 **Routing & Navigation**:
-- `src/App.jsx` - HashRouter with main route definitions
-- Routes: `/`, `/login`, `/upgrade`, `/success`, `/privacy-policy`, `/terms-of-service`
+- `src/App.jsx` — HashRouter with main route definitions
+- Routes: `/`, `/login`, `/upgrade`, `/success`, `/cancel`, `/dashboard`, `/docs`, `/privacy-policy`, `/terms-of-service`, `/attributions`
 
 ### Data Flow Patterns
 
 **Authentication-Payment Integration**:
-1. User clicks upgrade → checks auth state
-2. If not authenticated → redirects to `/login?redirect=checkout`
-3. After login → automatically redirects to Stripe checkout
-4. Post-payment → webhook updates Firestore → success page shows status
+1. User clicks "Buy Credits" on `/upgrade`
+2. If not authenticated → redirects to `/login`
+3. After login → user selects credit package
+4. `hermaApi.createCheckout(packageId)` → backend creates Stripe Checkout Session → returns URL
+5. User redirected to Stripe → completes payment
+6. Stripe webhook → backend adds credits → user redirected to `/success`
 
 **State Management**:
-- Authentication: React Context (`AuthContext`)
-- No global state management library (Redux/Zustand)
+- Authentication: React Context (`HermaAuthContext`)
+- No global state management library
 - Local component state for UI interactions
 
 **API Communication**:
-- Frontend → Firebase Functions via fetch API
-- Stripe webhooks → Firebase Functions → Firestore updates
-- Real-time subscription status via Firestore listeners
+- Frontend → Herma API via `hermaApi.js` (JWT Bearer auth)
+- Stripe webhooks → Herma API → PostgreSQL credit ledger
 
 ## Environment Variables
 
 Required for development:
 ```bash
-# Stripe
-REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_...
-REACT_APP_STRIPE_MONTHLY_PRICE_ID=price_...
+REACT_APP_HERMA_API_URL=http://localhost:8000
+```
 
-# API Endpoints
-REACT_APP_FUNCTIONS_URL=https://...
-REACT_APP_API_URL=http://localhost:5000
-
-# Firebase (auto-configured)
+Production (set on Railway):
+```bash
+REACT_APP_HERMA_API_URL=https://routingtesting-production.up.railway.app
 ```
 
 ## Key File Locations
 
-**Payment Implementation**:
-- `src/services/stripeService.js` - Stripe checkout session creation
-- `functions/index.js` - Checkout session backend and webhook event processing
+**API Client**: `src/services/hermaApi.js` — All backend communication
+**Auth Context**: `src/context/HermaAuthContext.js` — Auth provider and `useHermaAuth` hook
+**Purchase Flow**: `src/pages/PurchasePage.jsx` — Credit package UI
+**Analytics**: `src/utils/analytics.js` — Google Analytics (react-ga4)
 
-**Authentication System**:
-- `src/context/AuthContext.js` - Auth provider and hooks
-- `src/firebase/auth.js` - Firebase auth utilities
-- `src/components/Hero.jsx` - Auth-payment integration (see `handleUpgradeClick`)
+## Deployment
 
-**Database Schema**:
-- `users` collection: `{uid, email, stripeCustomerId, subscriptionStatus, isPro, updatedAt}`
-- Subscription statuses: `free`, `active`, `payment_failed`, `canceled`
+- **Dockerfile** builds the React app and serves via Nginx
+- **nginx.conf** handles SPA routing (all paths → index.html)
+- **railway.toml** configures the Railway deployment
+- Deployed on Railway alongside the Herma API backend
 
 ## Payment Testing
 
 - Use Stripe test cards: `4242 4242 4242 4242` (success), `4000 0000 0000 0002` (decline)
-- Test webhook delivery in Stripe dashboard
-- Monitor Firebase Functions logs: `cd functions && npm run logs`
+- Verify credits appear in dashboard after successful payment
 
 ## Special Considerations
 
-**Windows-Specific Scripts**:
-- npm scripts use Windows syntax: `set NODE_OPTIONS=--openssl-legacy-provider`
-- Required for React Scripts 5.0.1 with current Node versions
-- If developing on macOS/Linux, change `set` to `export` in package.json scripts
-
 **HashRouter Usage**:
-- Uses HashRouter instead of BrowserRouter for Firebase Hosting compatibility
+- Uses HashRouter for SPA compatibility
 - All routes prefixed with `#` in URLs (e.g., `/#/login`, `/#/success`)
-
-**Dual Backend Support**:
-- Firebase Functions (`functions/`) for production (recommended)
-- Express backend (`backend/`) for development/local testing
-- Both implement identical API endpoints
-
-**Additional Documentation**:
-- `PAYMENT_PIPELINE.md` - Detailed payment flow documentation with modification guides

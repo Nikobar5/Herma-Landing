@@ -1,62 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-// Commented out - no longer using auth/payment functionality
-// import { useNavigate } from 'react-router-dom';
-// import { useAuth } from '../context/AuthContext';
-// import { createCheckoutSession } from '../services/stripeService';
-// import { loadStripe } from '@stripe/stripe-js';
-
-// const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+import React, { useRef } from 'react';
 
 const Hero = () => {
-  // Commented out - no longer using auth/payment functionality
-  // const navigate = useNavigate();
-  // const { user } = useAuth();
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
   const videoRef = useRef(null);
-
-  // Commented out - no longer using auth/payment flow
-  // const handleUpgradeClick = async () => {
-  //   if (!user) {
-  //     navigate('/login?redirect=checkout');
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   setError(null);
-
-  //   try {
-  //     const { session, error: sessionError } = await createCheckoutSession(user);
-
-  //     if (sessionError) {
-  //       throw new Error(sessionError);
-  //     }
-
-  //     const stripe = await stripePromise;
-  //     const { error } = await stripe.redirectToCheckout({
-  //       sessionId: session.id,
-  //     });
-
-  //     if (error) {
-  //       throw new Error(error.message);
-  //     }
-  //   } catch (error) {
-  //     console.error('Upgrade error:', error);
-  //     setError(error.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleBookDemo = () => {
     window.open('https://calendly.com/hermalocal/30min', '_blank');
-  };
-
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
@@ -106,26 +54,6 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* Commented out - See How It Works button removed */}
-              {/* <button
-                onClick={() => scrollToSection('how-it-works')}
-                className="group px-8 py-4 bg-white text-[var(--highlight-color)] font-semibold rounded-lg shadow-md hover:shadow-lg border-2 border-[var(--highlight-color)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--highlight-color)]/30 focus:ring-offset-2 w-full sm:w-auto sm:min-w-[200px]"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                <span className="relative flex items-center justify-center gap-2">
-                  See How It Works
-                  <svg className="w-5 h-5 transform group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </span>
-              </button> */}
-
-              {/* Commented out - error display no longer needed */}
-              {/* {error && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg max-w-md mx-auto">
-                  <p className="text-red-700 text-sm" style={{ fontFamily: 'var(--font-ui)' }}>{error}</p>
-                </div>
-              )} */}
             </div>
 
             {/* Demo Video Section */}

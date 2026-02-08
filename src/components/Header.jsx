@@ -8,15 +8,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useHermaAuth();
-
-  const safeNavigate = (path) => {
-    if (navigate) {
-      navigate(path);
-    } else {
-      window.location.href = path;
-    }
-  };
+  const { isAuthenticated } = useHermaAuth();
 
   useEffect(() => {
     const handleScroll = () => {

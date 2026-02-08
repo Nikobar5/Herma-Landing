@@ -157,7 +157,7 @@ const Attributions = () => {
             Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
           </p>
           <p>
-            <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">http://www.apache.org/licenses/LICENSE-2.0</a>
+            <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noreferrer">http://www.apache.org/licenses/LICENSE-2.0</a>
           </p>
           <p>
             Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
@@ -171,7 +171,7 @@ const Attributions = () => {
             Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
           </p>
           <p>
-            <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">http://www.apache.org/licenses/LICENSE-2.0</a>
+            <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noreferrer">http://www.apache.org/licenses/LICENSE-2.0</a>
           </p>
           <p>
             Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
@@ -242,7 +242,7 @@ const Attributions = () => {
             You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
           </p>
           <p>
-            To obtain a copy of the GNU Lesser General Public License: <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" target="_blank">https://www.gnu.org/licenses/lgpl-3.0.en.html</a>
+            To obtain a copy of the GNU Lesser General Public License: <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" target="_blank" rel="noreferrer">https://www.gnu.org/licenses/lgpl-3.0.en.html</a>
           </p>
           
           <h2>5. CUSTOM LICENSE COMPONENTS</h2>
@@ -258,7 +258,7 @@ const Attributions = () => {
             Meta's LLaMA models are released under a custom license that permits both research and commercial use but has specific restrictions. The license requires attribution, notes that the model weights can't be used to train other models, and includes requirements for safety and compliance with applicable laws. 
           </p>
           <p>
-            For the complete license terms, please visit: <a href="https://github.com/meta-llama/llama/blob/main/LICENSE" target="_blank">https://github.com/meta-llama/llama/blob/main/LICENSE</a>
+            For the complete license terms, please visit: <a href="https://github.com/meta-llama/llama/blob/main/LICENSE" target="_blank" rel="noreferrer">https://github.com/meta-llama/llama/blob/main/LICENSE</a>
           </p>
           
           <h2>6. ADDITIONAL INFORMATION</h2>
