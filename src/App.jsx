@@ -26,6 +26,7 @@ import HowToUse from './components/HowToUse';
 import Contact from './components/Contact';
 import { initializeAnalytics, trackAppUsers } from './utils/analytics';
 import SuccessPage from './components/SuccessPage';
+import Documentation from './pages/Documentation';
 
 initializeAnalytics();
 // Initialize with enhanced configuration options
@@ -155,6 +156,7 @@ function App() {
               <Route path="api-keys" element={<ApiKeys />} />
               <Route path="billing" element={<Billing />} />
             </Route>
+            <Route path="/docs" element={<Documentation />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />

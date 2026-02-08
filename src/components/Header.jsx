@@ -101,6 +101,13 @@ const Header = () => {
             <div className="flex items-center gap-2">
               {/* Auth-aware nav links (desktop) */}
               <nav className="hidden sm:flex items-center gap-2">
+                <Link
+                  to="/docs"
+                  className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Docs
+                </Link>
                 {isAuthenticated ? (
                   <Link
                     to="/dashboard"

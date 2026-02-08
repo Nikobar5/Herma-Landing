@@ -63,6 +63,14 @@ const MenuOverlay = ({ isOpen, onClose }) => {
 
           {/* Navigation links */}
           <nav className="flex flex-col gap-2 mb-6">
+            <Link
+              to="/docs"
+              onClick={onClose}
+              className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Docs
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link
