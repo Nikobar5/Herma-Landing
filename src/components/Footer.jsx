@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Footer = () => {
@@ -58,8 +59,12 @@ const Footer = () => {
       {/* Bottom Bar */}
       <footer className="bg-[var(--primary-bg)] border-t border-gray-200 py-6">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-600 text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-gray-600 text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
             <p>&copy; {currentYear} <span className="text-[var(--highlight-color)] font-medium">Herma</span> — Unifying all AI models across privacy levels</p>
+            <div className="flex items-center gap-4">
+              <Link to="/privacy-policy" className="text-gray-500 hover:text-[var(--highlight-color)] transition-colors">Privacy Policy</Link>
+              <Link to="/terms-of-service" className="text-gray-500 hover:text-[var(--highlight-color)] transition-colors">Terms of Service</Link>
+            </div>
           </div>
         </div>
       </footer>
