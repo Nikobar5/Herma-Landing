@@ -29,7 +29,7 @@ const CodeBlock = ({ children, language }) => {
 };
 
 const Documentation = () => {
-  const API_URL = 'https://routingtesting-production.up.railway.app';
+  const API_URL = 'https://herma.up.railway.app';
 
   return (
     <div className="min-h-screen bg-[var(--primary-bg)] pt-24 pb-16">

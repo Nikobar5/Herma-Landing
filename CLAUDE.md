@@ -83,7 +83,7 @@ REACT_APP_HERMA_API_URL=http://localhost:8000
 
 Production (set on Railway):
 ```bash
-REACT_APP_HERMA_API_URL=https://routingtesting-production.up.railway.app
+REACT_APP_HERMA_API_URL=https://herma.up.railway.app
 ```
 
 ## Key File Locations
