@@ -39,7 +39,7 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
             onKeyDown={handleKeyDown}
             placeholder="Message Herma..."
             rows={1}
-            className="flex-1 resize-none bg-transparent outline-none text-sm text-[var(--primary-bg)] placeholder-gray-400"
+            className="flex-1 resize-none bg-transparent outline-none text-sm text-gray-900 placeholder-gray-400"
             style={{ fontFamily: 'var(--font-body)', maxHeight: '200px' }}
           />
           {isStreaming ? (

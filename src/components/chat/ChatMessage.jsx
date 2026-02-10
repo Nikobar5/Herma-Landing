@@ -20,7 +20,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
     <div className={`flex gap-3 py-4 px-4 ${isUser ? 'justify-end' : ''}`}>
       {isAssistant && (
         <div
-          className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--secondary-bg)]/30 text-[var(--highlight-color)]"
+          className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--highlight-color)]/10 text-[var(--highlight-color)]"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           H
@@ -31,7 +31,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           className={`rounded-2xl px-4 py-3 ${
             isUser
               ? 'bg-[var(--highlight-color)] text-white rounded-br-md'
-              : 'bg-[var(--secondary-bg)]/10 text-[var(--primary-bg)] rounded-bl-md'
+              : 'bg-gray-50 text-gray-900 rounded-bl-md'
           }`}
         >
           {isUser ? (
@@ -39,7 +39,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
               {message.content}
             </p>
           ) : (
-            <div className="prose prose-sm max-w-none text-[var(--primary-bg)]" style={{ fontFamily: 'var(--font-body)' }}>
+            <div className="prose prose-sm max-w-none text-gray-900" style={{ fontFamily: 'var(--font-body)' }}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -61,7 +61,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                     }
                     return (
                       <code
-                        className="px-1.5 py-0.5 bg-[var(--secondary-bg)]/20 rounded text-sm"
+                        className="px-1.5 py-0.5 bg-gray-200/60 rounded text-sm text-gray-800"
                         style={{ fontFamily: 'var(--font-code)' }}
                         {...props}
                       >

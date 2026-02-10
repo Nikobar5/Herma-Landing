@@ -31,7 +31,7 @@ const ChatSidebar = ({
   };
 
   const sidebar = (
-    <div className="flex flex-col h-full bg-[var(--primary-bg)] text-white">
+    <div className="flex flex-col h-full bg-[var(--highlight-color)] text-white">
       {/* New Chat Button */}
       <div className="p-3">
         <button

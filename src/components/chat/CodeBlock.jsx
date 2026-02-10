@@ -14,7 +14,7 @@ const CodeBlock = ({ language, children }) => {
   };
 
   return (
-    <div className="rounded-lg overflow-hidden my-3 border border-[var(--secondary-bg)]/30">
+    <div className="rounded-lg overflow-hidden my-3 border border-gray-200">
       <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e2e] text-xs text-gray-400">
         <span style={{ fontFamily: 'var(--font-code)' }}>{language || 'text'}</span>
         <button
