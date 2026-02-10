@@ -80,7 +80,7 @@ const ChatPage = () => {
   const isEmpty = !activeConversation || messages.length === 0;
 
   return (
-    <div className="flex h-screen pt-16 bg-white">
+    <div className="flex h-screen pt-16 bg-[#F9F8F5]">
       <ChatSidebar
         conversations={conversations}
         activeId={activeId}
@@ -133,6 +133,7 @@ const ChatPage = () => {
           onSend={handleSend}
           onStop={stopGeneration}
           isStreaming={isStreaming}
+          hasMessages={!isEmpty}
         />
       </div>
 

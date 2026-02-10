@@ -17,10 +17,10 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   };
 
   return (
-    <div className={`flex gap-3 py-4 px-4 ${isUser ? 'justify-end' : ''}`}>
+    <div className={`flex gap-3 py-5 px-4 ${isUser ? 'justify-end' : ''} ${isAssistant ? 'border-b border-gray-100' : ''}`}>
       {isAssistant && (
         <div
-          className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--highlight-color)]/10 text-[var(--highlight-color)]"
+          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--highlight-color)] text-white shadow-sm"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           H
@@ -28,10 +28,10 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
       )}
       <div className={`group max-w-[80%] ${isUser ? 'order-first' : ''}`}>
         <div
-          className={`rounded-2xl px-4 py-3 ${
+          className={`${
             isUser
-              ? 'bg-[var(--highlight-color)] text-white rounded-br-md'
-              : 'bg-gray-50 text-gray-900 rounded-bl-md'
+              ? 'rounded-2xl px-4 py-3 bg-[var(--highlight-color)] text-white rounded-br-md shadow-sm'
+              : 'text-gray-900'
           }`}
         >
           {isUser ? (
@@ -45,20 +45,23 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                 components={{
                   code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
-                    if (!inline && match) {
+                    const content = String(children);
+                    // Block code: has language class or multiline content
+                    if (match) {
                       return (
                         <CodeBlock language={match[1]}>
-                          {String(children).replace(/\n$/, '')}
+                          {content.replace(/\n$/, '')}
                         </CodeBlock>
                       );
                     }
-                    if (!inline) {
+                    if (content.includes('\n')) {
                       return (
                         <CodeBlock language="">
-                          {String(children).replace(/\n$/, '')}
+                          {content.replace(/\n$/, '')}
                         </CodeBlock>
                       );
                     }
+                    // Inline code
                     return (
                       <code
                         className="px-1.5 py-0.5 bg-gray-200/60 rounded text-sm text-gray-800"
@@ -77,6 +80,15 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                   },
                   ol({ children }) {
                     return <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>;
+                  },
+                  h1({ children }) {
+                    return <h1 className="text-xl font-bold text-gray-900 mt-5 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h1>;
+                  },
+                  h2({ children }) {
+                    return <h2 className="text-lg font-bold text-gray-900 mt-4 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h2>;
+                  },
+                  h3({ children }) {
+                    return <h3 className="text-base font-semibold text-gray-900 mt-3 mb-1.5" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h3>;
                   },
                   a({ href, children }) {
                     return (
@@ -98,6 +110,12 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                   td({ children }) {
                     return <td className="border border-gray-300 px-3 py-1">{children}</td>;
                   },
+                  blockquote({ children }) {
+                    return <blockquote className="border-l-3 border-[var(--highlight-color)]/30 pl-4 my-2 text-gray-600 italic">{children}</blockquote>;
+                  },
+                  li({ children }) {
+                    return <li className="leading-relaxed">{children}</li>;
+                  },
                 }}
               >
                 {message.content}
@@ -111,24 +129,24 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
 
         {/* Actions */}
         {isAssistant && message.content && !isStreaming && (
-          <div className="flex items-center gap-2 mt-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-3 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <button
               onClick={handleCopy}
-              className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+              className="text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center gap-1.5 px-2 py-1 rounded-md transition-all"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              {copied ? 'Copied' : 'Copy'}
+              {copied ? 'Copied!' : 'Copy'}
             </button>
             {isLast && onRegenerate && (
               <button
                 onClick={onRegenerate}
-                className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+                className="text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center gap-1.5 px-2 py-1 rounded-md transition-all"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Regenerate
@@ -139,7 +157,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
       </div>
       {isUser && (
         <div
-          className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--highlight-color)] text-white"
+          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold bg-gradient-to-br from-[var(--highlight-color)] to-[var(--secondary-bg)] text-white shadow-sm"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           U
