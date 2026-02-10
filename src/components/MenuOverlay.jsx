@@ -74,6 +74,14 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             {isAuthenticated ? (
               <>
                 <Link
+                  to="/chat"
+                  onClick={onClose}
+                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Chat
+                </Link>
+                <Link
                   to="/dashboard"
                   onClick={onClose}
                   className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"

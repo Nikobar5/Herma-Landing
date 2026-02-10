@@ -130,3 +130,106 @@ export function createCheckout(packageId) {
     body: JSON.stringify({ package: packageId }),
   });
 }
+
+// --- Subscriptions ---
+
+export function createSubscriptionCheckout(plan) {
+  return authFetch('/portal/subscribe', {
+    method: 'POST',
+    body: JSON.stringify({ plan }),
+  });
+}
+
+export function getSubscriptionStatus() {
+  return authFetch('/portal/subscription');
+}
+
+export function manageSubscription() {
+  return authFetch('/portal/subscription/manage', {
+    method: 'POST',
+  });
+}
+
+export function getChatBalance() {
+  return authFetch('/portal/chat-balance');
+}
+
+// --- Portal Chat (streaming) ---
+
+export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {
+  const token = getToken();
+  if (!token) {
+    clearAuth();
+    window.location.hash = '#/login';
+    throw new Error('Not authenticated');
+  }
+
+  const res = await fetch(`${API_URL}/portal/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ messages, stream: true }),
+    signal,
+  });
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.hash = '#/login';
+    throw new Error('Session expired');
+  }
+  if (res.status === 402) {
+    throw new Error('Insufficient credits. Please add more credits to continue.');
+  }
+  if (res.status === 429) {
+    throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body.detail || `Request failed (${res.status})`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let lastUsage = null;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+        const data = trimmed.slice(6);
+        if (data === '[DONE]') {
+          onDone?.(lastUsage);
+          return;
+        }
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.usage) {
+            lastUsage = parsed.usage;
+          }
+          const delta = parsed.choices?.[0]?.delta;
+          if (delta?.content) {
+            onChunk?.(delta.content);
+          }
+        } catch {
+          // skip malformed JSON lines
+        }
+      }
+    }
+    onDone?.(lastUsage);
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    onError?.(err);
+    throw err;
+  }
+}

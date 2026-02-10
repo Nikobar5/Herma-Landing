@@ -18,6 +18,7 @@ import Overview from './pages/dashboard/Overview';
 import Usage from './pages/dashboard/Usage';
 import ApiKeys from './pages/dashboard/ApiKeys';
 import Billing from './pages/dashboard/Billing';
+import ChatPage from './pages/ChatPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HermaAuthProvider } from './context/HermaAuthContext';
 import ReactGA from 'react-ga4';
@@ -95,7 +96,7 @@ const RouteTracker = () => {
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname === '/login';
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname === '/login' || location.pathname === '/chat';
   if (hideFooter) return null;
   return <Footer />;
 };
@@ -153,6 +154,14 @@ function App() {
               <Route path="api-keys" element={<ApiKeys />} />
               <Route path="billing" element={<Billing />} />
             </Route>
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <ChatPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/docs" element={<Documentation />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />

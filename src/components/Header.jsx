@@ -101,13 +101,22 @@ const Header = () => {
                   Docs
                 </Link>
                 {isAuthenticated ? (
-                  <Link
-                    to="/dashboard"
-                    className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
-                    style={{ fontFamily: 'var(--font-ui)' }}
-                  >
-                    Dashboard
-                  </Link>
+                  <>
+                    <Link
+                      to="/chat"
+                      className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    >
+                      Chat
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    >
+                      Dashboard
+                    </Link>
+                  </>
                 ) : (
                   <Link
                     to="/login"
