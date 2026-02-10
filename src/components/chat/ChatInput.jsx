@@ -29,9 +29,9 @@ const ChatInput = ({ onSend, onStop, isStreaming, hasMessages }) => {
   };
 
   return (
-    <div className="flex-shrink-0 bg-[#F9F8F5] pt-2 pb-3">
+    <div className="flex-shrink-0 bg-[var(--bg-primary)] pt-2 pb-3">
       <div className="max-w-3xl mx-auto px-4">
-        <div className="flex items-end gap-2 bg-white rounded-2xl border border-gray-200/80 shadow-md px-4 py-2.5 focus-within:border-[var(--highlight-color)]/40 focus-within:shadow-lg transition-all">
+        <div className="flex items-end gap-2 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-secondary)] shadow-md px-4 py-2.5 focus-within:border-[var(--accent-primary)]/40 focus-within:shadow-lg transition-all">
           <textarea
             ref={textareaRef}
             value={value}
@@ -39,13 +39,13 @@ const ChatInput = ({ onSend, onStop, isStreaming, hasMessages }) => {
             onKeyDown={handleKeyDown}
             placeholder={hasMessages ? "Ask a follow-up..." : "Ask anything..."}
             rows={1}
-            className="flex-1 resize-none bg-transparent outline-none text-sm text-gray-900 placeholder-gray-400"
+            className="flex-1 resize-none bg-transparent outline-none text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
             style={{ fontFamily: 'var(--font-body)', maxHeight: '200px' }}
           />
           {isStreaming ? (
             <button
               onClick={onStop}
-              className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+              className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--error)] text-white flex items-center justify-center hover:opacity-90 transition-colors"
               aria-label="Stop generating"
             >
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -56,7 +56,7 @@ const ChatInput = ({ onSend, onStop, isStreaming, hasMessages }) => {
             <button
               onClick={handleSubmit}
               disabled={!value.trim()}
-              className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--highlight-color)] text-white flex items-center justify-center hover:opacity-90 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] flex items-center justify-center hover:bg-[var(--accent-hover)] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
               aria-label="Send message"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,7 +65,7 @@ const ChatInput = ({ onSend, onStop, isStreaming, hasMessages }) => {
             </button>
           )}
         </div>
-        <p className="text-[10px] text-gray-400 text-center mt-2" style={{ fontFamily: 'var(--font-ui)' }}>
+        <p className="text-[10px] text-[var(--text-tertiary)] text-center mt-2" style={{ fontFamily: 'var(--font-ui)' }}>
           Herma can make mistakes. Consider checking important information.
         </p>
       </div>

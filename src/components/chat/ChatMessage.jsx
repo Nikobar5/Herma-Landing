@@ -17,10 +17,10 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   };
 
   return (
-    <div className={`flex gap-3 py-5 px-4 ${isUser ? 'justify-end' : ''} ${isAssistant ? 'border-b border-gray-100' : ''}`}>
+    <div className={`flex gap-3 py-5 px-4 ${isUser ? 'justify-end' : ''} ${isAssistant ? 'border-b border-[var(--border-primary)]' : ''}`}>
       {isAssistant && (
         <div
-          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--highlight-color)] text-white shadow-sm"
+          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold bg-[var(--accent-primary)] text-[var(--text-inverse)] shadow-sm"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           H
@@ -30,8 +30,8 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
         <div
           className={`${
             isUser
-              ? 'rounded-2xl px-4 py-3 bg-[var(--highlight-color)] text-white rounded-br-md shadow-sm'
-              : 'text-gray-900'
+              ? 'rounded-2xl px-4 py-3 bg-[var(--accent-primary)] text-white rounded-br-md shadow-sm'
+              : 'text-[var(--text-primary)]'
           }`}
         >
           {isUser ? (
@@ -39,7 +39,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
               {message.content}
             </p>
           ) : (
-            <div className="prose prose-sm max-w-none text-gray-900" style={{ fontFamily: 'var(--font-body)' }}>
+            <div className="prose prose-sm prose-invert max-w-none text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-body)' }}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -64,7 +64,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                     // Inline code
                     return (
                       <code
-                        className="px-1.5 py-0.5 bg-gray-200/60 rounded text-sm text-gray-800"
+                        className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] rounded text-sm text-[var(--accent-primary)]"
                         style={{ fontFamily: 'var(--font-code)' }}
                         {...props}
                       >
@@ -82,17 +82,17 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                     return <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>;
                   },
                   h1({ children }) {
-                    return <h1 className="text-xl font-bold text-gray-900 mt-5 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h1>;
+                    return <h1 className="text-xl font-bold text-[var(--text-primary)] mt-5 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h1>;
                   },
                   h2({ children }) {
-                    return <h2 className="text-lg font-bold text-gray-900 mt-4 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h2>;
+                    return <h2 className="text-lg font-bold text-[var(--text-primary)] mt-4 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h2>;
                   },
                   h3({ children }) {
-                    return <h3 className="text-base font-semibold text-gray-900 mt-3 mb-1.5" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h3>;
+                    return <h3 className="text-base font-semibold text-[var(--text-primary)] mt-3 mb-1.5" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h3>;
                   },
                   a({ href, children }) {
                     return (
-                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--highlight-color)] underline">
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-primary)] underline">
                         {children}
                       </a>
                     );
@@ -100,18 +100,18 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                   table({ children }) {
                     return (
                       <div className="overflow-x-auto my-2">
-                        <table className="border-collapse border border-gray-300 text-sm">{children}</table>
+                        <table className="border-collapse border border-[var(--border-secondary)] text-sm">{children}</table>
                       </div>
                     );
                   },
                   th({ children }) {
-                    return <th className="border border-gray-300 px-3 py-1 bg-gray-100 font-semibold">{children}</th>;
+                    return <th className="border border-[var(--border-secondary)] px-3 py-1 bg-[var(--bg-tertiary)] font-semibold">{children}</th>;
                   },
                   td({ children }) {
-                    return <td className="border border-gray-300 px-3 py-1">{children}</td>;
+                    return <td className="border border-[var(--border-secondary)] px-3 py-1">{children}</td>;
                   },
                   blockquote({ children }) {
-                    return <blockquote className="border-l-3 border-[var(--highlight-color)]/30 pl-4 my-2 text-gray-600 italic">{children}</blockquote>;
+                    return <blockquote className="border-l-3 border-[var(--accent-primary)]/30 pl-4 my-2 text-[var(--text-secondary)] italic">{children}</blockquote>;
                   },
                   li({ children }) {
                     return <li className="leading-relaxed">{children}</li>;
@@ -121,7 +121,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                 {message.content}
               </ReactMarkdown>
               {isStreaming && isLast && (
-                <span className="inline-block w-0.5 h-4 bg-[var(--highlight-color)] animate-pulse ml-0.5 align-text-bottom" />
+                <span className="inline-block w-0.5 h-4 bg-[var(--accent-primary)] animate-pulse ml-0.5 align-text-bottom" />
               )}
             </div>
           )}
@@ -132,7 +132,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           <div className="flex items-center gap-3 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <button
               onClick={handleCopy}
-              className="text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center gap-1.5 px-2 py-1 rounded-md transition-all"
+              className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 px-2 py-1 rounded-md transition-all"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,7 +143,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
             {isLast && onRegenerate && (
               <button
                 onClick={onRegenerate}
-                className="text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center gap-1.5 px-2 py-1 rounded-md transition-all"
+                className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 px-2 py-1 rounded-md transition-all"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,7 +157,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
       </div>
       {isUser && (
         <div
-          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold bg-gradient-to-br from-[var(--highlight-color)] to-[var(--secondary-bg)] text-white shadow-sm"
+          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-hover)] text-white shadow-sm"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
           U

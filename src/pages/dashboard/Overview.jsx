@@ -35,7 +35,7 @@ const Overview = () => {
     return (
       <div className="flex items-center justify-center py-20">
         <div
-          className="text-sm text-[var(--highlight-color)]/60"
+          className="text-sm text-[var(--text-tertiary)]"
           style={{ fontFamily: 'var(--font-ui)' }}
         >
           Loading dashboard...
@@ -47,7 +47,7 @@ const Overview = () => {
   if (error) {
     return (
       <div
-        className="p-4 bg-red-50 border border-red-200 text-sm text-red-700"
+        className="p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 text-sm text-[var(--error)]"
         style={{ borderRadius: 'var(--radius-sm)' }}
       >
         {error}
@@ -77,7 +77,7 @@ const Overview = () => {
   return (
     <div>
       <h1
-        className="text-2xl font-bold text-[var(--highlight-color)] mb-6"
+        className="text-2xl font-bold text-[var(--text-primary)] mb-6"
         style={{ fontFamily: 'var(--font-heading)' }}
       >
         Overview
@@ -87,17 +87,17 @@ const Overview = () => {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-6"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-6"
             style={{ borderRadius: 'var(--radius-md)' }}
           >
             <p
-              className="text-sm text-[var(--highlight-color)]/60 mb-1"
+              className="text-sm text-[var(--text-tertiary)] mb-1"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               {card.label}
             </p>
             <p
-              className="text-2xl font-bold text-[var(--highlight-color)]"
+              className="text-2xl font-bold text-[var(--text-primary)]"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               {card.value}

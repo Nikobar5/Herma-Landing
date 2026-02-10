@@ -61,7 +61,7 @@ const ApiKeys = () => {
   return (
     <div>
       <h1
-        className="text-2xl font-bold text-[var(--highlight-color)] mb-6"
+        className="text-2xl font-bold text-[var(--text-primary)] mb-6"
         style={{ fontFamily: 'var(--font-heading)' }}
       >
         API Keys
@@ -69,11 +69,11 @@ const ApiKeys = () => {
 
       {/* Create new key */}
       <div
-        className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-6 mb-6"
+        className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-6 mb-6"
         style={{ borderRadius: 'var(--radius-md)' }}
       >
         <h2
-          className="text-sm font-medium text-[var(--highlight-color)] mb-3"
+          className="text-sm font-medium text-[var(--text-primary)] mb-3"
           style={{ fontFamily: 'var(--font-ui)' }}
         >
           Create a new API key
@@ -84,13 +84,13 @@ const ApiKeys = () => {
             value={newKeyName}
             onChange={(e) => setNewKeyName(e.target.value)}
             placeholder="Key name (e.g. production)"
-            className="flex-1 px-3 py-2 text-sm border border-[var(--secondary-bg)]/30 focus:outline-none focus:ring-2 focus:ring-[var(--highlight-color)]/30 focus:border-[var(--highlight-color)]"
+            className="flex-1 px-3 py-2 text-sm border border-[var(--border-secondary)] bg-[var(--bg-input)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:border-[var(--accent-primary)]"
             style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
           />
           <button
             type="submit"
             disabled={creating || !newKeyName.trim()}
-            className="px-4 py-2 text-sm font-medium text-white bg-[var(--highlight-color)] hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="px-4 py-2 text-sm font-medium text-[var(--text-inverse)] bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
             style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
           >
             {creating ? 'Creating...' : 'Create Key'}
@@ -101,25 +101,25 @@ const ApiKeys = () => {
       {/* New key display */}
       {newKeyRaw && (
         <div
-          className="mb-6 p-4 bg-green-50 border border-green-200"
+          className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30"
           style={{ borderRadius: 'var(--radius-sm)' }}
         >
           <p
-            className="text-sm font-medium text-green-800 mb-2"
+            className="text-sm font-medium text-emerald-400 mb-2"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             Your new API key (copy it now — it won't be shown again):
           </p>
           <div className="flex items-center gap-2">
             <code
-              className="flex-1 px-3 py-2 bg-white text-sm border border-green-300 break-all"
+              className="flex-1 px-3 py-2 bg-[var(--bg-tertiary)] text-sm text-[var(--text-primary)] border border-emerald-500/30 break-all"
               style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-code)' }}
             >
               {newKeyRaw}
             </code>
             <button
               onClick={handleCopyKey}
-              className="px-3 py-2 text-sm font-medium text-green-700 border border-green-300 hover:bg-green-100 transition-colors"
+              className="px-3 py-2 text-sm font-medium text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 transition-colors"
               style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
             >
               Copy
@@ -130,7 +130,7 @@ const ApiKeys = () => {
 
       {error && (
         <div
-          className="mb-4 p-4 bg-red-50 border border-red-200 text-sm text-red-700"
+          className="mb-4 p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 text-sm text-[var(--error)]"
           style={{ borderRadius: 'var(--radius-sm)' }}
         >
           {error}
@@ -139,31 +139,31 @@ const ApiKeys = () => {
 
       {/* Keys table */}
       <div
-        className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 overflow-hidden"
+        className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] overflow-hidden"
         style={{ borderRadius: 'var(--radius-md)' }}
       >
         <div className="overflow-x-auto">
           <table className="w-full text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
             <thead>
-              <tr className="bg-[var(--secondary-bg)]/10 border-b border-[var(--secondary-bg)]/20">
-                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Name</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Prefix</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Status</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Last Used</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Created</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Actions</th>
+              <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-primary)]">
+                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Name</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Prefix</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Last Used</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Created</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-[var(--highlight-color)]/60">
+                  <td colSpan={6} className="px-4 py-8 text-center text-[var(--text-tertiary)]">
                     Loading...
                   </td>
                 </tr>
               ) : keys.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-[var(--highlight-color)]/60">
+                  <td colSpan={6} className="px-4 py-8 text-center text-[var(--text-tertiary)]">
                     No API keys yet — create one above
                   </td>
                 </tr>
@@ -171,13 +171,13 @@ const ApiKeys = () => {
                 keys.map((key) => (
                   <tr
                     key={key.id}
-                    className="border-b border-[var(--secondary-bg)]/10 hover:bg-[var(--secondary-bg)]/5 transition-colors"
+                    className="border-b border-[var(--border-primary)] hover:bg-[var(--bg-hover)] transition-colors"
                   >
-                    <td className="px-4 py-3 text-[var(--highlight-color)]">
+                    <td className="px-4 py-3 text-[var(--text-primary)]">
                       {key.name}
                     </td>
                     <td
-                      className="px-4 py-3 text-[var(--highlight-color)]/80"
+                      className="px-4 py-3 text-[var(--text-secondary)]"
                       style={{ fontFamily: 'var(--font-code)' }}
                     >
                       {key.key_prefix}...
@@ -186,27 +186,27 @@ const ApiKeys = () => {
                       <span
                         className={`inline-flex px-2 py-0.5 text-xs font-medium ${
                           key.is_active
-                            ? 'bg-green-50 text-green-700 border border-green-200'
-                            : 'bg-red-50 text-red-700 border border-red-200'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-[var(--error)]/10 text-[var(--error)] border border-[var(--error)]/30'
                         }`}
                         style={{ borderRadius: '9999px' }}
                       >
                         {key.is_active ? 'Active' : 'Revoked'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[var(--highlight-color)]/60 text-sm">
+                    <td className="px-4 py-3 text-[var(--text-tertiary)] text-sm">
                       {key.last_used_at
                         ? new Date(key.last_used_at).toLocaleDateString()
                         : 'Never'}
                     </td>
-                    <td className="px-4 py-3 text-[var(--highlight-color)]/60 text-sm">
+                    <td className="px-4 py-3 text-[var(--text-tertiary)] text-sm">
                       {new Date(key.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
                       {key.is_active && (
                         <button
                           onClick={() => handleRevoke(key.id)}
-                          className="text-sm text-red-600 hover:text-red-800 transition-colors"
+                          className="text-sm text-[var(--error)] hover:text-[var(--error)]/80 transition-colors"
                           style={{ fontFamily: 'var(--font-ui)' }}
                         >
                           Revoke

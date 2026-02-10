@@ -13,14 +13,14 @@ const Footer = () => {
   return (
     <>
       {/* CTA Section */}
-      <section className="py-10 sm:py-12 md:py-16 bg-white">
+      <section className="py-10 sm:py-12 md:py-16 bg-[var(--bg-primary)]">
         <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div
             ref={ctaRef}
-            className={`bg-[#faf8f3] rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 md:p-12 border border-[#e8e4dc] animate-on-scroll animate-fade-up ${ctaVisible ? 'is-visible' : ''}`}
+            className={`bg-[var(--bg-secondary)] rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 md:p-12 border border-[var(--border-secondary)] animate-on-scroll animate-fade-up ${ctaVisible ? 'is-visible' : ''}`}
           >
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#242424] mb-6 sm:mb-8"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-6 sm:mb-8"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               Interested in trying it out?
@@ -28,7 +28,7 @@ const Footer = () => {
 
             <button
               onClick={handleBookDemo}
-              className="group relative overflow-hidden px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-[var(--highlight-color)] text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transform transition-all duration-200 hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-[var(--highlight-color)]/30 focus:ring-offset-2 mb-6 sm:mb-8"
+              className="group relative overflow-hidden px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)] mb-6 sm:mb-8"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -41,13 +41,13 @@ const Footer = () => {
             </button>
 
             <p
-              className="text-sm sm:text-base text-gray-600"
+              className="text-sm sm:text-base text-[var(--text-secondary)]"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               Or contact us at{' '}
               <a
                 href="mailto:hermalocal@gmail.com"
-                className="text-[var(--highlight-color)] hover:text-indigo-700 underline transition-colors"
+                className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] underline transition-colors"
               >
                 hermalocal@gmail.com
               </a>
@@ -57,13 +57,13 @@ const Footer = () => {
       </section>
 
       {/* Bottom Bar */}
-      <footer className="bg-[var(--primary-bg)] border-t border-gray-200 py-6">
+      <footer className="bg-[var(--bg-secondary)] border-t border-[var(--border-primary)] py-6">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-gray-600 text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
-            <p>&copy; {currentYear} <span className="text-[var(--highlight-color)] font-medium">Herma</span> — Unifying all AI models across privacy levels</p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[var(--text-tertiary)] text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
+            <p>&copy; {currentYear} <span className="text-[var(--accent-primary)] font-medium">Herma</span> — Unifying all AI models across privacy levels</p>
             <div className="flex items-center gap-4">
-              <Link to="/privacy-policy" className="text-gray-500 hover:text-[var(--highlight-color)] transition-colors">Privacy Policy</Link>
-              <Link to="/terms-of-service" className="text-gray-500 hover:text-[var(--highlight-color)] transition-colors">Terms of Service</Link>
+              <Link to="/privacy-policy" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">Privacy Policy</Link>
+              <Link to="/terms-of-service" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>

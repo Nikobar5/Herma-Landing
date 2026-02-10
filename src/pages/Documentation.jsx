@@ -32,19 +32,19 @@ const Documentation = () => {
   const API_URL = 'https://herma.up.railway.app';
 
   return (
-    <div className="min-h-screen bg-[var(--primary-bg)] pt-24 pb-16">
+    <div className="min-h-screen bg-[var(--bg-primary)] pt-24 pb-16">
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="mb-12">
           <h1
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--highlight-color)] mb-4 tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4 tracking-tight"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             API Documentation
           </h1>
           <p
-            className="text-lg text-[var(--highlight-color)]/70 max-w-2xl"
+            className="text-lg text-[var(--text-secondary)] max-w-2xl"
             style={{ fontFamily: 'var(--font-body)' }}
           >
             Herma provides an OpenAI-compatible API. Change two lines of code and you're up and running.
@@ -54,7 +54,7 @@ const Documentation = () => {
         {/* Quick Start */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-6"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-6"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Quick Start
@@ -62,51 +62,51 @@ const Documentation = () => {
 
           <div className="space-y-4">
             <div
-              className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-5 sm:p-6"
+              className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-5 sm:p-6"
               style={{ borderRadius: 'var(--radius-md)' }}
             >
               <h3
-                className="text-lg font-semibold text-[var(--highlight-color)] mb-2"
+                className="text-lg font-semibold text-[var(--text-primary)] mb-2"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 1. Create an account
               </h3>
-              <p className="text-[var(--highlight-color)]/70" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
                 Sign up at{' '}
-                <a href="/#/login" className="text-[var(--highlight-color)] underline font-medium">hermaai.com</a>{' '}
+                <a href="/#/login" className="text-[var(--accent-primary)] underline font-medium">hermaai.com</a>{' '}
                 and add credits from the Billing page.
               </p>
             </div>
 
             <div
-              className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-5 sm:p-6"
+              className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-5 sm:p-6"
               style={{ borderRadius: 'var(--radius-md)' }}
             >
               <h3
-                className="text-lg font-semibold text-[var(--highlight-color)] mb-2"
+                className="text-lg font-semibold text-[var(--text-primary)] mb-2"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 2. Generate an API key
               </h3>
-              <p className="text-[var(--highlight-color)]/70" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
                 Go to{' '}
-                <a href="/#/dashboard/api-keys" className="text-[var(--highlight-color)] underline font-medium">Dashboard &rarr; API Keys</a>{' '}
-                and create a key. It starts with <code className="bg-[var(--secondary-bg)]/20 px-1.5 py-0.5 rounded text-sm" style={{ fontFamily: 'var(--font-code)' }}>hk-</code>.
+                <a href="/#/dashboard/api-keys" className="text-[var(--accent-primary)] underline font-medium">Dashboard &rarr; API Keys</a>{' '}
+                and create a key. It starts with <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>hk-</code>.
                 Copy it immediately — you won't see it again.
               </p>
             </div>
 
             <div
-              className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-5 sm:p-6"
+              className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-5 sm:p-6"
               style={{ borderRadius: 'var(--radius-md)' }}
             >
               <h3
-                className="text-lg font-semibold text-[var(--highlight-color)] mb-2"
+                className="text-lg font-semibold text-[var(--text-primary)] mb-2"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 3. Make your first request
               </h3>
-              <p className="text-[var(--highlight-color)]/70 mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[var(--text-secondary)] mb-4" style={{ fontFamily: 'var(--font-body)' }}>
                 Use the endpoint below with your API key. That's it.
               </p>
             </div>
@@ -116,7 +116,7 @@ const Documentation = () => {
         {/* Base URL */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-4"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Base URL
@@ -127,16 +127,16 @@ const Documentation = () => {
         {/* Authentication */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-4"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Authentication
           </h2>
           <p
-            className="text-[var(--highlight-color)]/70 mb-4"
+            className="text-[var(--text-secondary)] mb-4"
             style={{ fontFamily: 'var(--font-body)' }}
           >
-            Include your API key as a Bearer token in the <code className="bg-[var(--secondary-bg)]/20 px-1.5 py-0.5 rounded text-sm" style={{ fontFamily: 'var(--font-code)' }}>Authorization</code> header:
+            Include your API key as a Bearer token in the <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>Authorization</code> header:
           </p>
           <CodeBlock>Authorization: Bearer hk-your-api-key</CodeBlock>
         </section>
@@ -144,77 +144,77 @@ const Documentation = () => {
         {/* Endpoint */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-4"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Chat Completions
           </h2>
 
           <div
-            className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-5 sm:p-6 mb-6"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-5 sm:p-6 mb-6"
             style={{ borderRadius: 'var(--radius-md)' }}
           >
             <div className="flex items-center gap-3 mb-3">
               <span
-                className="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded"
+                className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded"
                 style={{ fontFamily: 'var(--font-code)' }}
               >
                 POST
               </span>
-              <code className="text-sm text-[var(--highlight-color)]" style={{ fontFamily: 'var(--font-code)' }}>
+              <code className="text-sm text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-code)' }}>
                 /v1/chat/completions
               </code>
             </div>
-            <p className="text-[var(--highlight-color)]/70 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-[var(--text-secondary)] text-sm" style={{ fontFamily: 'var(--font-body)' }}>
               OpenAI-compatible chat completions endpoint. Supports streaming.
             </p>
           </div>
 
           {/* Request Body */}
           <h3
-            className="text-lg font-semibold text-[var(--highlight-color)] mb-3"
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             Request Body
           </h3>
 
           <div
-            className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 overflow-hidden mb-6"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] overflow-hidden mb-6"
             style={{ borderRadius: 'var(--radius-md)' }}
           >
             <table className="w-full text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
               <thead>
-                <tr className="bg-[var(--secondary-bg)]/10 border-b border-[var(--secondary-bg)]/20">
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Parameter</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Type</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Description</th>
+                <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-primary)]">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Parameter</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Type</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--secondary-bg)]/10">
+              <tbody className="divide-y divide-[var(--border-primary)]">
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm" style={{ fontFamily: 'var(--font-code)' }}>model</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/60">string</td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Use <code className="bg-[var(--secondary-bg)]/20 px-1 rounded text-xs" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code> for automatic model selection</td>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>model</code></td>
+                  <td className="px-4 py-3 text-[var(--text-tertiary)]">string</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Use <code className="bg-[var(--bg-tertiary)] px-1 rounded text-xs text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code> for automatic model selection</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm" style={{ fontFamily: 'var(--font-code)' }}>messages</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/60">array</td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Array of message objects with <code className="bg-[var(--secondary-bg)]/20 px-1 rounded text-xs" style={{ fontFamily: 'var(--font-code)' }}>role</code> and <code className="bg-[var(--secondary-bg)]/20 px-1 rounded text-xs" style={{ fontFamily: 'var(--font-code)' }}>content</code></td>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>messages</code></td>
+                  <td className="px-4 py-3 text-[var(--text-tertiary)]">array</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Array of message objects with <code className="bg-[var(--bg-tertiary)] px-1 rounded text-xs text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>role</code> and <code className="bg-[var(--bg-tertiary)] px-1 rounded text-xs text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>content</code></td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm" style={{ fontFamily: 'var(--font-code)' }}>stream</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/60">boolean</td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Set to <code className="bg-[var(--secondary-bg)]/20 px-1 rounded text-xs" style={{ fontFamily: 'var(--font-code)' }}>true</code> for streaming responses. Default: <code className="bg-[var(--secondary-bg)]/20 px-1 rounded text-xs" style={{ fontFamily: 'var(--font-code)' }}>false</code></td>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>stream</code></td>
+                  <td className="px-4 py-3 text-[var(--text-tertiary)]">boolean</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Set to <code className="bg-[var(--bg-tertiary)] px-1 rounded text-xs text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>true</code> for streaming responses. Default: <code className="bg-[var(--bg-tertiary)] px-1 rounded text-xs text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>false</code></td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm" style={{ fontFamily: 'var(--font-code)' }}>temperature</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/60">float</td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Sampling temperature (0-2). Optional</td>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>temperature</code></td>
+                  <td className="px-4 py-3 text-[var(--text-tertiary)]">float</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Sampling temperature (0-2). Optional</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm" style={{ fontFamily: 'var(--font-code)' }}>max_tokens</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/60">integer</td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Maximum tokens to generate. Optional</td>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>max_tokens</code></td>
+                  <td className="px-4 py-3 text-[var(--text-tertiary)]">integer</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Maximum tokens to generate. Optional</td>
                 </tr>
               </tbody>
             </table>
@@ -224,7 +224,7 @@ const Documentation = () => {
         {/* Examples */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-6"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-6"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Examples
@@ -232,7 +232,7 @@ const Documentation = () => {
 
           {/* cURL */}
           <h3
-            className="text-lg font-semibold text-[var(--highlight-color)] mb-3"
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             cURL
@@ -251,7 +251,7 @@ const Documentation = () => {
 
           {/* Python */}
           <h3
-            className="text-lg font-semibold text-[var(--highlight-color)] mb-3"
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             Python (OpenAI SDK)
@@ -276,7 +276,7 @@ print(response.choices[0].message.content)`}</CodeBlock>
 
           {/* Python Streaming */}
           <h3
-            className="text-lg font-semibold text-[var(--highlight-color)] mb-3"
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             Python (Streaming)
@@ -304,7 +304,7 @@ for chunk in stream:
 
           {/* JavaScript */}
           <h3
-            className="text-lg font-semibold text-[var(--highlight-color)] mb-3"
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             JavaScript (Node.js)
@@ -329,7 +329,7 @@ console.log(response.choices[0].message.content);`}</CodeBlock>
 
           {/* JavaScript fetch */}
           <h3
-            className="text-lg font-semibold text-[var(--highlight-color)] mb-3"
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             JavaScript (fetch)
@@ -357,13 +357,13 @@ console.log(data.choices[0].message.content);`}</CodeBlock>
         {/* Response Format */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-4"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Response Format
           </h2>
           <p
-            className="text-[var(--highlight-color)]/70 mb-4"
+            className="text-[var(--text-secondary)] mb-4"
             style={{ fontFamily: 'var(--font-body)' }}
           >
             Responses follow the standard OpenAI chat completion format:
@@ -394,38 +394,38 @@ console.log(data.choices[0].message.content);`}</CodeBlock>
         {/* Error Handling */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-4"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Error Codes
           </h2>
           <div
-            className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 overflow-hidden"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] overflow-hidden"
             style={{ borderRadius: 'var(--radius-md)' }}
           >
             <table className="w-full text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
               <thead>
-                <tr className="bg-[var(--secondary-bg)]/10 border-b border-[var(--secondary-bg)]/20">
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Code</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--highlight-color)]/60 uppercase tracking-wider">Meaning</th>
+                <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-primary)]">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Code</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Meaning</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--secondary-bg)]/10">
+              <tbody className="divide-y divide-[var(--border-primary)]">
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm font-bold" style={{ fontFamily: 'var(--font-code)' }}>401</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Invalid or missing API key</td>
+                  <td className="px-4 py-3"><code className="text-sm font-bold text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>401</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Invalid or missing API key</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm font-bold" style={{ fontFamily: 'var(--font-code)' }}>402</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Insufficient credits — add more from the Billing page</td>
+                  <td className="px-4 py-3"><code className="text-sm font-bold text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>402</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Insufficient credits — add more from the Billing page</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm font-bold" style={{ fontFamily: 'var(--font-code)' }}>429</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Rate limit exceeded — wait and retry</td>
+                  <td className="px-4 py-3"><code className="text-sm font-bold text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>429</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Rate limit exceeded — wait and retry</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3"><code className="text-sm font-bold" style={{ fontFamily: 'var(--font-code)' }}>500</code></td>
-                  <td className="px-4 py-3 text-[var(--highlight-color)]/70">Server error — retry or contact support</td>
+                  <td className="px-4 py-3"><code className="text-sm font-bold text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>500</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Server error — retry or contact support</td>
                 </tr>
               </tbody>
             </table>
@@ -435,23 +435,23 @@ console.log(data.choices[0].message.content);`}</CodeBlock>
         {/* Rate Limits */}
         <section className="mb-12">
           <h2
-            className="text-2xl font-bold text-[var(--highlight-color)] mb-4"
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Rate Limits
           </h2>
           <div
-            className="bg-white/90 backdrop-blur-sm border border-[var(--secondary-bg)]/20 p-5 sm:p-6"
+            className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-5 sm:p-6"
             style={{ borderRadius: 'var(--radius-md)' }}
           >
-            <ul className="space-y-2 text-[var(--highlight-color)]/70" style={{ fontFamily: 'var(--font-body)' }}>
+            <ul className="space-y-2 text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
               <li className="flex items-start gap-2">
-                <span className="text-[var(--highlight-color)] mt-1">&#8226;</span>
-                <span><strong style={{ fontFamily: 'var(--font-ui)' }}>60 requests per minute</strong> per API key</span>
+                <span className="text-[var(--accent-primary)] mt-1">&#8226;</span>
+                <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>60 requests per minute</strong> per API key</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[var(--highlight-color)] mt-1">&#8226;</span>
-                <span><strong style={{ fontFamily: 'var(--font-ui)' }}>5 concurrent requests</strong> per account</span>
+                <span className="text-[var(--accent-primary)] mt-1">&#8226;</span>
+                <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>5 concurrent requests</strong> per account</span>
               </li>
             </ul>
           </div>
@@ -460,7 +460,7 @@ console.log(data.choices[0].message.content);`}</CodeBlock>
         {/* CTA */}
         <section className="text-center">
           <div
-            className="bg-gradient-to-br from-[var(--highlight-color)] to-indigo-700 p-8 sm:p-10"
+            className="bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-hover)] p-8 sm:p-10"
             style={{ borderRadius: 'var(--radius-md)' }}
           >
             <h2
@@ -470,14 +470,14 @@ console.log(data.choices[0].message.content);`}</CodeBlock>
               Ready to get started?
             </h2>
             <p
-              className="text-blue-100 mb-6"
+              className="text-indigo-100 mb-6"
               style={{ fontFamily: 'var(--font-body)' }}
             >
               Create an account, add credits, and start making API calls in minutes.
             </p>
             <a
               href="/#/login"
-              className="inline-block px-8 py-3 bg-white text-[var(--highlight-color)] font-semibold rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-block px-8 py-3 bg-white text-[var(--accent-primary)] font-semibold rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               Get Started

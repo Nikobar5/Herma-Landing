@@ -41,15 +41,15 @@ const prompts = [
 
 const EmptyState = ({ onPromptClick }) => {
   return (
-    <div className="flex-1 min-h-0 flex flex-col items-center px-4 bg-[#F9F8F5] overflow-auto">
+    <div className="flex-1 min-h-0 flex flex-col items-center px-4 bg-[var(--bg-primary)] overflow-auto">
       <div className="flex-[3]" />
       <h1
-        className="text-4xl font-bold text-[var(--highlight-color)] mb-2 tracking-tight"
+        className="text-4xl font-bold text-[var(--accent-primary)] mb-2 tracking-tight"
         style={{ fontFamily: 'var(--font-heading)' }}
       >
         HΞRMΛ
       </h1>
-      <p className="text-gray-400 mb-6 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+      <p className="text-[var(--text-tertiary)] mb-6 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
         Ask anything — Herma routes to the best model for you.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
@@ -57,15 +57,15 @@ const EmptyState = ({ onPromptClick }) => {
           <button
             key={prompt.title}
             onClick={() => onPromptClick(prompt.text)}
-            className="text-left p-4 rounded-2xl bg-white border border-gray-200/60 shadow-sm hover:shadow-md hover:border-[var(--highlight-color)]/30 transition-all group"
+            className="text-left p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] shadow-sm hover:shadow-md hover:border-[var(--border-accent)] transition-all group"
           >
-            <div className="flex items-center gap-2 mb-1.5 text-[var(--highlight-color)]">
+            <div className="flex items-center gap-2 mb-1.5 text-[var(--accent-primary)]">
               {prompt.icon}
               <span className="text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
                 {prompt.title}
               </span>
             </div>
-            <p className="text-xs text-gray-500 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-xs text-[var(--text-tertiary)] leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
               {prompt.text}
             </p>
           </button>

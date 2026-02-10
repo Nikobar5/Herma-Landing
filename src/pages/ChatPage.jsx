@@ -80,7 +80,7 @@ const ChatPage = () => {
   const isEmpty = !activeConversation || messages.length === 0;
 
   return (
-    <div className="flex h-screen pt-16 bg-[#F9F8F5]">
+    <div className="flex h-screen pt-16 bg-[var(--bg-primary)]">
       <ChatSidebar
         conversations={conversations}
         activeId={activeId}
@@ -97,18 +97,18 @@ const ChatPage = () => {
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-2 border-b border-gray-200">
+        <div className="md:hidden flex items-center gap-3 px-4 py-2 border-b border-[var(--border-primary)]">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
             aria-label="Open sidebar"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
           <span
-            className="text-sm font-medium text-[var(--primary-bg)] truncate"
+            className="text-sm font-medium text-[var(--text-primary)] truncate"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             {activeConversation?.title || 'New chat'}

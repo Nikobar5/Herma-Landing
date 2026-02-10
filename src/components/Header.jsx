@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import HermaLogo from './Herma.jpeg';
 import MenuOverlay from './MenuOverlay';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
@@ -57,10 +56,10 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-sm transition-all duration-300 w-full
+        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-sm transition-all duration-300 w-full border-b
         ${scrolled
-          ? 'py-2 bg-[var(--primary-bg)]/95 shadow-lg'
-          : 'py-4 bg-[var(--primary-bg)]/80'
+          ? 'py-2 bg-[var(--bg-primary)]/95 shadow-lg border-[var(--border-primary)]'
+          : 'py-4 bg-[var(--bg-primary)]/80 border-transparent'
         }`}
       >
         <div className="w-full px-6 sm:px-8 lg:px-12">
@@ -72,10 +71,10 @@ const Header = () => {
                 className="flex items-center group"
                 aria-label="Home"
               >
-                <div className={`h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-lg mr-2 sm:mr-3 shadow-sm transition-all duration-300
+                <div className={`h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-lg mr-2 sm:mr-3 transition-all duration-300
                   group-hover:shadow-lg ${scrolled ? 'scale-90' : ''}`}>
                   <img
-                    src={HermaLogo}
+                    src="/herma-logo.png"
                     alt="Herma Logo"
                     className="h-full w-full object-cover"
                   />
@@ -83,7 +82,7 @@ const Header = () => {
                 <div className="flex flex-col items-start">
                   <span className={`font-bold tracking-wide transition-all duration-300
                     ${scrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}`}>
-                    <span className="text-[var(--highlight-color)]">HΞRMΛ</span>
+                    <span className="text-[var(--text-primary)]">HΞRMΛ</span>
                   </span>
                 </div>
               </Link>
@@ -95,7 +94,7 @@ const Header = () => {
               <nav className="hidden sm:flex items-center gap-2">
                 <Link
                   to="/docs"
-                  className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Docs
@@ -104,14 +103,14 @@ const Header = () => {
                   <>
                     <Link
                       to="/chat"
-                      className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     >
                       Chat
                     </Link>
                     <Link
                       to="/dashboard"
-                      className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     >
                       Dashboard
@@ -120,7 +119,7 @@ const Header = () => {
                 ) : (
                   <Link
                     to="/login"
-                    className="px-4 py-2 text-sm font-medium text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/20 rounded-full transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
                     Log in
@@ -131,10 +130,10 @@ const Header = () => {
               {/* Request Demo Button */}
               <button
                 onClick={handleRequestDemo}
-                className="hidden sm:flex px-5 py-2 bg-blue-900 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group"
+                className="hidden sm:flex px-5 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-full shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)] transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
-                <span className="text-sm text-white/90 group-hover:text-white transition-colors">
+                <span className="text-sm">
                   Request a Demo
                 </span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +144,7 @@ const Header = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={toggleMenu}
-                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-[var(--secondary-bg)]/20 text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/40 transition-colors focus:outline-none"
+                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] transition-colors focus:outline-none"
                 aria-expanded={menuOpen}
                 aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               >

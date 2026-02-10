@@ -43,16 +43,16 @@ const MenuOverlay = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/10 z-50 flex justify-end"
+      className="fixed inset-0 bg-black/40 z-50 flex justify-end"
       onClick={handleOverlayClick}
     >
-      <div className="w-64 bg-white shadow-xl h-full overflow-y-auto animate-slide-in-right">
+      <div className="w-64 bg-[var(--bg-secondary)] shadow-xl h-full overflow-y-auto animate-slide-in-right border-l border-[var(--border-primary)]">
         <div className="p-5 flex flex-col h-full">
           <div className="flex justify-between items-center mb-8">
-            <span className="text-xl font-bold text-blue-900">Menu</span>
+            <span className="text-xl font-bold text-[var(--text-primary)]">Menu</span>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500"
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--bg-hover)] text-[var(--text-tertiary)]"
               aria-label="Close menu"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,7 +66,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             <Link
               to="/docs"
               onClick={onClose}
-              className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+              className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               Docs
@@ -76,7 +76,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                 <Link
                   to="/chat"
                   onClick={onClose}
-                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+                  className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Chat
@@ -84,7 +84,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                 <Link
                   to="/dashboard"
                   onClick={onClose}
-                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+                  className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Dashboard
@@ -92,7 +92,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                 <Link
                   to="/dashboard/usage"
                   onClick={onClose}
-                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900/70 transition-colors text-sm"
+                  className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors text-sm"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Usage
@@ -100,7 +100,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                 <Link
                   to="/dashboard/api-keys"
                   onClick={onClose}
-                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900/70 transition-colors text-sm"
+                  className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors text-sm"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   API Keys
@@ -108,7 +108,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                 <Link
                   to="/dashboard/billing"
                   onClick={onClose}
-                  className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900/70 transition-colors text-sm"
+                  className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors text-sm"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Billing
@@ -118,7 +118,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
               <Link
                 to="/login"
                 onClick={onClose}
-                className="px-4 py-3 rounded-lg hover:bg-blue-50 text-blue-900 transition-colors"
+                className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 Log in
@@ -126,13 +126,13 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             )}
           </nav>
 
-          <div className="mt-auto pt-4 border-t border-gray-200 space-y-3">
+          <div className="mt-auto pt-4 border-t border-[var(--border-primary)] space-y-3">
             {isAuthenticated && user && (
               <div className="px-4 mb-2">
-                <p className="text-sm font-medium text-blue-900 truncate" style={{ fontFamily: 'var(--font-ui)' }}>
+                <p className="text-sm font-medium text-[var(--text-primary)] truncate" style={{ fontFamily: 'var(--font-ui)' }}>
                   {user.name}
                 </p>
-                <p className="text-xs text-gray-500 truncate" style={{ fontFamily: 'var(--font-ui)' }}>
+                <p className="text-xs text-[var(--text-tertiary)] truncate" style={{ fontFamily: 'var(--font-ui)' }}>
                   {user.email}
                 </p>
               </div>
@@ -140,7 +140,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
 
             <button
               onClick={handleRequestDemo}
-              className="w-full py-3 bg-blue-900 text-white font-medium rounded-lg flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-[var(--accent-hover)] transition-colors"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <span>Request a Demo</span>
@@ -152,7 +152,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             {isAuthenticated && (
               <button
                 onClick={handleLogout}
-                className="w-full py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="w-full py-2 text-sm text-[var(--error)] hover:bg-[var(--error)]/10 rounded-lg transition-colors"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 Log out

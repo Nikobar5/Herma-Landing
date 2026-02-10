@@ -21,16 +21,16 @@ const Dashboard = () => {
   const linkClass = ({ isActive }) =>
     `block px-4 py-2.5 text-sm font-medium transition-colors ${
       isActive
-        ? 'text-[var(--highlight-color)] bg-[var(--secondary-bg)]/15'
-        : 'text-[var(--highlight-color)]/60 hover:text-[var(--highlight-color)] hover:bg-[var(--secondary-bg)]/10'
+        ? 'text-[var(--accent-primary)] bg-[var(--accent-muted)]'
+        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
     }`;
 
   const linkStyle = { borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--primary-bg)' }}>
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:fixed md:inset-y-0 md:left-0 md:w-64 md:flex-col border-r border-[var(--secondary-bg)]/20 bg-white/80 backdrop-blur-sm pt-20">
+      <aside className="hidden md:flex md:fixed md:inset-y-0 md:left-0 md:w-64 md:flex-col border-r border-[var(--border-primary)] bg-[var(--bg-secondary)] pt-20">
         <div className="flex-1 flex flex-col px-4 py-6 gap-1">
           {navItems.map((item) => (
             <NavLink
@@ -45,17 +45,17 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="px-4 py-4 border-t border-[var(--secondary-bg)]/20">
+        <div className="px-4 py-4 border-t border-[var(--border-primary)]">
           {user && (
             <div className="mb-3 px-4">
               <p
-                className="text-sm font-medium text-[var(--highlight-color)] truncate"
+                className="text-sm font-medium text-[var(--text-primary)] truncate"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 {user.name}
               </p>
               <p
-                className="text-xs text-[var(--highlight-color)]/50 truncate"
+                className="text-xs text-[var(--text-tertiary)] truncate"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 {user.email}
@@ -64,7 +64,7 @@ const Dashboard = () => {
           )}
           <button
             onClick={handleLogout}
-            className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+            className="w-full px-4 py-2 text-sm text-[var(--error)] hover:bg-[var(--error)]/10 transition-colors text-left"
             style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
           >
             Log out
@@ -73,7 +73,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Mobile tabs */}
-      <div className="md:hidden fixed top-[60px] left-0 right-0 z-30 bg-white/90 backdrop-blur-sm border-b border-[var(--secondary-bg)]/20 px-2 py-1 flex gap-1 overflow-x-auto">
+      <div className="md:hidden fixed top-[60px] left-0 right-0 z-30 bg-[var(--bg-secondary)]/95 backdrop-blur-sm border-b border-[var(--border-primary)] px-2 py-1 flex gap-1 overflow-x-auto">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -82,8 +82,8 @@ const Dashboard = () => {
             className={({ isActive }) =>
               `px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'text-[var(--highlight-color)] bg-[var(--secondary-bg)]/15'
-                  : 'text-[var(--highlight-color)]/60 hover:text-[var(--highlight-color)]'
+                  ? 'text-[var(--accent-primary)] bg-[var(--accent-muted)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`
             }
             style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
