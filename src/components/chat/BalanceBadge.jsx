@@ -19,7 +19,7 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
     (hasFreeCredit ? parseFloat(chatFreeCredit) : 0);
 
   return (
-    <div className="px-4 py-3 border-t border-gray-200/50 space-y-2">
+    <div className="px-4 py-3 border-t border-white/10 space-y-2">
       {subscription && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -39,11 +39,11 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
       )}
 
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500" style={{ fontFamily: 'var(--font-ui)' }}>
+        <span className="text-xs text-white/60" style={{ fontFamily: 'var(--font-ui)' }}>
           Credits
         </span>
         <span
-          className="text-sm font-semibold text-[var(--highlight-color)]"
+          className="text-sm font-semibold text-white"
           style={{ fontFamily: 'var(--font-ui)' }}
         >
           ${totalAvailable.toFixed(2)}
@@ -52,10 +52,10 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
 
       {hasFreeCredit && (
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400" style={{ fontFamily: 'var(--font-ui)' }}>
+          <span className="text-xs text-white/40" style={{ fontFamily: 'var(--font-ui)' }}>
             Free chat credit
           </span>
-          <span className="text-xs text-gray-400" style={{ fontFamily: 'var(--font-ui)' }}>
+          <span className="text-xs text-white/40" style={{ fontFamily: 'var(--font-ui)' }}>
             ${parseFloat(chatFreeCredit).toFixed(2)}
           </span>
         </div>

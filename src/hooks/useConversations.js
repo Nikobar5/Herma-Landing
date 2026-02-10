@@ -31,9 +31,12 @@ export function useConversations() {
 
   const activeConversation = conversations.find((c) => c.id === activeId) || null;
 
-  const persist = useCallback((updated) => {
-    setConversations(updated);
-    saveConversations(updated);
+  const update = useCallback((fn) => {
+    setConversations((prev) => {
+      const next = fn(prev);
+      saveConversations(next);
+      return next;
+    });
   }, []);
 
   const createConversation = useCallback(() => {
@@ -44,81 +47,85 @@ export function useConversations() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    const updated = [conv, ...conversations].slice(0, MAX_CONVERSATIONS);
-    persist(updated);
+    update((prev) => [conv, ...prev].slice(0, MAX_CONVERSATIONS));
     setActiveId(conv.id);
     return conv;
-  }, [conversations, persist]);
+  }, [update]);
 
   const deleteConversation = useCallback(
     (id) => {
-      const updated = conversations.filter((c) => c.id !== id);
-      persist(updated);
-      if (activeId === id) {
-        setActiveId(updated.length > 0 ? updated[0].id : null);
-      }
+      update((prev) => prev.filter((c) => c.id !== id));
+      setActiveId((prevId) => {
+        if (prevId !== id) return prevId;
+        const remaining = conversations.filter((c) => c.id !== id);
+        return remaining.length > 0 ? remaining[0].id : null;
+      });
     },
-    [conversations, activeId, persist]
+    [conversations, update]
   );
 
   const renameConversation = useCallback(
     (id, title) => {
-      const updated = conversations.map((c) =>
-        c.id === id ? { ...c, title, updatedAt: new Date().toISOString() } : c
+      update((prev) =>
+        prev.map((c) =>
+          c.id === id ? { ...c, title, updatedAt: new Date().toISOString() } : c
+        )
       );
-      persist(updated);
     },
-    [conversations, persist]
+    [update]
   );
 
   const addMessage = useCallback(
     (conversationId, message) => {
-      const updated = conversations.map((c) => {
-        if (c.id !== conversationId) return c;
-        const messages = [...c.messages, message];
-        const title =
-          c.messages.length === 0 && message.role === 'user'
-            ? titleFromContent(message.content)
-            : c.title;
-        return { ...c, messages, title, updatedAt: new Date().toISOString() };
-      });
-      persist(updated);
+      update((prev) =>
+        prev.map((c) => {
+          if (c.id !== conversationId) return c;
+          const messages = [...c.messages, message];
+          const title =
+            c.messages.length === 0 && message.role === 'user'
+              ? titleFromContent(message.content)
+              : c.title;
+          return { ...c, messages, title, updatedAt: new Date().toISOString() };
+        })
+      );
     },
-    [conversations, persist]
+    [update]
   );
 
   const updateLastMessage = useCallback(
     (conversationId, updater) => {
-      const updated = conversations.map((c) => {
-        if (c.id !== conversationId || c.messages.length === 0) return c;
-        const messages = [...c.messages];
-        const last = { ...messages[messages.length - 1] };
-        if (typeof updater === 'function') {
-          Object.assign(last, updater(last));
-        } else {
-          Object.assign(last, updater);
-        }
-        messages[messages.length - 1] = last;
-        return { ...c, messages, updatedAt: new Date().toISOString() };
-      });
-      persist(updated);
+      update((prev) =>
+        prev.map((c) => {
+          if (c.id !== conversationId || c.messages.length === 0) return c;
+          const messages = [...c.messages];
+          const last = { ...messages[messages.length - 1] };
+          if (typeof updater === 'function') {
+            Object.assign(last, updater(last));
+          } else {
+            Object.assign(last, updater);
+          }
+          messages[messages.length - 1] = last;
+          return { ...c, messages, updatedAt: new Date().toISOString() };
+        })
+      );
     },
-    [conversations, persist]
+    [update]
   );
 
   const removeLastMessage = useCallback(
     (conversationId) => {
-      const updated = conversations.map((c) => {
-        if (c.id !== conversationId || c.messages.length === 0) return c;
-        return {
-          ...c,
-          messages: c.messages.slice(0, -1),
-          updatedAt: new Date().toISOString(),
-        };
-      });
-      persist(updated);
+      update((prev) =>
+        prev.map((c) => {
+          if (c.id !== conversationId || c.messages.length === 0) return c;
+          return {
+            ...c,
+            messages: c.messages.slice(0, -1),
+            updatedAt: new Date().toISOString(),
+          };
+        })
+      );
     },
-    [conversations, persist]
+    [update]
   );
 
   return {
