@@ -19,18 +19,18 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
     (hasFreeCredit ? parseFloat(chatFreeCredit) : 0);
 
   return (
-    <div className="px-4 py-3 border-t border-white/10 space-y-2">
+    <div className="px-4 py-3 space-y-3">
       {subscription && (
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
-            <span className="text-xs font-medium text-white/90 capitalize" style={{ fontFamily: 'var(--font-ui)' }}>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
+            <span className="text-xs font-medium text-[var(--text-primary)] capitalize" style={{ fontFamily: 'var(--font-ui)' }}>
               {subscription.plan} Plan
             </span>
           </div>
           <button
             onClick={handleManage}
-            className="text-xs text-[var(--highlight-color)] hover:underline"
+            className="text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             Manage
@@ -39,24 +39,24 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
       )}
 
       <div className="flex items-center justify-between">
-        <span className="text-xs text-white/60" style={{ fontFamily: 'var(--font-ui)' }}>
-          Credits
+        <span className="text-xs text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+          Available Credits
         </span>
         <span
-          className="text-sm font-semibold text-white"
-          style={{ fontFamily: 'var(--font-ui)' }}
+          className="text-sm font-bold text-[var(--text-primary)]"
+          style={{ fontFamily: 'var(--font-heading)' }}
         >
           ${totalAvailable.toFixed(2)}
         </span>
       </div>
 
       {hasFreeCredit && (
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-white/40" style={{ fontFamily: 'var(--font-ui)' }}>
-            Free chat credit
+        <div className="flex items-center justify-between pt-1 border-t border-[var(--border-primary)]/50">
+          <span className="text-[10px] text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+            Includes free credit
           </span>
-          <span className="text-xs text-white/40" style={{ fontFamily: 'var(--font-ui)' }}>
-            ${parseFloat(chatFreeCredit).toFixed(2)}
+          <span className="text-[10px] text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-code)' }}>
+            +${parseFloat(chatFreeCredit).toFixed(2)}
           </span>
         </div>
       )}
