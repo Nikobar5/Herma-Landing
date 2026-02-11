@@ -70,16 +70,14 @@ const EmptyState = ({ onSend, isStreaming, onStop }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 bg-[var(--bg-primary)] overflow-auto">
       <div className="w-full max-w-2xl flex flex-col items-center">
-        {/* Logo + Greeting */}
-        <h1 className="herma-wordmark text-4xl text-[var(--accent-primary)] mb-3">
-          HΞRMΛ
-        </h1>
-        <p
-          className="text-[var(--text-tertiary)] mb-8 text-base"
-          style={{ fontFamily: 'var(--font-ui)' }}
+        {/* Logo + Big Greeting */}
+        <img src="/herma-logo.png" alt="Herma" className="w-12 h-12 rounded-xl mb-5 shadow-lg" />
+        <h1
+          className="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-8 text-center"
+          style={{ fontFamily: 'var(--font-heading)' }}
         >
-          How can I help you today?
-        </p>
+          What can I help you with?
+        </h1>
 
         {/* Large Input Area */}
         <div className="w-full rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-tertiary)]/80 backdrop-blur-sm shadow-lg focus-within:border-[var(--accent-primary)] focus-within:ring-2 focus-within:ring-[var(--accent-primary)]/10 transition-all">
@@ -88,7 +86,7 @@ const EmptyState = ({ onSend, isStreaming, onStop }) => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask anything..."
+            placeholder="How can I help you today?"
             rows={3}
             className="w-full resize-none bg-transparent outline-none text-base text-[var(--text-primary)] placeholder-[var(--text-tertiary)] p-4 pb-2"
             style={{ fontFamily: 'var(--font-ui)', maxHeight: '200px' }}

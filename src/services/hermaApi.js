@@ -305,8 +305,11 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal } 
             lastUsage = parsed.usage;
           }
           const delta = parsed.choices?.[0]?.delta;
-          if (delta?.content) {
-            onChunk?.(delta.content);
+          const reasoning = delta?.reasoning || delta?.reasoning_content;
+          if (reasoning) {
+            onChunk?.({ type: 'reasoning', content: reasoning });
+          } else if (delta?.content) {
+            onChunk?.({ type: 'content', content: delta.content });
           }
         } catch {
           // skip malformed JSON lines

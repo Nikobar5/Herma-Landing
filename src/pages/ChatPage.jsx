@@ -114,12 +114,15 @@ const ChatPage = () => {
             </svg>
           </button>
 
-          {/* HERMA wordmark — navigates to home */}
+          {/* Herma logo + wordmark — navigates to home */}
           <button
             onClick={() => navigate('/')}
-            className="herma-wordmark text-base text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            HERMA
+            <img src="/herma-logo.png" alt="Herma" className="w-6 h-6 rounded-md" />
+            <span className="herma-wordmark text-base text-[var(--text-primary)]">
+              HERMA
+            </span>
           </button>
 
           <div className="flex-1" />

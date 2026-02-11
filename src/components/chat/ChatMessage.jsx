@@ -1,7 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
+
+const ThinkingSection = ({ reasoning, isStreaming }) => {
+  const [expanded, setExpanded] = useState(true);
+  const [autoCollapsed, setAutoCollapsed] = useState(false);
+
+  // Auto-collapse when streaming ends (content has started)
+  useEffect(() => {
+    if (!isStreaming && !autoCollapsed) {
+      setExpanded(false);
+      setAutoCollapsed(true);
+    }
+  }, [isStreaming, autoCollapsed]);
+
+  const wordCount = reasoning ? reasoning.split(/\s+/).filter(Boolean).length : 0;
+
+  return (
+    <div className="mb-3">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-2 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+        style={{ fontFamily: 'var(--font-ui)' }}
+      >
+        <svg
+          className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-90' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        <span className="flex items-center gap-1.5">
+          {isStreaming && (
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse" />
+          )}
+          Thinking{isStreaming ? '...' : ''}
+          {!expanded && !isStreaming && (
+            <span className="text-xs text-[var(--text-tertiary)] opacity-60 ml-1">
+              ({wordCount} words)
+            </span>
+          )}
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="mt-2 ml-5 pl-3 border-l-2 border-[var(--border-secondary)] text-sm text-[var(--text-tertiary)] leading-relaxed whitespace-pre-wrap" style={{ fontFamily: 'var(--font-ui)' }}>
+          {reasoning}
+          {isStreaming && (
+            <span className="inline-block w-1.5 h-3 bg-[var(--text-tertiary)] animate-pulse ml-0.5 rounded-sm align-middle opacity-50" />
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   const [copied, setCopied] = useState(false);
@@ -35,6 +89,14 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
+          {/* Collapsible thinking/reasoning section */}
+          {isAssistant && message.reasoning && (
+            <ThinkingSection
+              reasoning={message.reasoning}
+              isStreaming={isStreaming && isLast && !message.content}
+            />
+          )}
+
           <div className={`prose prose-base prose-invert max-w-none text-[var(--text-primary)]`} style={{ fontFamily: isUser ? 'var(--font-ui)' : 'var(--font-body)' }}>
             {isUser ? (
               <p className="whitespace-pre-wrap text-lg font-medium leading-relaxed">{message.content}</p>
@@ -137,7 +199,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
               </ReactMarkdown>
             )}
 
-            {isStreaming && isLast && (
+            {isStreaming && isLast && message.content && (
               <span className="inline-block w-2 h-4 bg-[var(--accent-primary)] animate-pulse ml-1 rounded-sm align-middle" />
             )}
           </div>
