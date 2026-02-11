@@ -44,8 +44,7 @@ const EmptyState = ({ onPromptClick }) => {
     <div className="flex-1 min-h-0 flex flex-col items-center px-4 bg-[var(--bg-primary)] overflow-auto">
       <div className="flex-[3]" />
       <h1
-        className="text-4xl font-bold text-[var(--accent-primary)] mb-2 tracking-tight"
-        style={{ fontFamily: 'var(--font-heading)' }}
+        className="text-4xl text-[var(--accent-primary)] mb-2 herma-wordmark"
       >
         HΞRMΛ
       </h1>

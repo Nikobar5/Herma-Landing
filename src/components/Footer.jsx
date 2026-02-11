@@ -60,7 +60,7 @@ const Footer = () => {
       <footer className="bg-[var(--bg-secondary)] border-t border-[var(--border-primary)] py-6">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[var(--text-tertiary)] text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
-            <p>&copy; {currentYear} <span className="text-[var(--accent-primary)] font-medium">Herma</span> — Unifying all AI models across privacy levels</p>
+            <p>&copy; {currentYear} <span className="text-[var(--accent-primary)] font-medium tracking-widest">HERMA</span> — Unifying all AI models across privacy levels</p>
             <div className="flex items-center gap-4">
               <Link to="/privacy-policy" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">Privacy Policy</Link>
               <Link to="/terms-of-service" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">Terms of Service</Link>

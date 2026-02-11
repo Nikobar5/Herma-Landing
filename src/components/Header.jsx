@@ -80,7 +80,7 @@ const Header = () => {
                   />
                 </div>
                 <div className="flex flex-col items-start">
-                  <span className={`font-bold tracking-wide transition-all duration-300
+                  <span className={`herma-wordmark transition-all duration-300
                     ${scrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}`}>
                     <span className="text-[var(--text-primary)]">HΞRMΛ</span>
                   </span>

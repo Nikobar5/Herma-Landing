@@ -66,7 +66,7 @@ const Hero = () => {
                     <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   </div>
-                  <span className="text-[var(--text-tertiary)] text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Herma Platform Demo</span>
+                  <span className="text-[var(--text-tertiary)] text-sm font-medium tracking-wide" style={{ fontFamily: 'var(--font-ui)' }}>HERMA Platform Demo</span>
                 </div>
 
                 {/* Video Container */}
