@@ -46,7 +46,20 @@ export default function useMemories() {
 
   const editMemory = useCallback(async (id, content, category) => {
     const updated = await updateMemory(id, { content, category });
-    setMemories((prev) => prev.map((m) => (m.id === id ? updated : m)));
+    setMemories((prev) => {
+      const old = prev.find((m) => m.id === id);
+      if (old && category && old.category !== category) {
+        setStats((s) => ({
+          ...s,
+          by_category: {
+            ...s.by_category,
+            [old.category]: Math.max(0, (s.by_category[old.category] || 1) - 1),
+            [category]: (s.by_category[category] || 0) + 1,
+          },
+        }));
+      }
+      return prev.map((m) => (m.id === id ? updated : m));
+    });
     return updated;
   }, []);
 
@@ -56,7 +69,7 @@ export default function useMemories() {
       const removed = prev.find((m) => m.id === id);
       if (removed) {
         setStats((s) => ({
-          total_memories: s.total_memories - 1,
+          total_memories: Math.max(0, s.total_memories - 1),
           by_category: {
             ...s.by_category,
             [removed.category]: Math.max(0, (s.by_category[removed.category] || 1) - 1),
