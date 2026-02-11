@@ -93,6 +93,13 @@ const RouteTracker = () => {
   return null;
 };
 
+// Conditionally render Header (hide on chat page — chat has its own top bar)
+const ConditionalHeader = () => {
+  const location = useLocation();
+  if (location.pathname === '/chat') return null;
+  return <Header />;
+};
+
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
@@ -137,7 +144,7 @@ function App() {
       <HermaAuthProvider>
         <div className="app">
           <RouteTracker />
-          <Header />
+          <ConditionalHeader />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

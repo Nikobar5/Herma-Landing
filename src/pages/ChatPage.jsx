@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useConversations } from '../hooks/useConversations';
 import { useChat } from '../hooks/useChat';
 import { useAutoScroll } from '../hooks/useAutoScroll';
@@ -10,6 +11,8 @@ import EmptyState from '../components/chat/EmptyState';
 import PaywallModal from '../components/chat/PaywallModal';
 
 const ChatPage = () => {
+  const navigate = useNavigate();
+
   const {
     conversations,
     activeConversation,
@@ -42,6 +45,7 @@ const ChatPage = () => {
   const [chatFreeCredit, setChatFreeCredit] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -56,7 +60,6 @@ const ChatPage = () => {
     fetchBalance();
   }, [fetchBalance]);
 
-  // Refresh balance after each completed response
   useEffect(() => {
     if (!isStreaming) {
       fetchBalance();
@@ -70,17 +73,18 @@ const ChatPage = () => {
     [sendMessage]
   );
 
-  const handlePromptClick = useCallback(
-    (text) => {
-      sendMessage(text);
-    },
-    [sendMessage]
-  );
-
   const isEmpty = !activeConversation || messages.length === 0;
 
+  const handleSidebarToggle = () => {
+    if (window.innerWidth < 768) {
+      setSidebarOpen(true);
+    } else {
+      setSidebarCollapsed((prev) => !prev);
+    }
+  };
+
   return (
-    <div className="flex h-screen pt-28 bg-[var(--bg-primary)] overflow-hidden">
+    <div className="flex h-screen bg-[var(--bg-primary)] overflow-hidden">
       <ChatSidebar
         conversations={conversations}
         activeId={activeId}
@@ -93,58 +97,84 @@ const ChatPage = () => {
         subscription={subscription}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        collapsed={sidebarCollapsed}
       />
 
       <div className="flex-1 flex flex-col min-w-0 relative h-full">
-        {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] shadow-sm z-20">
+        {/* Chat top bar */}
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] z-20 flex-shrink-0">
+          {/* Sidebar toggle */}
           <button
-            onClick={() => setSidebarOpen(true)}
+            onClick={handleSidebarToggle}
             className="p-2 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
-            aria-label="Open sidebar"
+            aria-label="Toggle sidebar"
           >
             <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
-          <span
-            className="text-base font-bold text-[var(--text-primary)] truncate"
-            style={{ fontFamily: 'var(--font-ui)' }}
+
+          {/* HERMA wordmark — navigates to home */}
+          <button
+            onClick={() => navigate('/')}
+            className="herma-wordmark text-base text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors"
           >
-            {activeConversation?.title || 'New chat'}
-          </span>
+            HERMA
+          </button>
+
+          <div className="flex-1" />
+
+          {/* New Chat button */}
+          <button
+            onClick={createConversation}
+            className="p-2 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
+            aria-label="New chat"
+            title="New chat"
+          >
+            <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+          </button>
         </div>
 
-        {/* Main Content Area */}
+        {/* Main content area */}
         <div className="flex-1 overflow-hidden relative flex flex-col">
           {isEmpty ? (
-            <div className="flex-1 overflow-y-auto w-full pb-32">
-              <EmptyState onPromptClick={handlePromptClick} />
-            </div>
-          ) : (
-            <div className="flex-1 overflow-y-auto w-full scrollbar-thin scrollbar-thumb-[var(--bg-hover)] hover:scrollbar-thumb-[var(--bg-active)] pb-32" ref={containerRef} onScroll={handleScroll}>
-              <div className="max-w-4xl mx-auto w-full">
-                <ChatMessages
-                  messages={messages}
-                  isStreaming={isStreaming}
-                  onRegenerate={regenerateLastResponse}
-                />
-                <div className="h-4 w-full" /> {/* Spacer */}
-              </div>
-            </div>
-          )}
-
-          {/* Faded bottom area for input - adapted for dark mode */}
-          <div className="absolute bottom-0 left-0 w-full z-10 pointer-events-none h-24 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent"></div>
-
-          <div className="absolute bottom-0 w-full z-20 pointer-events-auto">
-            <ChatInput
+            <EmptyState
               onSend={handleSend}
-              onStop={stopGeneration}
               isStreaming={isStreaming}
-              hasMessages={!isEmpty}
+              onStop={stopGeneration}
             />
-          </div>
+          ) : (
+            <>
+              <div
+                className="flex-1 overflow-y-auto w-full scrollbar-thin scrollbar-thumb-[var(--bg-hover)] hover:scrollbar-thumb-[var(--bg-active)] pb-32"
+                ref={containerRef}
+                onScroll={handleScroll}
+              >
+                <div className="max-w-4xl mx-auto w-full">
+                  <ChatMessages
+                    messages={messages}
+                    isStreaming={isStreaming}
+                    onRegenerate={regenerateLastResponse}
+                  />
+                  <div className="h-4 w-full" />
+                </div>
+              </div>
+
+              {/* Gradient fade */}
+              <div className="absolute bottom-0 left-0 w-full z-10 pointer-events-none h-24 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent" />
+
+              {/* Input */}
+              <div className="absolute bottom-0 w-full z-20 pointer-events-auto">
+                <ChatInput
+                  onSend={handleSend}
+                  onStop={stopGeneration}
+                  isStreaming={isStreaming}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 

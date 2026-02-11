@@ -1,76 +1,148 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-const prompts = [
+const capabilities = [
   {
-    title: 'Privacy routing',
+    label: 'Privacy routing',
     text: 'How does Herma route sensitive data to private models?',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
       </svg>
     ),
   },
   {
-    title: 'Cost savings',
+    label: 'Cost savings',
     text: 'How much can I save by routing non-sensitive requests to public models?',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
   },
   {
-    title: 'Compare models',
+    label: 'Compare models',
     text: 'What are the differences between GPT-4, Claude, and Gemini?',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
       </svg>
     ),
   },
   {
-    title: 'Write code',
+    label: 'Write code',
     text: 'Write a Python script that calls the Herma API with streaming',
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
       </svg>
     ),
   },
 ];
 
-const EmptyState = ({ onPromptClick }) => {
+const EmptyState = ({ onSend, isStreaming, onStop }) => {
+  const [value, setValue] = useState('');
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+    }
+  }, [value]);
+
+  const handleSubmit = () => {
+    if (!value.trim() || isStreaming) return;
+    onSend(value);
+    setValue('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   return (
-    <div className="flex-1 min-h-0 flex flex-col items-center px-4 bg-[var(--bg-primary)] overflow-auto">
-      <div className="flex-[3]" />
-      <h1
-        className="text-4xl text-[var(--accent-primary)] mb-2 herma-wordmark"
-      >
-        HΞRMΛ
-      </h1>
-      <p className="text-[var(--text-tertiary)] mb-6 text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
-        Ask anything — Herma routes to the best model for you.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
-        {prompts.map((prompt) => (
-          <button
-            key={prompt.title}
-            onClick={() => onPromptClick(prompt.text)}
-            className="text-left p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] shadow-sm hover:shadow-md hover:border-[var(--border-accent)] transition-all group"
-          >
-            <div className="flex items-center gap-2 mb-1.5 text-[var(--accent-primary)]">
-              {prompt.icon}
-              <span className="text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
-                {prompt.title}
-              </span>
-            </div>
-            <p className="text-xs text-[var(--text-tertiary)] leading-relaxed" style={{ fontFamily: 'var(--font-ui)' }}>
-              {prompt.text}
-            </p>
-          </button>
-        ))}
+    <div className="flex-1 flex flex-col items-center justify-center px-4 bg-[var(--bg-primary)] overflow-auto">
+      <div className="w-full max-w-2xl flex flex-col items-center">
+        {/* Logo + Greeting */}
+        <h1 className="herma-wordmark text-4xl text-[var(--accent-primary)] mb-3">
+          HΞRMΛ
+        </h1>
+        <p
+          className="text-[var(--text-tertiary)] mb-8 text-base"
+          style={{ fontFamily: 'var(--font-ui)' }}
+        >
+          How can I help you today?
+        </p>
+
+        {/* Large Input Area */}
+        <div className="w-full rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-tertiary)]/80 backdrop-blur-sm shadow-lg focus-within:border-[var(--accent-primary)] focus-within:ring-2 focus-within:ring-[var(--accent-primary)]/10 transition-all">
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask anything..."
+            rows={3}
+            className="w-full resize-none bg-transparent outline-none text-base text-[var(--text-primary)] placeholder-[var(--text-tertiary)] p-4 pb-2"
+            style={{ fontFamily: 'var(--font-ui)', maxHeight: '200px' }}
+            autoFocus
+          />
+          <div className="flex items-center justify-end px-3 pb-3">
+            {isStreaming ? (
+              <button
+                onClick={onStop}
+                className="w-9 h-9 rounded-xl bg-[var(--error)] text-white flex items-center justify-center hover:bg-opacity-90 transition-colors shadow-md"
+                aria-label="Stop generating"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="6" width="12" height="12" rx="1" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={!value.trim()}
+                className="w-9 h-9 rounded-xl bg-[var(--accent-primary)] text-white flex items-center justify-center hover:bg-[var(--accent-hover)] transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md"
+                aria-label="Send message"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Capability chips */}
+        <div className="flex flex-wrap gap-2 mt-5 justify-center">
+          {capabilities.map((cap) => (
+            <button
+              key={cap.label}
+              onClick={() => onSend(cap.text)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-[var(--border-secondary)] bg-[var(--bg-secondary)] text-sm text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)] hover:shadow-sm transition-all"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              <span className="text-[var(--accent-primary)]">{cap.icon}</span>
+              {cap.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Disclaimer */}
+        <p
+          className="text-[11px] text-[var(--text-tertiary)] text-center mt-8 opacity-70"
+          style={{ fontFamily: 'var(--font-ui)' }}
+        >
+          Herma can make mistakes. Consider checking important information.
+        </p>
       </div>
-      <div className="flex-[1]" />
     </div>
   );
 };

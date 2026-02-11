@@ -13,6 +13,7 @@ const ChatSidebar = ({
   subscription,
   isOpen,
   onClose,
+  collapsed,
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -143,9 +144,15 @@ const ChatSidebar = ({
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <div className="hidden md:flex w-64 flex-shrink-0 h-full z-20">
-        {sidebar}
+      {/* Desktop sidebar — with collapse/expand transition */}
+      <div
+        className={`hidden md:block flex-shrink-0 h-full z-20 transition-all duration-300 ease-in-out overflow-hidden ${
+          collapsed ? 'w-0' : 'w-64'
+        }`}
+      >
+        <div className="w-64 h-full flex-shrink-0">
+          {sidebar}
+        </div>
       </div>
 
       {/* Mobile sidebar overlay */}
