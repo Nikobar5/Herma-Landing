@@ -57,8 +57,11 @@ The Herma logomark is a white line-art illustration of a classical Greek bust (H
 
 The Herma wordmark uses the stylized text **HΞRMΛ** (with Greek character substitutions) in the heading font (Space Grotesk). This is used alongside or independently from the logomark.
 
-**Usage:** Headlines, hero sections, navigation bar (paired with logomark)
-**Font:** Space Grotesk, Bold, tracking-tight
+**Usage:** Headlines, hero sections, navigation bar (paired with logomark), footer copyright
+**Font:** Space Grotesk, weight 500, letter-spacing 0.2em
+**CSS class:** `.herma-wordmark`
+**Casing:** Always all-caps: `HΞRMΛ` in the wordmark, `HERMA` in plain text display contexts
+**In prose:** Use title-case "Herma" in running body text (e.g., "Herma routes your request")
 **Minimum size:** 14px
 
 ---
@@ -144,19 +147,37 @@ Herma uses a dark-first color system. All surfaces, components, and states deriv
 
 ### Font Stack
 
-| Role | Font Family | Weights | Fallbacks |
-|------|-------------|---------|-----------|
-| **Heading** | Space Grotesk | 500, 600, 700 | -apple-system, sans-serif |
-| **Body** | PT Serif | 400, 700 | Georgia, serif |
-| **UI** | Work Sans | 400, 500, 600 | -apple-system, sans-serif |
-| **Code** | Inconsolata | 400, 500 | 'Courier New', monospace |
+Herma uses a **two-font system**: Space Grotesk as the primary sans-serif for all UI, headings, and user-authored text, with PT Serif as an editorial accent for AI-generated content and long-form descriptions. This follows the Anthropic model (Styrene + Tiempos) of pairing a technical sans with an editorial serif.
+
+| Role | Font Family | Weights | Fallbacks | Usage |
+|------|-------------|---------|-----------|-------|
+| **Heading** | Space Grotesk | 500, 600, 700 | -apple-system, sans-serif | Section titles, hero headlines, wordmark |
+| **UI** | Space Grotesk | 300, 400, 500, 600 | -apple-system, sans-serif | Buttons, nav, labels, inputs, sidebar, user messages |
+| **Body** | PT Serif | 400, 700 | Georgia, serif | AI chat responses, landing page descriptions, long-form prose |
+| **Code** | Inconsolata | 400, 500 | 'Courier New', monospace | Code blocks, inline code, monetary values |
 
 ```css
 --font-heading: 'Space Grotesk', -apple-system, sans-serif;
+--font-ui:      'Space Grotesk', -apple-system, sans-serif;
 --font-body:    'PT Serif', Georgia, serif;
---font-ui:      'Work Sans', -apple-system, sans-serif;
 --font-code:    'Inconsolata', 'Courier New', monospace;
 ```
+
+> **Note:** `--font-heading` and `--font-ui` resolve to the same font (Space Grotesk). They are kept as separate tokens for semantic clarity — headings use bolder weights (500-700) while UI elements use lighter weights (400-500).
+
+### Wordmark Typography
+
+The HΞRMΛ wordmark has its own CSS class:
+
+```css
+.herma-wordmark {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+}
+```
+
+Apply via `className="herma-wordmark"` on any HΞRMΛ or HERMA display text. Do not add decorative pseudo-elements or accents to the wordmark.
 
 ### Type Scale
 
@@ -168,8 +189,8 @@ Based on a golden ratio (1.618) from a 16px base:
 | `--text-h1` | 2.5rem (40px) | 700 | Heading | Page titles |
 | `--text-h2` | 1.75rem (28px) | 600 | Heading | Section headings |
 | `--text-h3` | 1.25rem (20px) | 600 | Heading | Subsection headings |
-| `--text-body` | 1rem (16px) | 400 | Body | Paragraph text |
-| `--text-body-sm` | 0.875rem (14px) | 400 | Body | Secondary content |
+| `--text-body` | 1rem (16px) | 400 | Body | AI responses, descriptions |
+| `--text-body-sm` | 0.875rem (14px) | 400 | Body | Secondary long-form content |
 | `--text-ui` | 0.875rem (14px) | 500 | UI | Buttons, labels, nav |
 | `--text-ui-sm` | 0.75rem (12px) | 500 | UI | Badges, metadata |
 | `--text-caption` | 0.625rem (10px) | 400 | UI | Disclaimers, fine print |
@@ -183,12 +204,26 @@ Based on a golden ratio (1.618) from a 16px base:
 ```
 
 ### Typography Rules
-- **Headings** always use Space Grotesk — never PT Serif for headings
-- **Body text** in long-form contexts (chat responses, docs) uses PT Serif for readability
-- **UI elements** (buttons, nav, labels, badges) always use Work Sans
-- **Code** always uses Inconsolata — both inline and block
+
+**Font assignment by context:**
+
+| Context | Font | Rationale |
+|---------|------|-----------|
+| Headings (all sizes) | `--font-heading` (Space Grotesk) | Clean, geometric, confident |
+| Buttons, nav, labels, badges | `--font-ui` (Space Grotesk) | Consistent UI voice |
+| User-typed messages (chat input) | `--font-ui` (Space Grotesk) | User's voice = sans-serif |
+| AI chat responses (body text) | `--font-body` (PT Serif) | AI's voice = editorial serif |
+| AI chat response headings | `--font-heading` (Space Grotesk) | Structure within responses |
+| Landing page descriptions | `--font-body` (PT Serif) | Editorial warmth |
+| Sidebar conversation titles | `--font-ui` (Space Grotesk) | UI element, not prose |
+| Code (inline and block) | `--font-code` (Inconsolata) | Always monospace |
+| Monetary values (balance, cost) | `--font-code` (Inconsolata) | Tabular alignment |
+
+**General rules:**
+- Never use PT Serif for headings, buttons, labels, or navigation
 - Never use more than 2 font families on a single screen
 - Maximum line length: 65 characters for body text (use `max-w-prose` or `max-w-3xl`)
+- The wordmark HΞRMΛ always uses the `.herma-wordmark` class, never arbitrary font styling
 
 ---
 
@@ -405,7 +440,8 @@ animation: pulse 1s ease-in-out infinite;
 ### DO
 - Use the dark theme as the default for all surfaces
 - Maintain generous whitespace (negative space) between sections
-- Use the serif body font (PT Serif) for chat responses and long-form content
+- Use PT Serif (`--font-body`) only for AI chat responses and long-form editorial content
+- Use Space Grotesk (`--font-ui`) for all interactive UI: buttons, inputs, nav, sidebar, labels
 - Keep the accent color (soft indigo) for interactive elements only
 - Test all text against dark backgrounds for contrast compliance
 - Use the HΞRMΛ wordmark in headings, never the plain "Herma" spelling
@@ -465,10 +501,10 @@ animation: pulse 1s ease-in-out infinite;
   --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.15);
 
-  /* Typography */
+  /* Typography — Space Grotesk is the primary sans-serif for both heading and UI */
   --font-heading: 'Space Grotesk', -apple-system, sans-serif;
+  --font-ui:      'Space Grotesk', -apple-system, sans-serif;
   --font-body:    'PT Serif', Georgia, serif;
-  --font-ui:      'Work Sans', -apple-system, sans-serif;
   --font-code:    'Inconsolata', 'Courier New', monospace;
 
   /* Radius */
@@ -521,8 +557,8 @@ How Herma's brand compares to peer AI companies:
 |--------|-------------------|------------|--------|-----------|
 | Theme | Warm cream (light) | Warm cream (light) | White (light) | **Dark-first** |
 | Accent | Terracotta/sienna | Teal | Black/green | **Soft indigo** |
-| Heading font | Serif (editorial) | Sans-serif | Sans-serif | **Geometric sans (Space Grotesk)** |
-| Body font | Sans-serif | Sans-serif | Sans-serif | **Serif (PT Serif) — distinctive** |
+| Primary font | Styrene (sans) | FK Grotesk (sans) | OpenAI Sans (custom) | **Space Grotesk (heading + UI)** |
+| Body font | Tiempos (serif) | Newsreader (serif) | Sans-serif | **PT Serif — editorial accent** |
 | Logo style | Abstract spark | Abstract grid | Abstract blossom | **Classical figurative (Hermes bust)** |
 | Personality | Warm, approachable | Minimal, utilitarian | Bold, corporate | **Sophisticated, classical-modern** |
 | Differentiator | Safety emphasis | Search-first | Scale/power | **Routing intelligence, privacy** |
@@ -536,4 +572,4 @@ How Herma's brand compares to peer AI companies:
 ---
 
 *Last updated: 2026-02-10*
-*Version: 2.0 — Dark mode redesign*
+*Version: 3.0 — Typography consolidation (Space Grotesk primary, Work Sans removed)*

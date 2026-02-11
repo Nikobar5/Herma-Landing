@@ -80,7 +80,7 @@ const ChatSidebar = ({
                       if (e.key === 'Escape') setEditingId(null);
                     }}
                     className="flex-1 bg-[var(--bg-input)] text-[var(--text-primary)] text-sm px-2 py-1.5 rounded border border-[var(--accent-primary)] outline-none"
-                    style={{ fontFamily: 'var(--font-body)' }}
+                    style={{ fontFamily: 'var(--font-ui)' }}
                   />
                 </div>
               ) : (
@@ -91,7 +91,7 @@ const ChatSidebar = ({
                       onClose?.();
                     }}
                     className="flex-1 text-left px-4 py-2.5 text-sm truncate flex items-center gap-3 font-medium"
-                    style={{ fontFamily: 'var(--font-body)' }}
+                    style={{ fontFamily: 'var(--font-ui)' }}
                     title={conv.title}
                   >
                     <svg className="w-4 h-4 flex-shrink-0 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">

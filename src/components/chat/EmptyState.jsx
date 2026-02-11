@@ -48,7 +48,7 @@ const EmptyState = ({ onPromptClick }) => {
       >
         HΞRMΛ
       </h1>
-      <p className="text-[var(--text-tertiary)] mb-6 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+      <p className="text-[var(--text-tertiary)] mb-6 text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
         Ask anything — Herma routes to the best model for you.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
@@ -64,7 +64,7 @@ const EmptyState = ({ onPromptClick }) => {
                 {prompt.title}
               </span>
             </div>
-            <p className="text-xs text-[var(--text-tertiary)] leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-xs text-[var(--text-tertiary)] leading-relaxed" style={{ fontFamily: 'var(--font-ui)' }}>
               {prompt.text}
             </p>
           </button>

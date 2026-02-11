@@ -68,25 +68,11 @@ a {
   font-family: 'Space Grotesk', -apple-system, sans-serif;
 }
 
-/* HERMA wordmark — wide-tracked with wing accent */
+/* HERMA wordmark — wide-tracked */
 .herma-wordmark {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
   letter-spacing: 0.2em;
-  position: relative;
-  display: inline-block;
-}
-.herma-wordmark::before {
-  content: '';
-  position: absolute;
-  top: 0.1em;
-  left: -0.12em;
-  width: 0.5em;
-  height: 1px;
-  background: currentColor;
-  transform: rotate(-35deg);
-  transform-origin: right center;
-  opacity: 0.45;
 }
 
 .font-code {

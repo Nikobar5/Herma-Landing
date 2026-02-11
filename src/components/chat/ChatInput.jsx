@@ -40,7 +40,7 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
             placeholder="Send a message..."
             rows={1}
             className="flex-1 resize-none bg-transparent outline-none text-base text-[var(--text-primary)] placeholder-[var(--text-tertiary)] py-1"
-            style={{ fontFamily: 'var(--font-body)', maxHeight: '200px' }}
+            style={{ fontFamily: 'var(--font-ui)', maxHeight: '200px' }}
           />
           {isStreaming ? (
             <button

@@ -35,7 +35,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="prose prose-base prose-invert max-w-none text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-body)' }}>
+          <div className={`prose prose-base prose-invert max-w-none text-[var(--text-primary)]`} style={{ fontFamily: isUser ? 'var(--font-ui)' : 'var(--font-body)' }}>
             {isUser ? (
               <p className="whitespace-pre-wrap text-lg font-medium leading-relaxed">{message.content}</p>
             ) : (
@@ -120,7 +120,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                     return <tr>{children}</tr>;
                   },
                   th({ children }) {
-                    return <th className="px-6 py-3 text-left text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{children}</th>;
+                    return <th className="px-6 py-3 text-left text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider" style={{ fontFamily: 'var(--font-ui)' }}>{children}</th>;
                   },
                   td({ children }) {
                     return <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-tertiary)]">{children}</td>;
@@ -128,9 +128,9 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
                   hr() {
                     return <hr className="my-8 border-[var(--border-secondary)]" />;
                   },
-                  h1({ children }) { return <h1 className="text-2xl font-bold mt-8 mb-4 text-[var(--text-primary)]">{children}</h1> },
-                  h2({ children }) { return <h2 className="text-xl font-bold mt-6 mb-3 text-[var(--text-primary)]">{children}</h2> },
-                  h3({ children }) { return <h3 className="text-lg font-bold mt-5 mb-2 text-[var(--text-primary)]">{children}</h3> },
+                  h1({ children }) { return <h1 className="text-2xl font-bold mt-8 mb-4 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h1> },
+                  h2({ children }) { return <h2 className="text-xl font-bold mt-6 mb-3 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h2> },
+                  h3({ children }) { return <h3 className="text-lg font-bold mt-5 mb-2 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h3> },
                 }}
               >
                 {message.content}

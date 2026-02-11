@@ -93,7 +93,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
+                  <span className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
                     {plan.credits}
                   </span>
                 </div>
@@ -114,7 +114,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
           <a
             href="/#/upgrade"
             className="text-sm text-[var(--accent-primary)] hover:underline"
-            style={{ fontFamily: 'var(--font-body)' }}
+            style={{ fontFamily: 'var(--font-ui)' }}
           >
             Buy one-time credits instead
           </a>
@@ -122,7 +122,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
             <button
               onClick={onClose}
               className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
-              style={{ fontFamily: 'var(--font-body)' }}
+              style={{ fontFamily: 'var(--font-ui)' }}
             >
               Maybe later
             </button>
