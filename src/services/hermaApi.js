@@ -156,39 +156,6 @@ export function getChatBalance() {
   return authFetch('/portal/chat-balance');
 }
 
-// --- Memories ---
-
-export function getMemories(category) {
-  const qs = category ? `?category=${category}` : '';
-  return authFetch(`/portal/memories${qs}`);
-}
-
-export function getMemoryStats() {
-  return authFetch('/portal/memories/stats');
-}
-
-export function createMemory({ content, category }) {
-  return authFetch('/portal/memories', {
-    method: 'POST',
-    body: JSON.stringify({ content, category }),
-  });
-}
-
-export function updateMemory(id, { content, category }) {
-  return authFetch(`/portal/memories/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify({ content, category }),
-  });
-}
-
-export function deleteMemory(id) {
-  return authFetch(`/portal/memories/${id}`, { method: 'DELETE' });
-}
-
-export function clearAllMemories() {
-  return authFetch('/portal/memories', { method: 'DELETE' });
-}
-
 // --- Portal Chat (streaming) ---
 
 export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {
