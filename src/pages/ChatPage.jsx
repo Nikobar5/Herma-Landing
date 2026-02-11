@@ -49,7 +49,7 @@ const ChatPage = () => {
       setBalance(data.balance_usd ?? null);
       setChatFreeCredit(data.chat_free_credit_usd ?? null);
       setSubscription(data.has_subscription ? { plan: data.plan } : null);
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const ChatPage = () => {
   const isEmpty = !activeConversation || messages.length === 0;
 
   return (
-    <div className="flex h-screen pt-16 bg-[var(--bg-primary)]">
+    <div className="flex h-screen pt-28 bg-[var(--bg-primary)] overflow-hidden">
       <ChatSidebar
         conversations={conversations}
         activeId={activeId}
@@ -95,12 +95,12 @@ const ChatPage = () => {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative h-full">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-2 border-b border-[var(--border-primary)]">
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] shadow-sm z-20">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
+            className="p-2 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
             aria-label="Open sidebar"
           >
             <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,33 +108,44 @@ const ChatPage = () => {
             </svg>
           </button>
           <span
-            className="text-sm font-medium text-[var(--text-primary)] truncate"
+            className="text-base font-bold text-[var(--text-primary)] truncate"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
             {activeConversation?.title || 'New chat'}
           </span>
         </div>
 
-        {isEmpty ? (
-          <EmptyState onPromptClick={handlePromptClick} />
-        ) : (
-          <ChatMessages
-            messages={messages}
-            isStreaming={isStreaming}
-            onRegenerate={regenerateLastResponse}
-            containerRef={containerRef}
-            isAtBottom={isAtBottom}
-            scrollToBottom={scrollToBottom}
-            handleScroll={handleScroll}
-          />
-        )}
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-hidden relative flex flex-col">
+          {isEmpty ? (
+            <div className="flex-1 overflow-y-auto w-full pb-32">
+              <EmptyState onPromptClick={handlePromptClick} />
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto w-full scrollbar-thin scrollbar-thumb-[var(--bg-hover)] hover:scrollbar-thumb-[var(--bg-active)] pb-32" ref={containerRef} onScroll={handleScroll}>
+              <div className="max-w-4xl mx-auto w-full">
+                <ChatMessages
+                  messages={messages}
+                  isStreaming={isStreaming}
+                  onRegenerate={regenerateLastResponse}
+                />
+                <div className="h-4 w-full" /> {/* Spacer */}
+              </div>
+            </div>
+          )}
 
-        <ChatInput
-          onSend={handleSend}
-          onStop={stopGeneration}
-          isStreaming={isStreaming}
-          hasMessages={!isEmpty}
-        />
+          {/* Faded bottom area for input - adapted for dark mode */}
+          <div className="absolute bottom-0 left-0 w-full z-10 pointer-events-none h-24 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent"></div>
+
+          <div className="absolute bottom-0 w-full z-20 pointer-events-auto">
+            <ChatInput
+              onSend={handleSend}
+              onStop={stopGeneration}
+              isStreaming={isStreaming}
+              hasMessages={!isEmpty}
+            />
+          </div>
+        </div>
       </div>
 
       <PaywallModal isOpen={showPaywall} onClose={dismissPaywall} />
