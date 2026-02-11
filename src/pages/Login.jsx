@@ -12,7 +12,7 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login, signup, loginAsDemo } = useHermaAuth();
+  const { login, signup } = useHermaAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -205,19 +205,6 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="mt-6 border-t border-[var(--border-secondary)] pt-6">
-            <button
-              type="button"
-              onClick={() => {
-                loginAsDemo();
-                navigate('/dashboard');
-              }}
-              className="w-full flex justify-center py-2.5 px-4 text-sm font-medium text-[var(--text-primary)] bg-[var(--bg-tertiary)] hover:bg-[var(--bg-hover)] border border-[var(--border-secondary)] transition-colors"
-              style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
-            >
-              View Demo Dashboard
-            </button>
-          </div>
         </div>
       </div>
     </div>

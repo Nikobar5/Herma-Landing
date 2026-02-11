@@ -41,19 +41,6 @@ export function HermaAuthProvider({ children }) {
     return data;
   }
 
-  function loginAsDemo() {
-    const demoUser = {
-      customer_id: 'demo_user_123',
-      name: 'Demo User',
-      email: 'demo@herma.ai',
-      is_demo: true
-    };
-    localStorage.setItem('herma_token', 'DEMO_TOKEN');
-    localStorage.setItem('herma_user', JSON.stringify(demoUser));
-    setUser(demoUser);
-    return demoUser;
-  }
-
   function logout() {
     localStorage.removeItem('herma_token');
     localStorage.removeItem('herma_user');
@@ -66,7 +53,6 @@ export function HermaAuthProvider({ children }) {
     isAuthenticated: !!user,
     login,
     signup,
-    loginAsDemo,
     logout,
   };
 

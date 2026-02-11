@@ -44,12 +44,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         await streamChat(allMessages, {
           signal: controller.signal,
           onChunk: (delta) => {
-            if (typeof delta === 'string') {
-              // Backward compat for demo mode
-              updateLastMessage(convId, (prev) => ({
-                content: prev.content + delta,
-              }));
-            } else if (delta.type === 'reasoning') {
+            if (delta.type === 'reasoning') {
               updateLastMessage(convId, (prev) => ({
                 reasoning: (prev.reasoning || '') + delta.content,
               }));
@@ -119,11 +114,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       await streamChat(convMessages, {
         signal: controller.signal,
         onChunk: (delta) => {
-          if (typeof delta === 'string') {
-            updateLastMessage(activeId, (prev) => ({
-              content: prev.content + delta,
-            }));
-          } else if (delta.type === 'reasoning') {
+          if (delta.type === 'reasoning') {
             updateLastMessage(activeId, (prev) => ({
               reasoning: (prev.reasoning || '') + delta.content,
             }));
