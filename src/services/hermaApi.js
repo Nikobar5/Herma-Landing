@@ -158,7 +158,7 @@ export function getChatBalance() {
 
 // --- Portal Chat (streaming) ---
 
-export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {
+export async function streamChat(messages, { onChunk, onDone, onError, signal, webSearch } = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
@@ -172,7 +172,7 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal } 
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ messages, stream: true }),
+    body: JSON.stringify({ messages, stream: true, ...(webSearch && { web_search: true }) }),
     signal,
   });
 
@@ -218,6 +218,11 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal } 
           const parsed = JSON.parse(data);
           if (parsed.usage) {
             lastUsage = parsed.usage;
+          }
+          // Extract annotations (web search citations) from the chunk
+          const annotations = parsed.choices?.[0]?.delta?.annotations;
+          if (annotations?.length) {
+            onChunk?.({ type: 'annotations', annotations });
           }
           const delta = parsed.choices?.[0]?.delta;
           const reasoning = delta?.reasoning || delta?.reasoning_content;

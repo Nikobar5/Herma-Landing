@@ -47,6 +47,7 @@ const ChatPage = () => {
   const [subscription, setSubscription] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [webSearch, setWebSearch] = useState(false);
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -68,10 +69,10 @@ const ChatPage = () => {
   }, [isStreaming, fetchBalance]);
 
   const handleSend = useCallback(
-    (content) => {
-      sendMessage(content);
+    (content, options = {}) => {
+      sendMessage(content, { webSearch: options.webSearch ?? webSearch });
     },
-    [sendMessage]
+    [sendMessage, webSearch]
   );
 
   const isEmpty = !activeConversation || messages.length === 0;
@@ -148,6 +149,8 @@ const ChatPage = () => {
               onSend={handleSend}
               isStreaming={isStreaming}
               onStop={stopGeneration}
+              webSearch={webSearch}
+              setWebSearch={setWebSearch}
             />
           ) : (
             <>
@@ -182,6 +185,8 @@ const ChatPage = () => {
                   onSend={handleSend}
                   onStop={stopGeneration}
                   isStreaming={isStreaming}
+                  webSearch={webSearch}
+                  setWebSearch={setWebSearch}
                 />
               </div>
             </>

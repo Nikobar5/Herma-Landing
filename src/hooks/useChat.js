@@ -9,7 +9,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
   const dismissPaywall = useCallback(() => setShowPaywall(false), []);
 
   const sendMessage = useCallback(
-    async (content) => {
+    async (content, options = {}) => {
       if (!content.trim() || isStreaming) return;
 
       let convId = activeId;
@@ -21,7 +21,8 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       const userMsg = { role: 'user', content: content.trim() };
       addMessage(convId, userMsg);
 
-      const assistantMsg = { role: 'assistant', content: '' };
+      const webSearch = options.webSearch || false;
+      const assistantMsg = { role: 'assistant', content: '', webSearch };
       addMessage(convId, assistantMsg);
 
       setIsStreaming(true);
@@ -43,8 +44,13 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       try {
         await streamChat(allMessages, {
           signal: controller.signal,
+          webSearch,
           onChunk: (delta) => {
-            if (delta.type === 'reasoning') {
+            if (delta.type === 'annotations') {
+              updateLastMessage(convId, (prev) => ({
+                annotations: [...(prev.annotations || []), ...delta.annotations],
+              }));
+            } else if (delta.type === 'reasoning') {
               updateLastMessage(convId, (prev) => ({
                 reasoning: (prev.reasoning || '') + delta.content,
               }));
@@ -91,9 +97,11 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
     if (!activeConversation || activeConversation.messages.length < 2) return;
 
     const messages = activeConversation.messages;
+    const lastAssistant = messages[messages.length - 1];
     const lastUserIdx = messages.length - 2;
     if (messages[lastUserIdx]?.role !== 'user') return;
 
+    const webSearch = lastAssistant?.webSearch || false;
     removeLastMessage(activeId);
 
     // Now re-send: the last message should be the user message
@@ -103,7 +111,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       content: m.content,
     }));
 
-    const assistantMsg = { role: 'assistant', content: '' };
+    const assistantMsg = { role: 'assistant', content: '', webSearch };
     addMessage(activeId, assistantMsg);
 
     setIsStreaming(true);
@@ -113,8 +121,13 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
     try {
       await streamChat(convMessages, {
         signal: controller.signal,
+        webSearch,
         onChunk: (delta) => {
-          if (delta.type === 'reasoning') {
+          if (delta.type === 'annotations') {
+            updateLastMessage(activeId, (prev) => ({
+              annotations: [...(prev.annotations || []), ...delta.annotations],
+            }));
+          } else if (delta.type === 'reasoning') {
             updateLastMessage(activeId, (prev) => ({
               reasoning: (prev.reasoning || '') + delta.content,
             }));

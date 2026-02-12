@@ -3,6 +3,20 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
 
+const WebSearchIndicator = () => (
+  <div className="flex items-center gap-2 py-2 mb-1" style={{ fontFamily: 'var(--font-ui)' }}>
+    <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5a17.92 17.92 0 01-8.716-2.247m0 0A8.966 8.966 0 013 12c0-1.777.514-3.434 1.4-4.83" />
+    </svg>
+    <span className="shimmer-text text-sm font-medium">Searching the web</span>
+    <span className="flex items-center gap-1">
+      <span className="thinking-dot" />
+      <span className="thinking-dot" />
+      <span className="thinking-dot" />
+    </span>
+  </div>
+);
+
 const WaitingIndicator = () => (
   <div className="flex items-center gap-3 py-2" style={{ fontFamily: 'var(--font-ui)' }}>
     <span className="shimmer-text text-sm font-medium">Thinking</span>
@@ -13,6 +27,49 @@ const WaitingIndicator = () => (
     </span>
   </div>
 );
+
+const CitationSources = ({ annotations }) => {
+  // Deduplicate by URL and filter to url_citation type
+  const seen = new Set();
+  const sources = [];
+  for (const ann of annotations) {
+    if (ann.type !== 'url_citation') continue;
+    if (seen.has(ann.url)) continue;
+    seen.add(ann.url);
+    sources.push(ann);
+  }
+  if (sources.length === 0) return null;
+
+  return (
+    <div className="mt-4 pt-3 border-t border-[var(--border-secondary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+      <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-2">Sources</p>
+      <div className="flex flex-wrap gap-2">
+        {sources.map((source, i) => {
+          let domain;
+          try { domain = new URL(source.url).hostname.replace('www.', ''); } catch { domain = source.url; }
+          return (
+            <a
+              key={i}
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-secondary)] bg-[var(--bg-tertiary)]/50 text-xs text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)] transition-all group"
+            >
+              <img
+                src={`https://www.google.com/s2/favicons?sz=16&domain=${domain}`}
+                alt=""
+                className="w-3.5 h-3.5 rounded-sm"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+              <span className="font-medium text-[var(--accent-primary)] mr-0.5">{i + 1}</span>
+              <span className="truncate max-w-[180px]">{source.title || domain}</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const ThinkingSection = ({ reasoning, isStreaming }) => {
   const [expanded, setExpanded] = useState(true);
@@ -103,8 +160,13 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   return (
     <div className="flex w-full px-4 md:px-6 py-4">
       <div className="w-full max-w-4xl mx-auto">
+        {/* Web search indicator — shows before any tokens arrive when web search is enabled */}
+        {isAssistant && isStreaming && isLast && message.webSearch && !message.reasoning && !message.content && (
+          <WebSearchIndicator />
+        )}
+
         {/* Waiting indicator — shows before any tokens arrive */}
-        {isAssistant && isStreaming && isLast && !message.reasoning && !message.content && (
+        {isAssistant && isStreaming && isLast && !message.reasoning && !message.content && !message.webSearch && (
           <WaitingIndicator />
         )}
 
@@ -218,6 +280,11 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
             <span className="streaming-cursor" />
           )}
         </div>
+
+        {/* Citation sources from web search */}
+        {isAssistant && message.annotations?.length > 0 && (
+          <CitationSources annotations={message.annotations} />
+        )}
 
         {/* Message Actions */}
         {isAssistant && message.content && !isStreaming && (
