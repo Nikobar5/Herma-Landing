@@ -139,6 +139,8 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   if (isUser) {
     const content = message.content;
     const isMultimodal = Array.isArray(content);
+    const attachments = message.attachments || [];
+    const displayText = message.displayText || '';
 
     return (
       <div className="flex w-full px-4 md:px-6 py-4 justify-end">
@@ -149,33 +151,39 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           >
             {isMultimodal ? (
               <>
-                {content.map((block, i) => {
-                  if (block.type === 'text' && block.text) {
-                    return <p key={i} className="whitespace-pre-wrap">{block.text}</p>;
-                  }
-                  if (block.type === 'image_url') {
-                    return (
-                      <a key={i} href={block.image_url?.url} target="_blank" rel="noopener noreferrer" className="block mt-2">
-                        <img
-                          src={block.image_url?.url}
-                          alt="Uploaded"
-                          className="max-w-[300px] rounded-lg border border-[var(--border-secondary)]"
-                        />
-                      </a>
-                    );
-                  }
-                  if (block.type === 'file' && block.file) {
-                    return (
-                      <div key={i} className="flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-secondary)] text-xs text-[var(--text-secondary)] w-fit">
-                        <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 3.5L18.5 8H14V3.5zM6 20V4h7v5h5v11H6z" />
-                        </svg>
-                        <span className="truncate max-w-[200px]">{block.file.filename || 'PDF'}</span>
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
+                {/* User's typed text */}
+                {displayText && <p className="whitespace-pre-wrap">{displayText}</p>}
+
+                {/* Image thumbnails from content blocks */}
+                {content.filter(b => b.type === 'image_url').map((block, i) => (
+                  <a key={`img-${i}`} href={block.image_url?.url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+                    <img
+                      src={block.image_url?.url}
+                      alt="Uploaded"
+                      className="max-w-[300px] rounded-lg border border-[var(--border-secondary)]"
+                    />
+                  </a>
+                ))}
+
+                {/* PDF chips from content blocks */}
+                {content.filter(b => b.type === 'file' && b.file).map((block, i) => (
+                  <div key={`pdf-${i}`} className="flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-secondary)] text-xs text-[var(--text-secondary)] w-fit">
+                    <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 3.5L18.5 8H14V3.5zM6 20V4h7v5h5v11H6z" />
+                    </svg>
+                    <span className="truncate max-w-[200px]">{block.file.filename || 'PDF'}</span>
+                  </div>
+                ))}
+
+                {/* Text/code file chips from attachments metadata */}
+                {attachments.filter(a => a.isText).map((att, i) => (
+                  <div key={`txt-${i}`} className="flex items-center gap-1.5 mt-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-secondary)] text-xs text-[var(--text-secondary)] w-fit">
+                    <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                    </svg>
+                    <span className="truncate max-w-[200px]">{att.name}</span>
+                  </div>
+                ))}
               </>
             ) : (
               <p className="whitespace-pre-wrap">{content}</p>

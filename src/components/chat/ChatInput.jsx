@@ -1,7 +1,29 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+const TEXT_EXTENSIONS = new Set([
+  'txt', 'md', 'markdown', 'csv', 'tsv', 'log', 'rtf',
+  'py', 'js', 'ts', 'jsx', 'tsx', 'html', 'htm', 'css', 'scss', 'less', 'sass',
+  'java', 'c', 'cpp', 'cc', 'h', 'hpp', 'cs', 'go', 'rs', 'rb', 'php',
+  'swift', 'kt', 'kts', 'scala', 'r', 'sh', 'bash', 'zsh', 'bat', 'ps1',
+  'sql', 'lua', 'pl', 'ex', 'exs', 'hs', 'clj', 'erl', 'zig', 'dart', 'groovy',
+  'json', 'xml', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env',
+  'svg', 'tex', 'bib', 'tf', 'hcl',
+]);
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+const ACCEPT_STRING = 'image/jpeg,image/png,image/gif,image/webp,.pdf,.txt,.md,.csv,.tsv,.log,.py,.js,.ts,.jsx,.tsx,.html,.htm,.css,.scss,.java,.c,.cpp,.h,.hpp,.go,.rs,.rb,.php,.swift,.kt,.scala,.r,.sh,.sql,.lua,.ex,.hs,.dart,.json,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.env,.svg,.tex,.groovy,.tf';
+
+function getFileExt(name) {
+  const dot = name.lastIndexOf('.');
+  return dot >= 0 ? name.slice(dot + 1).toLowerCase() : '';
+}
+
+function isAcceptedFile(file) {
+  if (IMAGE_TYPES.has(file.type)) return true;
+  if (file.type === 'application/pdf') return true;
+  if (TEXT_EXTENSIONS.has(getFileExt(file.name))) return true;
+  return false;
+}
 
 const ChatInput = ({ onSend, onStop, isStreaming }) => {
   const [value, setValue] = useState('');
@@ -29,12 +51,14 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
   const addFiles = useCallback((incoming) => {
     const valid = [];
     for (const f of incoming) {
-      if (!ACCEPTED_TYPES.includes(f.type)) continue;
+      if (!isAcceptedFile(f)) continue;
       if (f.size > MAX_FILE_SIZE) {
         setSizeWarning(`${f.name} exceeds 20 MB limit`);
         continue;
       }
-      valid.push({ file: f, preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null, type: f.type });
+      const isImage = f.type.startsWith('image/');
+      const isText = !isImage && f.type !== 'application/pdf' && TEXT_EXTENSIONS.has(getFileExt(f.name));
+      valid.push({ file: f, preview: isImage ? URL.createObjectURL(f) : null, type: f.type, isText });
     }
     setFiles((prev) => [...prev, ...valid]);
   }, []);
@@ -121,9 +145,15 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
                   </div>
                 ) : (
                   <div key={i} className="relative group/chip flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-secondary)] text-xs text-[var(--text-secondary)]">
-                    <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 3.5L18.5 8H14V3.5zM6 20V4h7v5h5v11H6z" />
-                    </svg>
+                    {f.isText ? (
+                      <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 3.5L18.5 8H14V3.5zM6 20V4h7v5h5v11H6z" />
+                      </svg>
+                    )}
                     <span className="truncate max-w-[100px]">{f.file.name}</span>
                     <button
                       onClick={() => removeFile(i)}
@@ -153,7 +183,7 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
               ref={fileInputRef}
               type="file"
               multiple
-              accept="image/jpeg,image/png,image/gif,image/webp,.pdf"
+              accept={ACCEPT_STRING}
               className="hidden"
               onChange={(e) => {
                 addFiles(Array.from(e.target.files));

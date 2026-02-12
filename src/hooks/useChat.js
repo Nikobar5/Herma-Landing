@@ -10,17 +10,62 @@ function fileToBase64(file) {
   });
 }
 
+function fileToText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsText(file);
+  });
+}
+
+const TEXT_EXTENSIONS = new Set([
+  'txt', 'md', 'markdown', 'csv', 'tsv', 'log', 'rtf',
+  'py', 'js', 'ts', 'jsx', 'tsx', 'html', 'htm', 'css', 'scss', 'less', 'sass',
+  'java', 'c', 'cpp', 'cc', 'h', 'hpp', 'cs', 'go', 'rs', 'rb', 'php',
+  'swift', 'kt', 'kts', 'scala', 'r', 'sh', 'bash', 'zsh', 'bat', 'ps1',
+  'sql', 'lua', 'pl', 'ex', 'exs', 'hs', 'clj', 'erl', 'zig', 'dart', 'groovy',
+  'json', 'xml', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env',
+  'svg', 'tex', 'bib', 'tf', 'hcl',
+]);
+
+const EXT_TO_LANG = {
+  py: 'python', js: 'javascript', ts: 'typescript', jsx: 'jsx', tsx: 'tsx',
+  html: 'html', htm: 'html', css: 'css', scss: 'scss', less: 'less',
+  java: 'java', c: 'c', cpp: 'cpp', h: 'c', hpp: 'cpp', cs: 'csharp',
+  go: 'go', rs: 'rust', rb: 'ruby', php: 'php', swift: 'swift',
+  kt: 'kotlin', scala: 'scala', r: 'r', sh: 'bash', bash: 'bash', zsh: 'zsh',
+  sql: 'sql', lua: 'lua', ex: 'elixir', hs: 'haskell', dart: 'dart',
+  json: 'json', xml: 'xml', yaml: 'yaml', yml: 'yaml', toml: 'toml',
+  md: 'markdown', svg: 'xml', tex: 'latex', tf: 'hcl', groovy: 'groovy',
+};
+
+function getFileExt(name) {
+  const dot = name.lastIndexOf('.');
+  return dot >= 0 ? name.slice(dot + 1).toLowerCase() : '';
+}
+
+function isTextFile(file) {
+  return TEXT_EXTENSIONS.has(getFileExt(file.name));
+}
+
 async function buildMultimodalContent(text, files) {
   const parts = [];
   if (text.trim()) {
     parts.push({ type: 'text', text: text.trim() });
   }
   for (const f of files) {
-    const dataUri = await fileToBase64(f);
     if (f.type.startsWith('image/')) {
+      const dataUri = await fileToBase64(f);
       parts.push({ type: 'image_url', image_url: { url: dataUri } });
     } else if (f.type === 'application/pdf') {
+      const dataUri = await fileToBase64(f);
       parts.push({ type: 'file', file: { filename: f.name, file_data: dataUri } });
+    } else if (isTextFile(f)) {
+      const content = await fileToText(f);
+      const ext = getFileExt(f.name);
+      const lang = EXT_TO_LANG[ext] || '';
+      parts.push({ type: 'text', text: `Content of ${f.name}:\n\`\`\`${lang}\n${content}\n\`\`\`` });
     }
   }
   return parts;
@@ -52,11 +97,18 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         msgContent = content.trim();
       }
 
-      // For display/title purposes, store the plain text as displayText
+      // For display/title purposes, store plain text + file metadata
       const userMsg = {
         role: 'user',
         content: msgContent,
-        ...(files.length > 0 && { displayText: content.trim() }),
+        ...(files.length > 0 && {
+          displayText: content.trim(),
+          attachments: files.map((f) => ({
+            name: f.name,
+            type: f.type,
+            isText: isTextFile(f),
+          })),
+        }),
       };
       addMessage(convId, userMsg);
 
