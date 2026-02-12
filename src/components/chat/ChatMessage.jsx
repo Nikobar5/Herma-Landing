@@ -15,14 +15,17 @@ const WaitingIndicator = () => (
 );
 
 const CitationSources = ({ annotations }) => {
-  // Deduplicate by URL and filter to url_citation type
+  // Normalize annotations — OpenRouter Chat Completions API nests data under
+  // url_citation: { url, title, content }, while the Responses API uses flat fields.
   const seen = new Set();
   const sources = [];
   for (const ann of annotations) {
     if (ann.type !== 'url_citation') continue;
-    if (seen.has(ann.url)) continue;
-    seen.add(ann.url);
-    sources.push(ann);
+    const cite = ann.url_citation || ann;
+    const url = cite.url;
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    sources.push({ url, title: cite.title || '', content: cite.content || '' });
   }
   if (sources.length === 0) return null;
 
@@ -48,7 +51,7 @@ const CitationSources = ({ annotations }) => {
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
               <span className="font-medium text-[var(--accent-primary)] mr-0.5">{i + 1}</span>
-              <span className="truncate max-w-[180px]">{source.title || domain}</span>
+              <span className="truncate max-w-[200px]">{source.title || domain}</span>
             </a>
           );
         })}
