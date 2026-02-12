@@ -1,23 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.52187ae7.css",
-    "main.js": "/static/js/main.8fb2f7df.js",
-    "static/media/question-image.png": "/static/media/question-image.98d13a1f0c7ee28a7dda.png",
-    "static/media/creative-image.png": "/static/media/creative-image.0ce8a0e752efba43c2e0.png",
-    "static/media/problem-image.png": "/static/media/problem-image.d41628eafcbddfe1e272.png",
-    "static/media/upload-image.png": "/static/media/upload-image.6446bf3ba27e70c0178b.png",
-    "static/media/creative-content.png": "/static/media/creative-content.5e333aaa2f5f6364735d.png",
-    "static/media/conversation-image.png": "/static/media/conversation-image.d0c1a7eabe27369361ac.png",
-    "static/media/complex-problem.png": "/static/media/complex-problem.c0fb3379421f1bac7965.png",
-    "static/media/doc-upload.png": "/static/media/doc-upload.8c2ec49cc11f0962a276.png",
-    "static/media/app-preview.png": "/static/media/app-preview.f801fb6443f54eca28b0.png",
-    "static/media/Herma.jpeg": "/static/media/Herma.fbab95905cdc0de697f3.jpeg",
+    "main.css": "/static/css/main.495f211e.css",
+    "main.js": "/static/js/main.f2b015bb.js",
     "index.html": "/index.html",
-    "main.52187ae7.css.map": "/static/css/main.52187ae7.css.map",
-    "main.8fb2f7df.js.map": "/static/js/main.8fb2f7df.js.map"
+    "main.495f211e.css.map": "/static/css/main.495f211e.css.map",
+    "main.f2b015bb.js.map": "/static/js/main.f2b015bb.js.map"
   },
   "entrypoints": [
-    "static/css/main.52187ae7.css",
-    "static/js/main.8fb2f7df.js"
+    "static/css/main.495f211e.css",
+    "static/js/main.f2b015bb.js"
   ]
 }

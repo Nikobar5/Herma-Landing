@@ -4,7 +4,7 @@ const ScrollToBottom = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="absolute bottom-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-[var(--bg-secondary)] shadow-lg border border-[var(--border-secondary)] flex items-center justify-center hover:bg-[var(--bg-hover)] hover:shadow-xl transition-all z-10"
+      className="w-9 h-9 rounded-full bg-[var(--bg-secondary)] shadow-lg border border-[var(--border-secondary)] flex items-center justify-center hover:bg-[var(--bg-hover)] hover:shadow-xl transition-all"
       aria-label="Scroll to bottom"
     >
       <svg className="w-4 h-4 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">

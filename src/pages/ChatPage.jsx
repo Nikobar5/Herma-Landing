@@ -9,6 +9,7 @@ import ChatMessages from '../components/chat/ChatMessages';
 import ChatInput from '../components/chat/ChatInput';
 import EmptyState from '../components/chat/EmptyState';
 import PaywallModal from '../components/chat/PaywallModal';
+import ScrollToBottom from '../components/chat/ScrollToBottom';
 
 const ChatPage = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const ChatPage = () => {
   });
 
   const messages = activeConversation?.messages || [];
-  const { containerRef, isAtBottom, scrollToBottom, handleScroll } = useAutoScroll([
+  const { containerRef, showScrollButton, scrollToBottom, handleScroll } = useAutoScroll([
     messages.length,
     messages[messages.length - 1]?.content,
   ]);
@@ -164,6 +165,13 @@ const ChatPage = () => {
                   <div className="h-4 w-full" />
                 </div>
               </div>
+
+              {/* Scroll to bottom */}
+              {showScrollButton && (
+                <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-20">
+                  <ScrollToBottom onClick={scrollToBottom} />
+                </div>
+              )}
 
               {/* Gradient fade */}
               <div className="absolute bottom-0 left-0 w-full z-10 pointer-events-none h-24 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent" />

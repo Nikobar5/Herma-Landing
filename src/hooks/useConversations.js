@@ -40,6 +40,11 @@ export function useConversations() {
   }, []);
 
   const createConversation = useCallback(() => {
+    // If the active conversation is already empty, reuse it instead of creating a new one
+    const current = conversations.find((c) => c.id === activeId);
+    if (current && current.messages.length === 0) {
+      return current;
+    }
     const conv = {
       id: generateId(),
       title: 'New chat',
@@ -50,7 +55,7 @@ export function useConversations() {
     update((prev) => [conv, ...prev].slice(0, MAX_CONVERSATIONS));
     setActiveId(conv.id);
     return conv;
-  }, [update]);
+  }, [update, conversations, activeId]);
 
   const deleteConversation = useCallback(
     (id) => {
