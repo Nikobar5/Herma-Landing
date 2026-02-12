@@ -158,7 +158,7 @@ export function getChatBalance() {
 
 // --- Portal Chat (streaming) ---
 
-export async function streamChat(messages, { onChunk, onDone, onError, signal, webSearch } = {}) {
+export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
@@ -172,7 +172,7 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal, w
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ messages, stream: true, ...(webSearch && { web_search: true }) }),
+    body: JSON.stringify({ messages, stream: true }),
     signal,
   });
 

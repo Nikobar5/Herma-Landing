@@ -3,20 +3,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
 
-const WebSearchIndicator = () => (
-  <div className="flex items-center gap-2 py-2 mb-1" style={{ fontFamily: 'var(--font-ui)' }}>
-    <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5a17.92 17.92 0 01-8.716-2.247m0 0A8.966 8.966 0 013 12c0-1.777.514-3.434 1.4-4.83" />
-    </svg>
-    <span className="shimmer-text text-sm font-medium">Searching the web</span>
-    <span className="flex items-center gap-1">
-      <span className="thinking-dot" />
-      <span className="thinking-dot" />
-      <span className="thinking-dot" />
-    </span>
-  </div>
-);
-
 const WaitingIndicator = () => (
   <div className="flex items-center gap-3 py-2" style={{ fontFamily: 'var(--font-ui)' }}>
     <span className="shimmer-text text-sm font-medium">Thinking</span>
@@ -160,13 +146,8 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   return (
     <div className="flex w-full px-4 md:px-6 py-4">
       <div className="w-full max-w-4xl mx-auto">
-        {/* Web search indicator — shows before any tokens arrive when web search is enabled */}
-        {isAssistant && isStreaming && isLast && message.webSearch && !message.reasoning && !message.content && (
-          <WebSearchIndicator />
-        )}
-
         {/* Waiting indicator — shows before any tokens arrive */}
-        {isAssistant && isStreaming && isLast && !message.reasoning && !message.content && !message.webSearch && (
+        {isAssistant && isStreaming && isLast && !message.reasoning && !message.content && (
           <WaitingIndicator />
         )}
 
