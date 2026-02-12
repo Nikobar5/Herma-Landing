@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import SmartRouterComparison from './SmartRouterComparison';
 
 const Hero = () => {
-  const videoRef = useRef(null);
+  const navigate = useNavigate();
 
-  const handleBookDemo = () => {
-    window.open('https://calendly.com/hermalocal/30min', '_blank');
+  const handleTryItOut = () => {
+    navigate('/chat');
   };
 
   return (
@@ -25,28 +27,28 @@ const Hero = () => {
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-[1.1] tracking-tight animate-hero"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                <span className="text-[var(--text-primary)]">Unify All AI Models</span>
+                <span className="text-[var(--text-primary)]">Cut AI Costs by 60%</span>
                 <br />
-                <span className="text-[var(--accent-primary)]">Across Privacy Levels</span>
+                <span className="text-[var(--accent-primary)]">With Smart Routing</span>
               </h1>
 
               <p
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 font-normal max-w-3xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Herma intelligently routes AI requests based on data sensitivity to maximize cost savings and model access while maintaining privacy.
+                Herma's intelligent API routes your prompts to the most cost-effective model without sacrificing quality. Same output, fraction of the price.
               </p>
 
               {/* CTA Button - Centered */}
               <div className="flex items-center justify-center mb-4 animate-hero-delayed-more">
                 <button
-                  onClick={handleBookDemo}
+                  onClick={handleTryItOut}
                   className="group relative overflow-hidden px-8 py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] min-w-[200px]"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   <span className="relative flex items-center justify-center gap-2">
-                    Book a Demo
+                    Try it out
                     <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -56,43 +58,9 @@ const Hero = () => {
 
             </div>
 
-            {/* Demo Video Section */}
-            <div className="w-full max-w-5xl mt-8 animate-hero-delayed-more">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-[var(--border-secondary)] p-1 bg-[var(--bg-secondary)]">
-                {/* MacOS-style Window Chrome */}
-                <div className="absolute top-0 left-0 right-0 h-10 bg-[var(--bg-tertiary)] backdrop-blur-sm flex items-center justify-center px-4 z-20 rounded-t-2xl">
-                  <div className="absolute left-4 flex space-x-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  </div>
-                  <span className="text-[var(--text-tertiary)] text-sm font-medium tracking-wide" style={{ fontFamily: 'var(--font-ui)' }}>HERMA Platform Demo</span>
-                </div>
-
-                {/* Video Container */}
-                <div className="bg-[var(--bg-primary)] rounded-b-2xl pt-10 overflow-hidden">
-                  <div className="relative" style={{ paddingBottom: "56.25%" }}>
-                    <video
-                      ref={videoRef}
-                      className="absolute top-0 left-0 w-full h-full object-cover"
-                      controls
-                      playsInline
-                      preload="metadata"
-                    >
-                      <source src="/demo.mp4" type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                </div>
-              </div>
-
-              {/* Video Caption */}
-              <p
-                className="mt-6 text-sm text-[var(--text-tertiary)] italic"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                Watch how Herma's data governor filters sensitive information in real-time, routing requests to the optimal AI model based on privacy requirements.
-              </p>
+            {/* Smart Comparison Component */}
+            <div className="w-full mt-8 animate-hero-delayed-more">
+              <SmartRouterComparison />
             </div>
           </div>
         </div>

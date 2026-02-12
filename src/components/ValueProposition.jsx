@@ -17,13 +17,13 @@ const ValueProposition = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] mb-4 tracking-tight px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Massive Cost Savings Without Compromising Privacy
+            Massive Cost Savings With Smart Routing
           </h2>
           <p
             className="text-base sm:text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-body)' }}
           >
-            Herma's intelligent routing delivers enterprise-grade cost optimization while maintaining airtight data security
+            Herma's intelligent API delivers enterprise-grade cost optimization by routing every request to the best model for the job.
           </p>
         </div>
 
