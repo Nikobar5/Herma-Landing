@@ -19,6 +19,7 @@ import Usage from './pages/dashboard/Usage';
 import ApiKeys from './pages/dashboard/ApiKeys';
 import Billing from './pages/dashboard/Billing';
 import ChatPage from './pages/ChatPage';
+import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HermaAuthProvider } from './context/HermaAuthContext';
 import ReactGA from 'react-ga4';
@@ -96,14 +97,14 @@ const RouteTracker = () => {
 // Conditionally render Header (hide on chat page — chat has its own top bar)
 const ConditionalHeader = () => {
   const location = useLocation();
-  if (location.pathname === '/chat') return null;
+  if (location.pathname === '/chat' || location.pathname.startsWith('/admin')) return null;
   return <Header />;
 };
 
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname === '/login' || location.pathname === '/chat';
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat';
   if (hideFooter) return null;
   return <Footer />;
 };
@@ -166,6 +167,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ChatPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />

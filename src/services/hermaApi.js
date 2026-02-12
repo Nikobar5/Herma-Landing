@@ -156,6 +156,48 @@ export function getChatBalance() {
   return authFetch('/portal/chat-balance');
 }
 
+// --- Admin Analytics (JWT auth, requires is_admin) ---
+
+export function getAdminOverview() {
+  return authFetch('/admin/analytics/overview');
+}
+
+export function getAdminDaily(days = 30) {
+  return authFetch(`/admin/analytics/daily?days=${days}`);
+}
+
+export function getAdminHourly(hours = 24) {
+  return authFetch(`/admin/analytics/hourly?hours=${hours}`);
+}
+
+export function getAdminCustomers(limit = 50) {
+  return authFetch(`/admin/analytics/customers?limit=${limit}`);
+}
+
+export function getAdminModels() {
+  return authFetch('/admin/analytics/models');
+}
+
+export function getAdminRecent(limit = 50) {
+  return authFetch(`/admin/analytics/recent?limit=${limit}`);
+}
+
+export function getAdminMemory() {
+  return authFetch('/admin/analytics/memory');
+}
+
+export function getAdminRouting() {
+  return authFetch('/admin/analytics/routing');
+}
+
+export function getAdminQuality() {
+  return authFetch('/admin/analytics/quality');
+}
+
+export function getAdminAgents() {
+  return authFetch('/admin/analytics/agents');
+}
+
 // --- Portal Chat (streaming) ---
 
 export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {

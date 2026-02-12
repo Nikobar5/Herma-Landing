@@ -31,13 +31,13 @@ export function HermaAuthProvider({ children }) {
 
   async function login({ email, password }) {
     const data = await hermaApi.login({ email, password });
-    setUser({ customer_id: data.customer_id, name: data.name, email: data.email });
+    setUser({ customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false });
     return data;
   }
 
   async function signup({ name, email, password, company }) {
     const data = await hermaApi.signup({ name, email, password, company });
-    setUser({ customer_id: data.customer_id, name: data.name, email: data.email });
+    setUser({ customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false });
     return data;
   }
 
@@ -51,6 +51,7 @@ export function HermaAuthProvider({ children }) {
     user,
     loading,
     isAuthenticated: !!user,
+    isAdmin: !!user?.is_admin,
     login,
     signup,
     logout,
