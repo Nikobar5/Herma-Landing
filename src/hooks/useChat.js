@@ -1,6 +1,31 @@
 import { useState, useRef, useCallback } from 'react';
 import { streamChat } from '../services/hermaApi';
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function buildMultimodalContent(text, files) {
+  const parts = [];
+  if (text.trim()) {
+    parts.push({ type: 'text', text: text.trim() });
+  }
+  for (const f of files) {
+    const dataUri = await fileToBase64(f);
+    if (f.type.startsWith('image/')) {
+      parts.push({ type: 'image_url', image_url: { url: dataUri } });
+    } else if (f.type === 'application/pdf') {
+      parts.push({ type: 'file', file: { filename: f.name, file_data: dataUri } });
+    }
+  }
+  return parts;
+}
+
 export function useChat({ activeId, addMessage, updateLastMessage, removeLastMessage, activeConversation, createConversation }) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -9,8 +34,9 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
   const dismissPaywall = useCallback(() => setShowPaywall(false), []);
 
   const sendMessage = useCallback(
-    async (content) => {
-      if (!content.trim() || isStreaming) return;
+    async (content, files = []) => {
+      if (!content.trim() && files.length === 0) return;
+      if (isStreaming) return;
 
       let convId = activeId;
       if (!convId) {
@@ -18,7 +44,20 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         convId = conv.id;
       }
 
-      const userMsg = { role: 'user', content: content.trim() };
+      // Build content: multimodal array if files present, plain string otherwise
+      let msgContent;
+      if (files.length > 0) {
+        msgContent = await buildMultimodalContent(content, files);
+      } else {
+        msgContent = content.trim();
+      }
+
+      // For display/title purposes, store the plain text as displayText
+      const userMsg = {
+        role: 'user',
+        content: msgContent,
+        ...(files.length > 0 && { displayText: content.trim() }),
+      };
       addMessage(convId, userMsg);
 
       const assistantMsg = { role: 'assistant', content: '' };
@@ -37,7 +76,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
           role: m.role,
           content: m.content,
         })),
-        { role: 'user', content: content.trim() },
+        { role: 'user', content: msgContent },
       ];
 
       try {

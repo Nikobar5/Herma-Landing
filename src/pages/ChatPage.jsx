@@ -68,8 +68,8 @@ const ChatPage = () => {
   }, [isStreaming, fetchBalance]);
 
   const handleSend = useCallback(
-    (content) => {
-      sendMessage(content);
+    (content, files = []) => {
+      sendMessage(content, files);
     },
     [sendMessage]
   );

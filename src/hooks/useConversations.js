@@ -21,8 +21,13 @@ function generateId() {
 }
 
 function titleFromContent(content) {
-  const trimmed = content.trim().slice(0, 60);
-  return trimmed.length < content.trim().length ? trimmed + '…' : trimmed;
+  const text = typeof content === 'string'
+    ? content
+    : Array.isArray(content)
+      ? (content.find(b => b.type === 'text')?.text || 'New chat')
+      : 'New chat';
+  const trimmed = text.trim().slice(0, 60);
+  return trimmed.length < text.trim().length ? trimmed + '…' : trimmed;
 }
 
 export function useConversations() {
@@ -88,7 +93,7 @@ export function useConversations() {
           const messages = [...c.messages, message];
           const title =
             c.messages.length === 0 && message.role === 'user'
-              ? titleFromContent(message.content)
+              ? titleFromContent(message.displayText || message.content)
               : c.title;
           return { ...c, messages, title, updatedAt: new Date().toISOString() };
         })
