@@ -70,8 +70,7 @@ const EmptyState = ({ onSend, isStreaming, onStop }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 bg-[var(--bg-primary)] overflow-auto">
       <div className="w-full max-w-2xl flex flex-col items-center">
-        {/* Logo + Big Greeting */}
-        <img src="/herma-logo.png" alt="Herma" className="w-12 h-12 rounded-xl mb-5 shadow-lg" />
+        {/* Big Greeting */}
         <h1
           className="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-8 text-center"
           style={{ fontFamily: 'var(--font-heading)' }}

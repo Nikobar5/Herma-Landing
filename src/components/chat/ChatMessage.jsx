@@ -116,7 +116,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           />
         )}
 
-        <div className="prose prose-base prose-invert max-w-none text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-body)' }}>
+        <div className="prose prose-base prose-invert max-w-none text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
