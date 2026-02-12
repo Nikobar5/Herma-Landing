@@ -3,6 +3,17 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
 
+const WaitingIndicator = () => (
+  <div className="flex items-center gap-3 py-2" style={{ fontFamily: 'var(--font-ui)' }}>
+    <span className="shimmer-text text-sm font-medium">Thinking</span>
+    <span className="flex items-center gap-1">
+      <span className="thinking-dot" />
+      <span className="thinking-dot" />
+      <span className="thinking-dot" />
+    </span>
+  </div>
+);
+
 const ThinkingSection = ({ reasoning, isStreaming }) => {
   const [expanded, setExpanded] = useState(true);
   const [autoCollapsed, setAutoCollapsed] = useState(false);
@@ -34,9 +45,13 @@ const ThinkingSection = ({ reasoning, isStreaming }) => {
         </svg>
         <span className="flex items-center gap-1.5">
           {isStreaming && (
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse" />
+            <span className="flex items-center gap-0.5">
+              <span className="thinking-dot" style={{ width: 4, height: 4 }} />
+              <span className="thinking-dot" style={{ width: 4, height: 4 }} />
+              <span className="thinking-dot" style={{ width: 4, height: 4 }} />
+            </span>
           )}
-          Thinking{isStreaming ? '...' : ''}
+          {isStreaming ? <span className="shimmer-text">Thinking</span> : 'Thinking'}
           {!expanded && !isStreaming && (
             <span className="text-xs text-[var(--text-tertiary)] opacity-60 ml-1">
               ({wordCount} words)
@@ -49,7 +64,7 @@ const ThinkingSection = ({ reasoning, isStreaming }) => {
         <div className="mt-2 ml-5 pl-3 border-l-2 border-[var(--border-secondary)] text-sm text-[var(--text-tertiary)] leading-relaxed whitespace-pre-wrap" style={{ fontFamily: 'var(--font-ui)' }}>
           {reasoning}
           {isStreaming && (
-            <span className="inline-block w-1.5 h-3 bg-[var(--text-tertiary)] animate-pulse ml-0.5 rounded-sm align-middle opacity-50" />
+            <span className="streaming-cursor" style={{ height: '0.8em', opacity: 0.7 }} />
           )}
         </div>
       )}
@@ -88,6 +103,11 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   return (
     <div className="flex w-full px-4 md:px-6 py-4">
       <div className="w-full max-w-4xl mx-auto">
+        {/* Waiting indicator — shows before any tokens arrive */}
+        {isAssistant && isStreaming && isLast && !message.reasoning && !message.content && (
+          <WaitingIndicator />
+        )}
+
         {/* Collapsible thinking/reasoning section */}
         {isAssistant && message.reasoning && (
           <ThinkingSection
@@ -195,7 +215,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           </ReactMarkdown>
 
           {isStreaming && isLast && message.content && (
-            <span className="inline-block w-2 h-4 bg-[var(--accent-primary)] animate-pulse ml-1 rounded-sm align-middle" />
+            <span className="streaming-cursor" />
           )}
         </div>
 
