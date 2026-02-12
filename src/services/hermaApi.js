@@ -61,6 +61,7 @@ export async function signup({ name, email, password, company }) {
     customer_id: data.customer_id,
     name: data.name,
     email: data.email,
+    is_admin: data.is_admin || false,
   }));
   return data;
 }
@@ -83,6 +84,7 @@ export async function login({ email, password }) {
     customer_id: data.customer_id,
     name: data.name,
     email: data.email,
+    is_admin: data.is_admin || false,
   }));
   return data;
 }
