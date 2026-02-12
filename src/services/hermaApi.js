@@ -200,6 +200,24 @@ export function getAdminAgents() {
   return authFetch('/admin/analytics/agents');
 }
 
+export function getAdminReports({ agent, severity, actionable_only, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+  if (agent) params.set('agent', agent);
+  if (severity) params.set('severity', severity);
+  if (actionable_only) params.set('actionable_only', 'true');
+  params.set('limit', limit);
+  params.set('offset', offset);
+  return authFetch(`/admin/analytics/reports?${params}`);
+}
+
+export function generateReportsNow() {
+  return authFetch('/admin/analytics/reports/generate', { method: 'POST' });
+}
+
+export function getSchedulerStatus() {
+  return authFetch('/admin/analytics/scheduler');
+}
+
 // --- Portal Chat (streaming) ---
 
 export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {

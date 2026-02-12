@@ -11,6 +11,9 @@ import {
   getAdminRouting,
   getAdminQuality,
   getAdminAgents,
+  getAdminReports,
+  generateReportsNow,
+  getSchedulerStatus,
 } from '../services/hermaApi';
 
 function fmt(n, decimals = 2) {
@@ -168,6 +171,7 @@ export default function AdminDashboard() {
     { id: 'quality', label: 'Quality' },
     { id: 'agents', label: 'Agents' },
     { id: 'memory', label: 'Memory' },
+    { id: 'reports', label: 'Reports' },
   ];
 
   return (
@@ -255,6 +259,7 @@ export default function AdminDashboard() {
         {tab === 'quality' && <QualityTab quality={quality} />}
         {tab === 'agents' && <AgentsTab agents={agents} />}
         {tab === 'memory' && <MemoryTab memory={memory} />}
+        {tab === 'reports' && <ReportsTab />}
       </div>
     </div>
   );
@@ -799,6 +804,182 @@ function MemoryTab({ memory }) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ReportsTab() {
+  const [reports, setReports] = useState(null);
+  const [scheduler, setScheduler] = useState(null);
+  const [agentFilter, setAgentFilter] = useState('');
+  const [severityFilter, setSeverityFilter] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [expanded, setExpanded] = useState({});
+
+  const loadReports = useCallback(async () => {
+    try {
+      const [rpt, sched] = await Promise.all([
+        getAdminReports({ agent: agentFilter || undefined, severity: severityFilter || undefined }),
+        getSchedulerStatus().catch(() => null),
+      ]);
+      setReports(rpt);
+      setScheduler(sched);
+    } catch {
+      // handled by parent
+    }
+  }, [agentFilter, severityFilter]);
+
+  useEffect(() => { loadReports(); }, [loadReports]);
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    try {
+      await generateReportsNow();
+      await loadReports();
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const toggleExpand = (id) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const severityStyles = {
+    critical: 'bg-red-500/10 text-red-400 border-red-500/20',
+    warning: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+    info: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  };
+
+  const agentIcons = {
+    finance: '$',
+    quality: 'Q',
+    routing: 'R',
+    optimizer: 'O',
+    memory: 'M',
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Controls */}
+      <div className="flex flex-wrap items-center gap-3">
+        <select
+          value={agentFilter}
+          onChange={(e) => setAgentFilter(e.target.value)}
+          className="text-sm bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)]"
+        >
+          <option value="">All agents</option>
+          <option value="finance">Finance</option>
+          <option value="quality">Quality</option>
+          <option value="routing">Routing</option>
+          <option value="optimizer">Optimizer</option>
+          <option value="memory">Memory</option>
+        </select>
+        <select
+          value={severityFilter}
+          onChange={(e) => setSeverityFilter(e.target.value)}
+          className="text-sm bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)]"
+        >
+          <option value="">All severities</option>
+          <option value="critical">Critical</option>
+          <option value="warning">Warning</option>
+          <option value="info">Info</option>
+        </select>
+        <button
+          onClick={handleGenerate}
+          disabled={generating}
+          className="ml-auto px-4 py-1.5 text-sm bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          {generating ? 'Generating...' : 'Generate Now'}
+        </button>
+      </div>
+
+      {/* Scheduler status */}
+      {scheduler && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`inline-block w-2 h-2 rounded-full ${scheduler.running ? 'bg-green-400' : 'bg-red-400'}`} />
+            <span className="text-sm text-[var(--text-primary)]">
+              Scheduler {scheduler.running ? 'running' : 'stopped'}
+            </span>
+          </div>
+          {scheduler.jobs?.length > 0 && (
+            <div className="space-y-1">
+              {scheduler.jobs.map((job) => (
+                <div key={job.id} className="flex items-center gap-3 text-xs text-[var(--text-tertiary)]">
+                  <span className="font-mono bg-[var(--bg-tertiary)] px-2 py-0.5 rounded">{job.id}</span>
+                  <span>{job.name}</span>
+                  {job.next_run && (
+                    <span className="ml-auto">Next: {new Date(job.next_run).toLocaleString()}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Reports list */}
+      {reports && reports.reports?.length > 0 ? (
+        <div className="space-y-3">
+          {reports.reports.map((r) => (
+            <div
+              key={r.id}
+              className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl overflow-hidden hover:border-[var(--border-accent)] transition-colors"
+            >
+              <div className="px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-bold text-[var(--accent-primary)] shrink-0">
+                    {agentIcons[r.agent_name] || '?'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${severityStyles[r.severity] || severityStyles.info}`}>
+                        {r.severity.toUpperCase()}
+                      </span>
+                      <h4 className="text-sm font-medium text-[var(--text-primary)]">{r.title}</h4>
+                      {r.actionable && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                          Actionable
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-[var(--text-tertiary)] mb-2">
+                      {r.agent_name} | {new Date(r.period_start).toLocaleDateString()} — {new Date(r.period_end).toLocaleDateString()} | {timeAgo(r.created_at)}
+                    </div>
+                    <div className="text-sm text-[var(--text-secondary)] whitespace-pre-line">{r.summary}</div>
+                  </div>
+                </div>
+              </div>
+              {r.details && (
+                <div className="border-t border-[var(--border-secondary)]">
+                  <button
+                    onClick={() => toggleExpand(r.id)}
+                    className="w-full px-5 py-2 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors text-left"
+                  >
+                    {expanded[r.id] ? 'Hide raw data' : 'Show raw data'}
+                  </button>
+                  {expanded[r.id] && (
+                    <pre className="px-5 pb-4 text-xs text-[var(--text-tertiary)] overflow-x-auto">
+                      {JSON.stringify(r.details, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <div className="text-xs text-[var(--text-tertiary)] text-center py-2">
+            Showing {reports.reports.length} of {reports.total} reports
+          </div>
+        </div>
+      ) : reports ? (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-8 text-center">
+          <div className="text-[var(--text-tertiary)] mb-2">No reports yet</div>
+          <div className="text-xs text-[var(--text-tertiary)] max-w-md mx-auto">
+            Agent reports are generated automatically — daily at 06:00 UTC (finance, quality, routing) and weekly on Mondays at 07:00 UTC (optimizer, memory). Click "Generate Now" to trigger all analyzers manually.
+          </div>
+        </div>
+      ) : (
+        <div className="text-[var(--text-tertiary)] text-center py-8">Loading reports...</div>
+      )}
     </div>
   );
 }
