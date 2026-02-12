@@ -218,6 +218,47 @@ export function getSchedulerStatus() {
   return authFetch('/admin/analytics/scheduler');
 }
 
+// --- Hierarchy / Trust / Permissions (Admin) ---
+
+export function getAgentHierarchy() {
+  return authFetch('/admin/analytics/hierarchy');
+}
+
+export function getAgentTrustScores() {
+  return authFetch('/admin/analytics/trust');
+}
+
+export function getPendingPermissions() {
+  return authFetch('/admin/analytics/permissions/pending');
+}
+
+export function approvePermission(requestId, notes = '') {
+  return authFetch(`/admin/analytics/permissions/${requestId}/approve`, {
+    method: 'POST',
+    body: JSON.stringify({ notes }),
+  });
+}
+
+export function denyPermission(requestId, notes = '') {
+  return authFetch(`/admin/analytics/permissions/${requestId}/deny`, {
+    method: 'POST',
+    body: JSON.stringify({ notes }),
+  });
+}
+
+export function getDecisionLog({ type, actor, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+  if (type) params.set('type', type);
+  if (actor) params.set('actor', actor);
+  params.set('limit', limit);
+  params.set('offset', offset);
+  return authFetch(`/admin/analytics/decisions?${params}`);
+}
+
+export function getTrustPromotions() {
+  return authFetch('/admin/analytics/trust/promotions');
+}
+
 // --- Portal Chat (streaming) ---
 
 export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {

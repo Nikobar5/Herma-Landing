@@ -14,6 +14,12 @@ import {
   getAdminReports,
   generateReportsNow,
   getSchedulerStatus,
+  getAgentHierarchy,
+  getAgentTrustScores,
+  getPendingPermissions,
+  approvePermission,
+  denyPermission,
+  getDecisionLog,
 } from '../services/hermaApi';
 
 function fmt(n, decimals = 2) {
@@ -94,6 +100,9 @@ export default function AdminDashboard() {
   const [routing, setRouting] = useState(null);
   const [quality, setQuality] = useState(null);
   const [agents, setAgents] = useState(null);
+  const [hierarchy, setHierarchy] = useState(null);
+  const [trustScores, setTrustScores] = useState(null);
+  const [pendingPerms, setPendingPerms] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tab, setTab] = useState('overview');
@@ -102,7 +111,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const [ov, dy, hr, md, rc, mem, rt, ql, ag] = await Promise.all([
+      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms] = await Promise.all([
         getAdminOverview(),
         getAdminDaily(30),
         getAdminHourly(24),
@@ -112,6 +121,9 @@ export default function AdminDashboard() {
         getAdminRouting().catch(() => null),
         getAdminQuality().catch(() => null),
         getAdminAgents().catch(() => null),
+        getAgentHierarchy().catch(() => null),
+        getAgentTrustScores().catch(() => null),
+        getPendingPermissions().catch(() => null),
       ]);
       setOverview(ov);
       setDaily(dy);
@@ -122,6 +134,9 @@ export default function AdminDashboard() {
       setRouting(rt);
       setQuality(ql);
       setAgents(ag);
+      setHierarchy(hier);
+      setTrustScores(trust);
+      setPendingPerms(perms);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -163,8 +178,11 @@ export default function AdminDashboard() {
     );
   }
 
+  const pendingCount = pendingPerms?.length || 0;
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'hierarchy', label: 'Hierarchy' },
+    { id: 'approvals', label: pendingCount > 0 ? `Approvals (${pendingCount})` : 'Approvals' },
     { id: 'models', label: 'Models' },
     { id: 'requests', label: 'Requests' },
     { id: 'routing', label: 'Routing' },
@@ -253,11 +271,13 @@ export default function AdminDashboard() {
 
         {/* Tab content */}
         {tab === 'overview' && <OverviewTab overview={overview} daily={daily} />}
+        {tab === 'hierarchy' && <HierarchyTab hierarchy={hierarchy} />}
+        {tab === 'approvals' && <ApprovalsTab pending={pendingPerms} onRefresh={loadData} />}
         {tab === 'models' && <ModelsTab models={models} />}
         {tab === 'requests' && <RequestsTab recent={recent} />}
         {tab === 'routing' && <RoutingTab routing={routing} />}
         {tab === 'quality' && <QualityTab quality={quality} />}
-        {tab === 'agents' && <AgentsTab agents={agents} />}
+        {tab === 'agents' && <AgentsTab agents={agents} trustScores={trustScores} />}
         {tab === 'memory' && <MemoryTab memory={memory} />}
         {tab === 'reports' && <ReportsTab />}
       </div>
@@ -468,7 +488,7 @@ function RequestsTab({ recent }) {
   );
 }
 
-function AgentsTab({ agents }) {
+function AgentsTab({ agents, trustScores }) {
   if (!agents?.agents) {
     return <div className="text-[var(--text-tertiary)] text-center py-8">Agent data not available.</div>;
   }
@@ -477,53 +497,89 @@ function AgentsTab({ agents }) {
   const tierColors = { 1: 'text-green-400', 2: 'text-blue-400', 3: 'text-yellow-400', 4: 'text-red-400' };
   const circuitColors = { closed: 'bg-green-400', open: 'bg-red-400', half_open: 'bg-yellow-400' };
 
+  const trustMap = {};
+  (trustScores || []).forEach((t) => { trustMap[t.agent_name] = t; });
+
   return (
     <div className="space-y-3">
-      {agents.agents.map((agent) => (
-        <div key={agent.name} className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5 hover:border-[var(--border-accent)] transition-colors">
-          <div className="flex items-start justify-between mb-3">
-            <div>
+      {agents.agents.map((agent) => {
+        const trust = trustMap[agent.name];
+        return (
+          <div key={agent.name} className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5 hover:border-[var(--border-accent)] transition-colors">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+                    {agent.role}
+                  </h3>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] font-mono">
+                    {agent.name}
+                  </span>
+                  {agent.domain && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
+                      {agent.domain}
+                    </span>
+                  )}
+                  {trust?.promotion_eligible && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                      Promotion Eligible
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">{agent.description}</p>
+              </div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {agent.role}
-                </h3>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] font-mono">
-                  {agent.name}
+                <span className={`inline-block w-2.5 h-2.5 rounded-full ${circuitColors[agent.circuit_state] || 'bg-gray-400'}`}
+                  title={`Circuit: ${agent.circuit_state}`} />
+                <span className="text-[10px] text-[var(--text-tertiary)]">{agent.circuit_state}</span>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-xs">
+              <div>
+                <span className="text-[var(--text-tertiary)]">Autonomy: </span>
+                <span className={tierColors[agent.autonomy_tier] || 'text-[var(--text-secondary)]'}>
+                  {tierLabels[agent.autonomy_tier] || `Tier ${agent.autonomy_tier}`}
                 </span>
               </div>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1">{agent.description}</p>
+              {trust && (
+                <>
+                  <div>
+                    <span className="text-[var(--text-tertiary)]">Trust: </span>
+                    <span className={trust.trust_score >= 75 ? 'text-green-400' : trust.trust_score >= 50 ? 'text-yellow-400' : 'text-red-400'}>
+                      {trust.trust_score.toFixed(1)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--text-tertiary)]">Actions: </span>
+                    <span className="text-[var(--text-secondary)]">{trust.total_actions} ({trust.successful_actions} ok / {trust.failed_actions} fail)</span>
+                  </div>
+                  {trust.safety_violations > 0 && (
+                    <div>
+                      <span className="text-[var(--text-tertiary)]">Violations: </span>
+                      <span className="text-red-400">{trust.safety_violations}</span>
+                    </div>
+                  )}
+                </>
+              )}
+              {agent.recent_errors > 0 && (
+                <div>
+                  <span className="text-[var(--text-tertiary)]">Errors: </span>
+                  <span className="text-red-400">{agent.recent_errors}</span>
+                </div>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`inline-block w-2.5 h-2.5 rounded-full ${circuitColors[agent.circuit_state] || 'bg-gray-400'}`}
-                title={`Circuit: ${agent.circuit_state}`} />
-              <span className="text-[10px] text-[var(--text-tertiary)]">{agent.circuit_state}</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-xs">
-            <div>
-              <span className="text-[var(--text-tertiary)]">Autonomy: </span>
-              <span className={tierColors[agent.autonomy_tier] || 'text-[var(--text-secondary)]'}>
-                {tierLabels[agent.autonomy_tier] || `Tier ${agent.autonomy_tier}`}
-              </span>
-            </div>
-            {agent.recent_errors > 0 && (
-              <div>
-                <span className="text-[var(--text-tertiary)]">Errors: </span>
-                <span className="text-red-400">{agent.recent_errors}</span>
+            {agent.capabilities?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {agent.capabilities.map((cap) => (
+                  <span key={cap} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">
+                    {cap}
+                  </span>
+                ))}
               </div>
             )}
           </div>
-          {agent.capabilities?.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {agent.capabilities.map((cap) => (
-                <span key={cap} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">
-                  {cap}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -980,6 +1036,249 @@ function ReportsTab() {
       ) : (
         <div className="text-[var(--text-tertiary)] text-center py-8">Loading reports...</div>
       )}
+    </div>
+  );
+}
+
+function HierarchyTab({ hierarchy }) {
+  if (!hierarchy || hierarchy.length === 0) {
+    return <div className="text-[var(--text-tertiary)] text-center py-8">Hierarchy data not available yet.</div>;
+  }
+
+  const tierLabels = { 1: 'Tier 1', 2: 'Tier 2', 3: 'Tier 3', 4: 'Tier 4' };
+  const tierColors = { 1: 'text-green-400', 2: 'text-blue-400', 3: 'text-yellow-400', 4: 'text-red-400' };
+
+  function TrustBadge({ score }) {
+    if (score == null) return null;
+    const color = score >= 75 ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                  score >= 50 ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                  'bg-red-500/10 text-red-400 border-red-500/20';
+    return (
+      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${color}`}>
+        Trust: {score.toFixed(1)}
+      </span>
+    );
+  }
+
+  function AgentNode({ node, depth = 0 }) {
+    return (
+      <div style={{ marginLeft: depth * 24 }}>
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 mb-2 hover:border-[var(--border-accent)] transition-colors">
+          <div className="flex items-center gap-2 flex-wrap">
+            {node.is_director && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                Director
+              </span>
+            )}
+            <h4 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+              {node.role}
+            </h4>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] font-mono">
+              {node.agent_name}
+            </span>
+            <span className={`text-[10px] font-medium ${tierColors[node.autonomy_tier] || 'text-[var(--text-tertiary)]'}`}>
+              {tierLabels[node.autonomy_tier]}
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
+              {node.domain}
+            </span>
+            {node.trust && <TrustBadge score={node.trust.trust_score} />}
+            {node.trust?.promotion_eligible && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                Promotion Eligible
+              </span>
+            )}
+          </div>
+          {node.description && (
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">{node.description}</p>
+          )}
+          {node.trust && (
+            <div className="flex gap-4 mt-2 text-xs text-[var(--text-tertiary)]">
+              <span>Actions: {node.trust.total_actions}</span>
+              <span>Success: {node.trust.successful_actions}</span>
+              <span>Failed: {node.trust.failed_actions}</span>
+              {node.trust.safety_violations > 0 && <span className="text-red-400">Violations: {node.trust.safety_violations}</span>}
+            </div>
+          )}
+          {node.capabilities?.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {node.capabilities.map((cap) => (
+                <span key={cap} className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">
+                  {cap}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        {node.children?.map((child) => (
+          <AgentNode key={child.agent_name} node={child} depth={depth + 1} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="mb-4">
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+              CEO (Niko)
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] border border-[var(--accent-primary)]/20">
+              Root
+            </span>
+          </div>
+          <p className="text-xs text-[var(--text-tertiary)] mt-1">Human root — all directors report here. Approves promotions, spawns, and cross-domain requests.</p>
+        </div>
+      </div>
+      {hierarchy.map((node) => (
+        <AgentNode key={node.agent_name} node={node} depth={1} />
+      ))}
+    </div>
+  );
+}
+
+function ApprovalsTab({ pending, onRefresh }) {
+  const [decisions, setDecisions] = useState(null);
+  const [actionLoading, setActionLoading] = useState({});
+  const [notes, setNotes] = useState({});
+
+  useEffect(() => {
+    getDecisionLog({ limit: 20 }).then(setDecisions).catch(() => null);
+  }, []);
+
+  const handleAction = async (id, action) => {
+    setActionLoading((prev) => ({ ...prev, [id]: true }));
+    try {
+      const fn = action === 'approve' ? approvePermission : denyPermission;
+      await fn(id, notes[id] || '');
+      onRefresh();
+      getDecisionLog({ limit: 20 }).then(setDecisions).catch(() => null);
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const typeLabels = {
+    capability: 'Capability',
+    tier_promotion: 'Promotion',
+    spawn_agent: 'Spawn Agent',
+  };
+  const statusColors = {
+    pending: 'bg-yellow-500/10 text-yellow-400',
+    approved: 'bg-green-500/10 text-green-400',
+    denied: 'bg-red-500/10 text-red-400',
+    escalated: 'bg-purple-500/10 text-purple-400',
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Pending requests */}
+      <div>
+        <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+          Pending CEO Approvals
+        </h3>
+        {pending && pending.length > 0 ? (
+          <div className="space-y-3">
+            {pending.map((req) => (
+              <div key={req.id} className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${statusColors[req.status] || 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]'}`}>
+                        {typeLabels[req.request_type] || req.request_type}
+                      </span>
+                      <span className="text-sm font-medium text-[var(--text-primary)]">
+                        {req.requesting_agent}
+                      </span>
+                      <span className="text-xs text-[var(--text-tertiary)]">
+                        requests: {req.requested_capability}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)]">{req.justification}</p>
+                    {req.reviewer_chain?.length > 0 && (
+                      <div className="text-[10px] text-[var(--text-tertiary)] mt-1">
+                        Review chain: {req.reviewer_chain.join(' → ')}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-xs text-[var(--text-tertiary)]">{timeAgo(req.created_at)}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <input
+                    type="text"
+                    placeholder="Notes (optional)"
+                    value={notes[req.id] || ''}
+                    onChange={(e) => setNotes((prev) => ({ ...prev, [req.id]: e.target.value }))}
+                    className="flex-1 text-xs bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
+                  />
+                  <button
+                    onClick={() => handleAction(req.id, 'approve')}
+                    disabled={actionLoading[req.id]}
+                    className="px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-500 disabled:opacity-50"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleAction(req.id, 'deny')}
+                    disabled={actionLoading[req.id]}
+                    className="px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg hover:bg-red-500 disabled:opacity-50"
+                  >
+                    Deny
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-8 text-center">
+            <div className="text-[var(--text-tertiary)]">No pending approvals</div>
+            <div className="text-xs text-[var(--text-tertiary)] mt-1">Promotion requests and cross-domain capability requests will appear here.</div>
+          </div>
+        )}
+      </div>
+
+      {/* Decision log */}
+      <div>
+        <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+          Decision Log
+        </h3>
+        {decisions?.entries?.length > 0 ? (
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] text-xs border-b border-[var(--border-secondary)]">
+                  <th className="text-left px-5 py-2">Time</th>
+                  <th className="text-left px-3 py-2">Type</th>
+                  <th className="text-left px-3 py-2">Actor</th>
+                  <th className="text-left px-3 py-2">Subject</th>
+                  <th className="text-left px-5 py-2">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {decisions.entries.map((d) => (
+                  <tr key={d.id} className="border-b border-[var(--border-secondary)]/50 hover:bg-[var(--bg-tertiary)]/30">
+                    <td className="px-5 py-2 text-xs text-[var(--text-secondary)]">{timeAgo(d.created_at)}</td>
+                    <td className="px-3 py-2">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">
+                        {d.decision_type}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-[var(--text-primary)] font-mono">{d.actor}</td>
+                    <td className="px-3 py-2 text-xs text-[var(--text-primary)] font-mono">{d.subject}</td>
+                    <td className="px-5 py-2 text-xs text-[var(--text-tertiary)] max-w-xs truncate">
+                      {d.details ? JSON.stringify(d.details).slice(0, 80) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-[var(--text-tertiary)] text-center py-4 text-sm">No decisions logged yet.</div>
+        )}
+      </div>
     </div>
   );
 }
