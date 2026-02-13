@@ -31,6 +31,10 @@ import {
   getQaOverview,
   getQaRuns,
   triggerQaRun,
+  getQaScenarios,
+  generateQaScenarios,
+  activateQaScenario,
+  retireQaScenario,
   getCsuiteOverview,
 } from '../services/hermaApi';
 
@@ -1670,16 +1674,19 @@ function QaTestingTab({ qaOverview, onRefresh }) {
   const [runs, setRuns] = useState(null);
   const [triggering, setTriggering] = useState(false);
   const [expanded, setExpanded] = useState({});
+  const [scenarios, setScenarios] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [scenarioExpanded, setScenarioExpanded] = useState({});
 
   useEffect(() => {
     getQaRuns({ limit: 30 }).then(setRuns).catch(() => null);
+    getQaScenarios().then(setScenarios).catch(() => null);
   }, []);
 
   const handleTrigger = async () => {
     setTriggering(true);
     try {
       await triggerQaRun();
-      // Wait briefly then refresh
       setTimeout(async () => {
         onRefresh();
         const data = await getQaRuns({ limit: 30 }).catch(() => null);
@@ -1689,11 +1696,60 @@ function QaTestingTab({ qaOverview, onRefresh }) {
     } catch { setTriggering(false); }
   };
 
+  const handleGenerate = async () => {
+    setGenerating(true);
+    try {
+      await generateQaScenarios();
+      setTimeout(async () => {
+        onRefresh();
+        const data = await getQaScenarios().catch(() => null);
+        setScenarios(data);
+        setGenerating(false);
+      }, 3000);
+    } catch { setGenerating(false); }
+  };
+
+  const handleActivate = async (id) => {
+    try {
+      await activateQaScenario(id);
+      const data = await getQaScenarios().catch(() => null);
+      setScenarios(data);
+      onRefresh();
+    } catch { /* ignore */ }
+  };
+
+  const handleRetire = async (id) => {
+    try {
+      await retireQaScenario(id, 'Manually retired from dashboard');
+      const data = await getQaScenarios().catch(() => null);
+      setScenarios(data);
+      onRefresh();
+    } catch { /* ignore */ }
+  };
+
   const statusStyles = {
     passed: 'bg-green-500/10 text-green-400',
     failed: 'bg-red-500/10 text-red-400',
     error: 'bg-yellow-500/10 text-yellow-400',
   };
+
+  const scenarioStatusStyles = {
+    draft: 'bg-yellow-500/10 text-yellow-400',
+    active: 'bg-green-500/10 text-green-400',
+    retired: 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]',
+  };
+
+  const categoryStyles = {
+    edge_case: 'bg-purple-500/10 text-purple-400',
+    regression: 'bg-red-500/10 text-red-400',
+    stress: 'bg-orange-500/10 text-orange-400',
+    safety: 'bg-blue-500/10 text-blue-400',
+    capability: 'bg-cyan-500/10 text-cyan-400',
+  };
+
+  const activeScenarios = scenarios?.filter(s => s.status === 'active') || [];
+  const draftScenarios = scenarios?.filter(s => s.status === 'draft') || [];
+  const retiredScenarios = scenarios?.filter(s => s.status === 'retired') || [];
 
   return (
     <div className="space-y-4">
@@ -1705,13 +1761,83 @@ function QaTestingTab({ qaOverview, onRefresh }) {
         <StatCard label="Total Cost" value={fmtUsd(qaOverview?.total_cost)} sub={qaOverview?.last_run ? `Last: ${timeAgo(qaOverview.last_run)}` : 'Never run'} />
       </div>
 
-      {/* Trigger button */}
-      <div>
+      {/* Action buttons */}
+      <div className="flex gap-3">
         <button onClick={handleTrigger} disabled={triggering}
           className="px-4 py-1.5 text-sm bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90 disabled:opacity-50">
           {triggering ? 'Running...' : 'Run Tests Now'}
         </button>
+        <button onClick={handleGenerate} disabled={generating}
+          className="px-4 py-1.5 text-sm bg-[var(--bg-tertiary)] text-[var(--text-primary)] border border-[var(--border-secondary)] rounded-lg hover:opacity-90 disabled:opacity-50">
+          {generating ? 'Generating...' : 'Generate New Scenarios'}
+        </button>
       </div>
+
+      {/* Generated Scenarios */}
+      {scenarios && scenarios.length > 0 && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-[var(--border-secondary)] flex items-center justify-between">
+            <h3 className="text-sm font-medium text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+              Generated Scenarios
+            </h3>
+            <div className="flex gap-2 text-[10px]">
+              <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400">{activeScenarios.length} active</span>
+              <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400">{draftScenarios.length} draft</span>
+              <span className="px-2 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">{retiredScenarios.length} retired</span>
+            </div>
+          </div>
+          <div className="divide-y divide-[var(--border-secondary)]/50">
+            {scenarios.map((s) => (
+              <div key={s.id} className="px-5 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-[var(--text-primary)]">{s.name}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${categoryStyles[s.category] || 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]'}`}>
+                      {s.category}
+                    </span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${scenarioStatusStyles[s.status]}`}>
+                      {s.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[var(--text-tertiary)]">
+                      {s.pass_count}P / {s.fail_count}F
+                      {s.last_run_at && ` · ${timeAgo(s.last_run_at)}`}
+                    </span>
+                    {s.status === 'draft' && (
+                      <button onClick={() => handleActivate(s.id)}
+                        className="text-[10px] px-2 py-0.5 bg-green-500/10 text-green-400 rounded hover:bg-green-500/20">
+                        Activate
+                      </button>
+                    )}
+                    {s.status === 'active' && (
+                      <button onClick={() => handleRetire(s.id)}
+                        className="text-[10px] px-2 py-0.5 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20">
+                        Retire
+                      </button>
+                    )}
+                    <button onClick={() => setScenarioExpanded((p) => ({ ...p, [s.id]: !p[s.id] }))}
+                      className="text-[10px] text-[var(--accent-primary)] hover:underline">
+                      {scenarioExpanded[s.id] ? 'Hide' : 'Details'}
+                    </button>
+                  </div>
+                </div>
+                <div className="text-xs text-[var(--text-secondary)] mt-1">{s.rationale}</div>
+                {scenarioExpanded[s.id] && (
+                  <div className="mt-2 p-3 bg-[var(--bg-tertiary)]/30 rounded-lg">
+                    {s.retired_reason && (
+                      <div className="text-xs text-[var(--text-tertiary)] mb-2">Retired: {s.retired_reason}</div>
+                    )}
+                    <pre className="text-xs text-[var(--text-tertiary)] overflow-x-auto whitespace-pre-wrap">
+                      {JSON.stringify(s.scenario_config, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent runs table */}
       <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl overflow-hidden">

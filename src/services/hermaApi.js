@@ -325,6 +325,31 @@ export function triggerQaRun() {
   return authFetch('/admin/analytics/qa/trigger', { method: 'POST' });
 }
 
+// --- QA Scenarios (Admin) ---
+
+export function getQaScenarios({ status, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  params.set('limit', limit);
+  params.set('offset', offset);
+  return authFetch(`/admin/analytics/qa/scenarios?${params}`);
+}
+
+export function generateQaScenarios() {
+  return authFetch('/admin/analytics/qa/scenarios/generate', { method: 'POST' });
+}
+
+export function activateQaScenario(id) {
+  return authFetch(`/admin/analytics/qa/scenarios/${id}/activate`, { method: 'POST' });
+}
+
+export function retireQaScenario(id, reason = '') {
+  return authFetch(`/admin/analytics/qa/scenarios/${id}/retire`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
 // --- C-Suite (Admin) ---
 
 export function getCsuiteOverview() {
