@@ -58,9 +58,9 @@ const Header = () => {
       <header
         className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-sm transition-all duration-300 w-full border-b
         ${scrolled
-          ? 'py-2 bg-[var(--bg-primary)]/95 shadow-lg border-[var(--border-primary)]'
-          : 'py-4 bg-[var(--bg-primary)]/80 border-transparent'
-        }`}
+            ? 'py-2 bg-[var(--bg-primary)]/95 shadow-lg border-[var(--border-primary)]'
+            : 'py-4 bg-[var(--bg-primary)]/80 border-transparent'
+          }`}
       >
         <div className="w-full px-6 sm:px-8 lg:px-12">
           <div className="flex justify-between items-center">
@@ -127,14 +127,14 @@ const Header = () => {
                 )}
               </nav>
 
-              {/* Request Demo Button */}
+              {/* Try it out Button */}
               <button
-                onClick={handleRequestDemo}
+                onClick={() => navigate('/chat')}
                 className="hidden sm:flex px-5 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-full shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)] transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 <span className="text-sm">
-                  Request a Demo
+                  Try it out
                 </span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
