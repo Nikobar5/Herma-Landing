@@ -20,6 +20,18 @@ import {
   approvePermission,
   denyPermission,
   getDecisionLog,
+  getNotifications,
+  getNotificationCount,
+  markNotificationRead,
+  markAllNotificationsRead,
+  actionNotification,
+  getAgentBudgets,
+  allocateBudget,
+  updateBudget,
+  getQaOverview,
+  getQaRuns,
+  triggerQaRun,
+  getCsuiteOverview,
 } from '../services/hermaApi';
 
 function fmt(n, decimals = 2) {
@@ -103,6 +115,12 @@ export default function AdminDashboard() {
   const [hierarchy, setHierarchy] = useState(null);
   const [trustScores, setTrustScores] = useState(null);
   const [pendingPerms, setPendingPerms] = useState(null);
+  const [notifCount, setNotifCount] = useState(0);
+  const [budgets, setBudgets] = useState(null);
+  const [qaOverview, setQaOverview] = useState(null);
+  const [csuiteData, setCsuiteData] = useState(null);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  const [notifDropdownData, setNotifDropdownData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tab, setTab] = useState('overview');
@@ -111,7 +129,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms] = await Promise.all([
+      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs] = await Promise.all([
         getAdminOverview(),
         getAdminDaily(30),
         getAdminHourly(24),
@@ -124,6 +142,10 @@ export default function AdminDashboard() {
         getAgentHierarchy().catch(() => null),
         getAgentTrustScores().catch(() => null),
         getPendingPermissions().catch(() => null),
+        getNotificationCount().catch(() => ({ unread: 0 })),
+        getAgentBudgets().catch(() => null),
+        getQaOverview().catch(() => null),
+        getCsuiteOverview().catch(() => null),
       ]);
       setOverview(ov);
       setDaily(dy);
@@ -137,6 +159,10 @@ export default function AdminDashboard() {
       setHierarchy(hier);
       setTrustScores(trust);
       setPendingPerms(perms);
+      setNotifCount(nc?.unread || 0);
+      setBudgets(bud);
+      setQaOverview(qa);
+      setCsuiteData(cs);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -181,8 +207,11 @@ export default function AdminDashboard() {
   const pendingCount = pendingPerms?.length || 0;
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'notifications', label: notifCount > 0 ? `Notifications (${notifCount})` : 'Notifications' },
     { id: 'hierarchy', label: 'Hierarchy' },
     { id: 'approvals', label: pendingCount > 0 ? `Approvals (${pendingCount})` : 'Approvals' },
+    { id: 'budgets', label: 'Budgets' },
+    { id: 'qa', label: 'QA Testing' },
     { id: 'models', label: 'Models' },
     { id: 'requests', label: 'Requests' },
     { id: 'routing', label: 'Routing' },
@@ -206,6 +235,55 @@ export default function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            {/* Notification bell */}
+            <div className="relative">
+              <button
+                onClick={async () => {
+                  if (!showNotifDropdown && !notifDropdownData) {
+                    try {
+                      const data = await getNotifications({ is_read: false, limit: 5 });
+                      setNotifDropdownData(data?.notifications || []);
+                    } catch { setNotifDropdownData([]); }
+                  }
+                  setShowNotifDropdown((v) => !v);
+                }}
+                className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors relative"
+                title="Notifications"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {notifCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 text-[10px] font-bold bg-red-500 text-white rounded-full flex items-center justify-center">
+                    {notifCount > 99 ? '99+' : notifCount}
+                  </span>
+                )}
+              </button>
+              {showNotifDropdown && (
+                <div className="absolute right-0 top-8 w-80 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl shadow-xl z-30 overflow-hidden">
+                  <div className="px-4 py-2 border-b border-[var(--border-secondary)] flex items-center justify-between">
+                    <span className="text-xs font-medium text-[var(--text-primary)]">Notifications</span>
+                    <button onClick={() => { setShowNotifDropdown(false); setTab('notifications'); }} className="text-[10px] text-[var(--accent-primary)] hover:underline">
+                      View all
+                    </button>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto divide-y divide-[var(--border-secondary)]/50">
+                    {notifDropdownData && notifDropdownData.length > 0 ? notifDropdownData.map((n) => (
+                      <div key={n.id} className="px-4 py-3 hover:bg-[var(--bg-tertiary)]/30">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className={`w-1.5 h-1.5 rounded-full ${n.severity === 'critical' ? 'bg-red-400' : n.severity === 'warning' ? 'bg-yellow-400' : 'bg-blue-400'}`} />
+                          <span className="text-xs font-medium text-[var(--text-primary)] truncate">{n.title}</span>
+                        </div>
+                        <p className="text-[10px] text-[var(--text-tertiary)] line-clamp-2">{n.message}</p>
+                        <span className="text-[10px] text-[var(--text-tertiary)]">{timeAgo(n.created_at)}</span>
+                      </div>
+                    )) : (
+                      <div className="px-4 py-6 text-center text-xs text-[var(--text-tertiary)]">No unread notifications</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               onClick={loadData}
               className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
@@ -270,9 +348,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tab content */}
-        {tab === 'overview' && <OverviewTab overview={overview} daily={daily} />}
+        {tab === 'overview' && <OverviewTab overview={overview} daily={daily} notifCount={notifCount} pendingCount={pendingCount} />}
+        {tab === 'notifications' && <NotificationsTab onRefresh={loadData} />}
         {tab === 'hierarchy' && <HierarchyTab hierarchy={hierarchy} />}
         {tab === 'approvals' && <ApprovalsTab pending={pendingPerms} onRefresh={loadData} />}
+        {tab === 'budgets' && <BudgetsTab budgets={budgets} onRefresh={loadData} />}
+        {tab === 'qa' && <QaTestingTab qaOverview={qaOverview} onRefresh={loadData} />}
         {tab === 'models' && <ModelsTab models={models} />}
         {tab === 'requests' && <RequestsTab recent={recent} />}
         {tab === 'routing' && <RoutingTab routing={routing} />}
@@ -285,9 +366,21 @@ export default function AdminDashboard() {
   );
 }
 
-function OverviewTab({ overview, daily }) {
+function OverviewTab({ overview, daily, notifCount = 0, pendingCount = 0 }) {
   return (
     <div className="space-y-4">
+      {/* Action items row */}
+      {(notifCount > 0 || pendingCount > 0) && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {notifCount > 0 && (
+            <StatCard label="Unread Notifications" value={notifCount} accent />
+          )}
+          {pendingCount > 0 && (
+            <StatCard label="Pending Approvals" value={pendingCount} accent />
+          )}
+        </div>
+      )}
+
       {/* Financial summary */}
       <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5">
         <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
@@ -906,6 +999,11 @@ function ReportsTab() {
   };
 
   const agentIcons = {
+    cso: 'S',
+    cqo: 'Q',
+    cto: 'T',
+    cfo: 'F',
+    qa_tester: 'QA',
     finance: '$',
     quality: 'Q',
     routing: 'R',
@@ -923,6 +1021,11 @@ function ReportsTab() {
           className="text-sm bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)]"
         >
           <option value="">All agents</option>
+          <option value="cso">CSO</option>
+          <option value="cqo">CQO</option>
+          <option value="cto">CTO</option>
+          <option value="cfo">CFO</option>
+          <option value="qa_tester">QA Tester</option>
           <option value="finance">Finance</option>
           <option value="quality">Quality</option>
           <option value="routing">Routing</option>
@@ -1065,7 +1168,12 @@ function HierarchyTab({ hierarchy }) {
       <div style={{ marginLeft: depth * 24 }}>
         <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 mb-2 hover:border-[var(--border-accent)] transition-colors">
           <div className="flex items-center gap-2 flex-wrap">
-            {node.is_director && (
+            {node.is_executive && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                Executive
+              </span>
+            )}
+            {node.is_director && !node.is_executive && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
                 Director
               </span>
@@ -1129,7 +1237,7 @@ function HierarchyTab({ hierarchy }) {
               Root
             </span>
           </div>
-          <p className="text-xs text-[var(--text-tertiary)] mt-1">Human root — all directors report here. Approves promotions, spawns, and cross-domain requests.</p>
+          <p className="text-xs text-[var(--text-tertiary)] mt-1">Human root — executives report here. Approves promotions, budget allocation, spawns, and cross-domain requests.</p>
         </div>
       </div>
       {hierarchy.map((node) => (
@@ -1277,6 +1385,412 @@ function ApprovalsTab({ pending, onRefresh }) {
           </div>
         ) : (
           <div className="text-[var(--text-tertiary)] text-center py-4 text-sm">No decisions logged yet.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NotificationsTab({ onRefresh }) {
+  const [notifications, setNotifications] = useState(null);
+  const [sevFilter, setSevFilter] = useState('');
+  const [readFilter, setReadFilter] = useState('unread');
+  const [actionLoading, setActionLoading] = useState({});
+
+  const loadNotifs = useCallback(async () => {
+    try {
+      const isRead = readFilter === 'all' ? undefined : readFilter === 'read' ? true : false;
+      const data = await getNotifications({ is_read: isRead, severity: sevFilter || undefined, limit: 50 });
+      setNotifications(data);
+    } catch { setNotifications(null); }
+  }, [sevFilter, readFilter]);
+
+  useEffect(() => { loadNotifs(); }, [loadNotifs]);
+
+  const handleMarkRead = async (id) => {
+    setActionLoading((p) => ({ ...p, [id]: true }));
+    try { await markNotificationRead(id); await loadNotifs(); onRefresh(); } finally { setActionLoading((p) => ({ ...p, [id]: false })); }
+  };
+
+  const handleMarkAllRead = async () => {
+    try { await markAllNotificationsRead(); await loadNotifs(); onRefresh(); } catch {}
+  };
+
+  const handleAction = async (id) => {
+    setActionLoading((p) => ({ ...p, [id]: true }));
+    try { await actionNotification(id); await loadNotifs(); onRefresh(); } finally { setActionLoading((p) => ({ ...p, [id]: false })); }
+  };
+
+  const sevStyles = {
+    critical: 'bg-red-500/10 text-red-400 border-red-500/20',
+    warning: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+    info: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)}
+          className="text-sm bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)]">
+          <option value="">All severities</option>
+          <option value="critical">Critical</option>
+          <option value="warning">Warning</option>
+          <option value="info">Info</option>
+        </select>
+        <select value={readFilter} onChange={(e) => setReadFilter(e.target.value)}
+          className="text-sm bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)]">
+          <option value="unread">Unread</option>
+          <option value="read">Read</option>
+          <option value="all">All</option>
+        </select>
+        <button onClick={handleMarkAllRead}
+          className="ml-auto px-4 py-1.5 text-sm bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] rounded-lg hover:text-[var(--text-primary)] transition-colors">
+          Mark all read
+        </button>
+      </div>
+
+      {notifications?.notifications?.length > 0 ? (
+        <div className="space-y-3">
+          {notifications.notifications.map((n) => (
+            <div key={n.id} className={`bg-[var(--bg-secondary)] border rounded-xl p-5 transition-colors ${n.is_read ? 'border-[var(--border-secondary)] opacity-70' : 'border-[var(--border-accent)]'}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${sevStyles[n.severity] || sevStyles.info}`}>
+                      {n.severity.toUpperCase()}
+                    </span>
+                    <span className="text-sm font-medium text-[var(--text-primary)]">{n.title}</span>
+                    {n.source_agent && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] font-mono">
+                        {n.source_agent}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] mb-1">{n.message}</p>
+                  {n.proposed_action && (
+                    <p className="text-xs text-[var(--accent-primary)] italic">Suggested: {n.proposed_action}</p>
+                  )}
+                </div>
+                <span className="text-[10px] text-[var(--text-tertiary)] whitespace-nowrap">{timeAgo(n.created_at)}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-3">
+                {!n.is_read && (
+                  <button onClick={() => handleMarkRead(n.id)} disabled={actionLoading[n.id]}
+                    className="px-3 py-1 text-xs bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] rounded-lg hover:text-[var(--text-primary)] disabled:opacity-50">
+                    Mark read
+                  </button>
+                )}
+                {n.action_type && !n.is_actioned && (
+                  <button onClick={() => handleAction(n.id)} disabled={actionLoading[n.id]}
+                    className="px-3 py-1 text-xs bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90 disabled:opacity-50">
+                    {n.action_type.replace(/_/g, ' ')}
+                  </button>
+                )}
+                {n.is_actioned && (
+                  <span className="text-[10px] text-green-400">Actioned</span>
+                )}
+              </div>
+            </div>
+          ))}
+          {notifications.total > notifications.notifications.length && (
+            <div className="text-xs text-[var(--text-tertiary)] text-center py-2">
+              Showing {notifications.notifications.length} of {notifications.total}
+            </div>
+          )}
+        </div>
+      ) : notifications ? (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-8 text-center">
+          <div className="text-[var(--text-tertiary)]">No notifications</div>
+          <div className="text-xs text-[var(--text-tertiary)] mt-1">Events from agents, QA tests, budgets, and permissions will appear here.</div>
+        </div>
+      ) : (
+        <div className="text-[var(--text-tertiary)] text-center py-8">Loading notifications...</div>
+      )}
+    </div>
+  );
+}
+
+function BudgetsTab({ budgets, onRefresh }) {
+  const [showForm, setShowForm] = useState(false);
+  const [formAgent, setFormAgent] = useState('');
+  const [formAmount, setFormAmount] = useState('');
+  const [formPeriod, setFormPeriod] = useState('monthly');
+  const [saving, setSaving] = useState(false);
+  const [editAgent, setEditAgent] = useState(null);
+  const [editAmount, setEditAmount] = useState('');
+
+  const handleAllocate = async () => {
+    if (!formAgent || !formAmount) return;
+    setSaving(true);
+    try {
+      await allocateBudget(formAgent, parseFloat(formAmount), formPeriod);
+      setShowForm(false);
+      setFormAgent('');
+      setFormAmount('');
+      onRefresh();
+    } finally { setSaving(false); }
+  };
+
+  const handleUpdate = async (agentName, updates) => {
+    try {
+      await updateBudget(agentName, updates);
+      setEditAgent(null);
+      onRefresh();
+    } catch {}
+  };
+
+  const budgetList = budgets || [];
+  const totalAllocated = budgetList.reduce((s, b) => s + Number(b.allocated_usd || 0), 0);
+  const totalSpent = budgetList.reduce((s, b) => s + Number(b.spent_usd || 0), 0);
+
+  return (
+    <div className="space-y-4">
+      {/* Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <StatCard label="Total Allocated" value={fmtUsd(totalAllocated)} accent />
+        <StatCard label="Total Spent" value={fmtUsd(totalSpent)} />
+        <StatCard label="Remaining" value={fmtUsd(totalAllocated - totalSpent)} />
+      </div>
+
+      {/* Allocate button */}
+      <div className="flex items-center gap-3">
+        <button onClick={() => setShowForm((v) => !v)}
+          className="px-4 py-1.5 text-sm bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90">
+          {showForm ? 'Cancel' : 'Allocate Budget'}
+        </button>
+      </div>
+
+      {/* Allocate form */}
+      {showForm && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5">
+          <h4 className="text-sm font-medium text-[var(--text-primary)] mb-3">Allocate Budget</h4>
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="text-xs text-[var(--text-tertiary)] block mb-1">Agent</label>
+              <input type="text" value={formAgent} onChange={(e) => setFormAgent(e.target.value)}
+                placeholder="e.g. qa_tester" className="text-sm bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] w-40" />
+            </div>
+            <div>
+              <label className="text-xs text-[var(--text-tertiary)] block mb-1">Amount (USD)</label>
+              <input type="number" value={formAmount} onChange={(e) => setFormAmount(e.target.value)}
+                placeholder="250" className="text-sm bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] w-32" />
+            </div>
+            <div>
+              <label className="text-xs text-[var(--text-tertiary)] block mb-1">Period</label>
+              <select value={formPeriod} onChange={(e) => setFormPeriod(e.target.value)}
+                className="text-sm bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)]">
+                <option value="monthly">Monthly</option>
+                <option value="one_time">One-time</option>
+              </select>
+            </div>
+            <button onClick={handleAllocate} disabled={saving || !formAgent || !formAmount}
+              className="px-4 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-500 disabled:opacity-50">
+              {saving ? 'Saving...' : 'Allocate'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Budget cards */}
+      {budgetList.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {budgetList.map((b) => {
+            const allocated = Number(b.allocated_usd || 0);
+            const spent = Number(b.spent_usd || 0);
+            const remaining = allocated - spent;
+            const pct = allocated > 0 ? Math.min(100, (spent / allocated) * 100) : 0;
+            const barColor = pct >= 90 ? 'bg-red-400' : pct >= 70 ? 'bg-yellow-400' : 'bg-green-400';
+            return (
+              <div key={b.agent_name} className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5 hover:border-[var(--border-accent)] transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+                      {b.agent_name}
+                    </h4>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">
+                      {b.period_type}
+                    </span>
+                    {b.is_paused && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20">
+                        PAUSED
+                      </span>
+                    )}
+                  </div>
+                  <button onClick={() => { setEditAgent(editAgent === b.agent_name ? null : b.agent_name); setEditAmount(String(allocated)); }}
+                    className="text-[10px] text-[var(--accent-primary)] hover:underline">
+                    {editAgent === b.agent_name ? 'Cancel' : 'Edit'}
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-xs mb-3">
+                  <div>
+                    <div className="text-[var(--text-tertiary)]">Allocated</div>
+                    <div className="text-[var(--text-primary)] font-medium">{fmtUsd(allocated)}</div>
+                  </div>
+                  <div>
+                    <div className="text-[var(--text-tertiary)]">Spent</div>
+                    <div className="text-[var(--text-primary)] font-medium">{fmtUsd(spent)}</div>
+                  </div>
+                  <div>
+                    <div className="text-[var(--text-tertiary)]">Remaining</div>
+                    <div className={`font-medium ${remaining > 0 ? 'text-green-400' : 'text-red-400'}`}>{fmtUsd(remaining)}</div>
+                  </div>
+                </div>
+                <div className="h-2 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                </div>
+                <div className="text-[10px] text-[var(--text-tertiary)] mt-1">{pct.toFixed(1)}% used</div>
+
+                {editAgent === b.agent_name && (
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--border-secondary)]">
+                    <input type="number" value={editAmount} onChange={(e) => setEditAmount(e.target.value)}
+                      className="text-sm bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] rounded-lg px-3 py-1.5 text-[var(--text-primary)] w-32" />
+                    <button onClick={() => handleUpdate(b.agent_name, { amount_usd: parseFloat(editAmount) })}
+                      className="px-3 py-1 text-xs bg-green-600 text-white rounded-lg hover:bg-green-500">Save</button>
+                    {b.is_paused && (
+                      <button onClick={() => handleUpdate(b.agent_name, { is_paused: false })}
+                        className="px-3 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500">Resume</button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-8 text-center">
+          <div className="text-[var(--text-tertiary)]">No budgets allocated</div>
+          <div className="text-xs text-[var(--text-tertiary)] mt-1">Allocate budgets to agents to control their autonomous spending.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function QaTestingTab({ qaOverview, onRefresh }) {
+  const [runs, setRuns] = useState(null);
+  const [triggering, setTriggering] = useState(false);
+  const [expanded, setExpanded] = useState({});
+
+  useEffect(() => {
+    getQaRuns({ limit: 30 }).then(setRuns).catch(() => null);
+  }, []);
+
+  const handleTrigger = async () => {
+    setTriggering(true);
+    try {
+      await triggerQaRun();
+      // Wait briefly then refresh
+      setTimeout(async () => {
+        onRefresh();
+        const data = await getQaRuns({ limit: 30 }).catch(() => null);
+        setRuns(data);
+        setTriggering(false);
+      }, 2000);
+    } catch { setTriggering(false); }
+  };
+
+  const statusStyles = {
+    passed: 'bg-green-500/10 text-green-400',
+    failed: 'bg-red-500/10 text-red-400',
+    error: 'bg-yellow-500/10 text-yellow-400',
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Pass Rate" value={qaOverview?.pass_rate != null ? fmtPct(qaOverview.pass_rate) : 'N/A'} accent />
+        <StatCard label="Total Runs" value={qaOverview?.total_runs || 0} sub={`${qaOverview?.passed || 0} passed / ${qaOverview?.failed || 0} failed`} />
+        <StatCard label="Avg Latency" value={qaOverview?.avg_latency_ms ? `${qaOverview.avg_latency_ms}ms` : 'N/A'} />
+        <StatCard label="Total Cost" value={fmtUsd(qaOverview?.total_cost)} sub={qaOverview?.last_run ? `Last: ${timeAgo(qaOverview.last_run)}` : 'Never run'} />
+      </div>
+
+      {/* Trigger button */}
+      <div>
+        <button onClick={handleTrigger} disabled={triggering}
+          className="px-4 py-1.5 text-sm bg-[var(--accent-primary)] text-white rounded-lg hover:opacity-90 disabled:opacity-50">
+          {triggering ? 'Running...' : 'Run Tests Now'}
+        </button>
+      </div>
+
+      {/* Recent runs table */}
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-[var(--border-secondary)]">
+          <h3 className="text-sm font-medium text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+            Recent Test Runs
+          </h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-[var(--text-tertiary)] text-xs border-b border-[var(--border-secondary)]">
+                <th className="text-left px-5 py-2">Scenario</th>
+                <th className="text-center px-3 py-2">Status</th>
+                <th className="text-right px-3 py-2">Latency</th>
+                <th className="text-right px-3 py-2">Score</th>
+                <th className="text-right px-3 py-2">Cost</th>
+                <th className="text-left px-3 py-2">Time</th>
+                <th className="text-center px-5 py-2">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runs?.runs?.length > 0 ? runs.runs.map((r) => (
+                <React.Fragment key={r.id}>
+                  <tr className="border-b border-[var(--border-secondary)]/50 hover:bg-[var(--bg-tertiary)]/30">
+                    <td className="px-5 py-2 font-mono text-xs text-[var(--text-primary)]">{r.scenario_name}</td>
+                    <td className="text-center px-3 py-2">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${statusStyles[r.status] || 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]'}`}>
+                        {r.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="text-right px-3 py-2 text-xs text-[var(--text-secondary)]">
+                      {r.response_latency_ms ? `${(r.response_latency_ms / 1000).toFixed(1)}s` : '—'}
+                    </td>
+                    <td className="text-right px-3 py-2 text-xs">
+                      {r.quality_score != null ? (
+                        <span className={r.quality_score >= 4 ? 'text-green-400' : r.quality_score >= 2.5 ? 'text-yellow-400' : 'text-red-400'}>
+                          {r.quality_score.toFixed(1)}
+                        </span>
+                      ) : '—'}
+                    </td>
+                    <td className="text-right px-3 py-2 text-xs text-[var(--text-secondary)]">{fmtUsd(r.cost_usd)}</td>
+                    <td className="px-3 py-2 text-xs text-[var(--text-tertiary)]">{timeAgo(r.created_at)}</td>
+                    <td className="text-center px-5 py-2">
+                      <button onClick={() => setExpanded((p) => ({ ...p, [r.id]: !p[r.id] }))}
+                        className="text-[10px] text-[var(--accent-primary)] hover:underline">
+                        {expanded[r.id] ? 'Hide' : 'Show'}
+                      </button>
+                    </td>
+                  </tr>
+                  {expanded[r.id] && (
+                    <tr>
+                      <td colSpan={7} className="px-5 py-3 bg-[var(--bg-tertiary)]/20">
+                        {r.error_message && (
+                          <div className="text-xs text-red-400 mb-2">Error: {r.error_message}</div>
+                        )}
+                        {r.details && (
+                          <pre className="text-xs text-[var(--text-tertiary)] overflow-x-auto whitespace-pre-wrap">
+                            {JSON.stringify(r.details, null, 2)}
+                          </pre>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              )) : (
+                <tr>
+                  <td colSpan={7} className="px-5 py-8 text-center text-[var(--text-tertiary)]">
+                    No test runs yet. Click "Run Tests Now" to start.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {runs?.total > (runs?.runs?.length || 0) && (
+          <div className="text-xs text-[var(--text-tertiary)] text-center py-2 border-t border-[var(--border-secondary)]">
+            Showing {runs.runs.length} of {runs.total} runs
+          </div>
         )}
       </div>
     </div>
