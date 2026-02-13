@@ -358,7 +358,7 @@ export function getCsuiteOverview() {
 
 // --- Portal Chat (streaming) ---
 
-export async function streamChat(messages, { onChunk, onDone, onError, signal } = {}) {
+export async function streamChat(messages, { onChunk, onDone, onError, signal, model } = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
@@ -366,13 +366,16 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal } 
     throw new Error('Not authenticated');
   }
 
+  const body = { messages, stream: true };
+  if (model) body.model = model;
+
   const res = await fetch(`${API_URL}/portal/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ messages, stream: true }),
+    body: JSON.stringify(body),
     signal,
   });
 

@@ -1,18 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { streamChat } from '../services/hermaApi';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
+const MODELS = [
+  { id: 'openai/gpt-4o', label: 'GPT-4o', provider: 'OpenAI' },
+  { id: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', provider: 'OpenAI' },
+  { id: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4', provider: 'Anthropic' },
+  { id: 'anthropic/claude-3.5-haiku', label: 'Claude 3.5 Haiku', provider: 'Anthropic' },
+  { id: 'google/gemini-2.0-flash-001', label: 'Gemini 2.0 Flash', provider: 'Google' },
+  { id: 'meta-llama/llama-3.1-70b-instruct', label: 'Llama 3.1 70B', provider: 'Meta' },
+  { id: 'meta-llama/llama-3.1-8b-instruct', label: 'Llama 3.1 8B', provider: 'Meta' },
+];
+
 const SmartRouterComparison = () => {
   const [query, setQuery] = useState('');
+  const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [openAIKey, setOpenAIKey] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
   const { isAuthenticated } = useHermaAuth();
 
-  // Results state
   const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Smart Router', time: 0, loading: false, error: null });
-  const [stdResult, setStdResult] = useState({ content: '', cost: null, model: 'GPT-4', time: 0, loading: false, error: null });
+  const [stdResult, setStdResult] = useState({ content: '', cost: null, model: MODELS[0].label, time: 0, loading: false, error: null });
 
   const examples = [
     "Summarize this quarterly report",
@@ -20,36 +27,28 @@ const SmartRouterComparison = () => {
     "Draft a cold email to a potential client"
   ];
 
-  const handleExampleClick = (text) => {
-    setQuery(text);
-  };
+  const selectedModelLabel = MODELS.find(m => m.id === selectedModel)?.label || selectedModel;
 
   const handleCompare = async () => {
     if (!query) return;
 
     setIsProcessing(true);
-    setShowResults(true); // Show the panels immediately
 
-    // Reset results
-    setHermaResult(prev => ({ ...prev, content: '', cost: null, time: 0, loading: true, error: null }));
-    setStdResult(prev => ({ ...prev, content: '', cost: null, time: 0, loading: true, error: null }));
+    setHermaResult({ content: '', cost: null, model: 'Smart Router', time: 0, loading: true, error: null });
+    setStdResult({ content: '', cost: null, model: selectedModelLabel, time: 0, loading: true, error: null });
 
     const startTime = Date.now();
 
-    // 1. Call Herma API
+    // 1. Herma Smart Router (auto-routed)
     const hermaPromise = (async () => {
       if (!isAuthenticated) {
-        setHermaResult(prev => ({
-          ...prev,
-          loading: false,
-          error: "Please log in to use the Herma Smart Router."
-        }));
+        setHermaResult(prev => ({ ...prev, loading: false, error: "Please log in to use the comparison." }));
         return;
       }
-
       try {
         let content = '';
         await streamChat([{ role: 'user', content: query }], {
+          model: 'openrouter/auto',
           onChunk: (delta) => {
             if (delta.type === 'content') {
               content += delta.content;
@@ -57,10 +56,6 @@ const SmartRouterComparison = () => {
             }
           },
           onDone: (usage) => {
-            // Estimate cost if usage not provided or calculate based on model
-            // For demo, we might need to mock cost if not returned immediately, 
-            // but let's assume usage gives us something or we calculate.
-            // Simplified cost calculation for demo:
             const cost = usage ? (usage.total_tokens * 0.000002).toFixed(5) : '0.00005';
             setHermaResult(prev => ({
               ...prev,
@@ -78,52 +73,35 @@ const SmartRouterComparison = () => {
       }
     })();
 
-    // 2. Call OpenAI API (if key provided)
+    // 2. Selected model (specific model via OpenRouter)
     const stdPromise = (async () => {
-      if (!openAIKey) {
-        setStdResult(prev => ({
-          ...prev,
-          loading: false,
-          error: "Enter OpenAI API Key to compare."
-        }));
+      if (!isAuthenticated) {
+        setStdResult(prev => ({ ...prev, loading: false, error: "Please log in to use the comparison." }));
         return;
       }
-
       try {
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${openAIKey}`
+        let content = '';
+        await streamChat([{ role: 'user', content: query }], {
+          model: selectedModel,
+          onChunk: (delta) => {
+            if (delta.type === 'content') {
+              content += delta.content;
+              setStdResult(prev => ({ ...prev, content }));
+            }
           },
-          body: JSON.stringify({
-            model: "gpt-4",
-            messages: [{ role: "user", content: query }],
-            max_tokens: 150 // Reasonable limit
-          })
+          onDone: (usage) => {
+            const cost = usage ? (usage.total_tokens * 0.000003).toFixed(5) : '0.00010';
+            setStdResult(prev => ({
+              ...prev,
+              loading: false,
+              time: ((Date.now() - startTime) / 1000).toFixed(2),
+              cost: `$${cost}`
+            }));
+          },
+          onError: (err) => {
+            setStdResult(prev => ({ ...prev, loading: false, error: err.message }));
+          }
         });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error?.message || 'OpenAI Error');
-        }
-
-        const content = data.choices[0].message.content;
-        // GPT-4 Cost (approx): Input $0.03/1k, Output $0.06/1k. 
-        // Simplified: (Total Tokens * ~0.000045)
-        const totalTokens = data.usage.total_tokens;
-        const cost = (totalTokens * 0.000045).toFixed(5);
-
-        setStdResult(prev => ({
-          ...prev,
-          content,
-          cost: `$${cost}`,
-          time: ((Date.now() - startTime) / 1000).toFixed(2),
-          loading: false,
-          model: 'GPT-4'
-        }));
-
       } catch (err) {
         setStdResult(prev => ({ ...prev, loading: false, error: err.message }));
       }
@@ -138,32 +116,25 @@ const SmartRouterComparison = () => {
       <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-xl border border-[var(--border-secondary)] overflow-hidden">
         {/* Header / Input Area */}
         <div className="p-6 sm:p-8 border-b border-[var(--border-secondary)] bg-[var(--bg-tertiary)]/50">
-          <div className="flex justify-between items-center mb-6 relative">
-            <div className="w-8"></div> {/* Spacer for centering */}
-            <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] text-center" style={{ fontFamily: 'var(--font-heading)' }}>
-              See the Difference
-            </h3>
-            <button
-              onClick={() => setShowSettings(!showSettings)}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--bg-hover)] text-[var(--text-tertiary)] transition-colors"
-              title="Settings"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </button>
-          </div>
+          <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] text-center mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+            See the Difference
+          </h3>
 
-          {/* Settings / API Key Input */}
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showSettings ? 'max-h-24 mb-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <div className="flex items-center gap-2 max-w-lg mx-auto bg-[var(--bg-primary)] p-2 rounded-lg border border-[var(--border-secondary)]">
-              <span className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap pl-2">OpenAI Key:</span>
-              <input
-                type="password"
-                value={openAIKey}
-                onChange={(e) => setOpenAIKey(e.target.value)}
-                placeholder="sk-..."
-                className="flex-1 bg-transparent border-none text-[var(--text-primary)] text-sm focus:ring-0 placeholder-[var(--text-tertiary)]"
-              />
-            </div>
+          {/* Model Selector */}
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <span className="text-sm font-medium text-[var(--text-secondary)]">Compare against:</span>
+            <select
+              value={selectedModel}
+              onChange={(e) => {
+                setSelectedModel(e.target.value);
+                setStdResult(prev => ({ ...prev, model: MODELS.find(m => m.id === e.target.value)?.label || e.target.value }));
+              }}
+              className="px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] cursor-pointer"
+            >
+              {MODELS.map(m => (
+                <option key={m.id} value={m.id}>{m.label} ({m.provider})</option>
+              ))}
+            </select>
           </div>
 
           <div className="relative max-w-3xl mx-auto">
@@ -185,11 +156,11 @@ const SmartRouterComparison = () => {
           </div>
 
           {/* Examples */}
-          <div className="flex flex-wrapjustify-center gap-3 mt-4 justify-center">
+          <div className="flex flex-wrap justify-center gap-3 mt-4">
             {examples.map((ex, i) => (
               <button
                 key={i}
-                onClick={() => handleExampleClick(ex)}
+                onClick={() => setQuery(ex)}
                 className="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-[var(--bg-primary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors"
               >
                 "{ex}"
@@ -203,26 +174,36 @@ const SmartRouterComparison = () => {
           {/* Vertical Divider for Desktop */}
           <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-[var(--border-secondary)] -ml-px z-10"></div>
 
-          {/* Standard API Side (OpenAI) */}
+          {/* Selected Model Side */}
           <div className="p-6 sm:p-8 bg-[var(--bg-secondary)] relative group min-h-[300px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs">AI</div>
-                <span className="font-semibold text-[var(--text-secondary)]">Standard API</span>
+                <span className="font-semibold text-[var(--text-secondary)]">{selectedModelLabel}</span>
               </div>
-              <span className="text-xs font-mono text-[var(--text-tertiary)]">{stdResult.model}</span>
+              <span className="text-xs font-mono text-[var(--text-tertiary)]">Direct Model</span>
             </div>
 
             <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base">
-              {stdResult.loading ? (
+              {stdResult.loading && !stdResult.content ? (
                 <div className="animate-pulse space-y-2">
                   <div className="h-4 bg-gray-200/50 rounded w-3/4"></div>
                   <div className="h-4 bg-gray-200/50 rounded w-full"></div>
                   <div className="h-4 bg-gray-200/50 rounded w-5/6"></div>
                 </div>
+              ) : stdResult.loading && stdResult.content ? (
+                <p className="whitespace-pre-wrap">{stdResult.content}</p>
               ) : stdResult.error ? (
                 <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
                   {stdResult.error}
+                  {!isAuthenticated && (
+                    <button
+                      onClick={() => window.location.hash = '#/login'}
+                      className="block mt-2 mx-auto px-4 py-2 bg-[var(--accent-primary)] text-white rounded text-xs hover:bg-[var(--accent-hover)]"
+                    >
+                      Log In
+                    </button>
+                  )}
                 </div>
               ) : stdResult.content ? (
                 <p className="whitespace-pre-wrap">{stdResult.content}</p>
@@ -235,12 +216,12 @@ const SmartRouterComparison = () => {
             <div className={`transition-opacity duration-300 ${stdResult.cost ? 'opacity-100' : 'opacity-0'}`}>
               <div className="bg-[var(--bg-primary)] rounded-xl p-4 border border-[var(--border-secondary)]">
                 <div className="flex justify-between items-end mb-1">
-                  <span className="text-sm text-[var(--text-tertiary)]">Actual Cost</span>
+                  <span className="text-sm text-[var(--text-tertiary)]">Cost</span>
                   <span className="text-xl font-bold text-gray-500">{stdResult.cost}</span>
                 </div>
                 <div className="flex justify-between text-xs text-[var(--text-tertiary)] mt-2">
                   <span>Time: {stdResult.time}s</span>
-                  <span>Model: {stdResult.model}</span>
+                  <span>Model: {selectedModelLabel}</span>
                 </div>
               </div>
             </div>
@@ -258,7 +239,7 @@ const SmartRouterComparison = () => {
                 </div>
                 <span className="font-semibold text-[var(--accent-primary)]">Herma Router</span>
               </div>
-              <span className="text-xs font-mono text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-2 py-0.5 rounded-full">{hermaResult.model}</span>
+              <span className="text-xs font-mono text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-2 py-0.5 rounded-full">Smart Router</span>
             </div>
 
             <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base">
@@ -268,6 +249,8 @@ const SmartRouterComparison = () => {
                   <div className="h-4 bg-[var(--accent-primary)]/20 rounded w-full"></div>
                   <div className="h-4 bg-[var(--accent-primary)]/20 rounded w-5/6"></div>
                 </div>
+              ) : hermaResult.loading && hermaResult.content ? (
+                <p className="whitespace-pre-wrap">{hermaResult.content}</p>
               ) : hermaResult.error ? (
                 <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
                   {hermaResult.error}
@@ -309,7 +292,7 @@ const SmartRouterComparison = () => {
         {/* Footer Info */}
         <div className="bg-[var(--bg-tertiary)] p-4 text-center border-t border-[var(--border-secondary)]">
           <p className="text-xs text-[var(--text-tertiary)]">
-            * Real-time comparison. Enter your OpenAI Key to compare against standard GPT-4 pricing.
+            * Real-time comparison. Both requests route through Herma — one to the model you selected, one through our smart router.
           </p>
         </div>
       </div>
