@@ -36,6 +36,7 @@ import {
   activateQaScenario,
   retireQaScenario,
   getCsuiteOverview,
+  getAdminLatency,
 } from '../services/hermaApi';
 
 function fmt(n, decimals = 2) {
@@ -123,6 +124,7 @@ export default function AdminDashboard() {
   const [budgets, setBudgets] = useState(null);
   const [qaOverview, setQaOverview] = useState(null);
   const [csuiteData, setCsuiteData] = useState(null);
+  const [latencyData, setLatencyData] = useState(null);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [notifDropdownData, setNotifDropdownData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -133,7 +135,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs] = await Promise.all([
+      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs, lat] = await Promise.all([
         getAdminOverview(),
         getAdminDaily(30),
         getAdminHourly(24),
@@ -150,6 +152,7 @@ export default function AdminDashboard() {
         getAgentBudgets().catch(() => null),
         getQaOverview().catch(() => null),
         getCsuiteOverview().catch(() => null),
+        getAdminLatency(7).catch(() => null),
       ]);
       setOverview(ov);
       setDaily(dy);
@@ -167,6 +170,7 @@ export default function AdminDashboard() {
       setBudgets(bud);
       setQaOverview(qa);
       setCsuiteData(cs);
+      setLatencyData(lat);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -216,6 +220,7 @@ export default function AdminDashboard() {
     { id: 'approvals', label: pendingCount > 0 ? `Approvals (${pendingCount})` : 'Approvals' },
     { id: 'budgets', label: 'Budgets' },
     { id: 'qa', label: 'QA Testing' },
+    { id: 'latency', label: 'Latency' },
     { id: 'models', label: 'Models' },
     { id: 'requests', label: 'Requests' },
     { id: 'routing', label: 'Routing' },
@@ -358,6 +363,7 @@ export default function AdminDashboard() {
         {tab === 'approvals' && <ApprovalsTab pending={pendingPerms} onRefresh={loadData} />}
         {tab === 'budgets' && <BudgetsTab budgets={budgets} onRefresh={loadData} />}
         {tab === 'qa' && <QaTestingTab qaOverview={qaOverview} onRefresh={loadData} />}
+        {tab === 'latency' && <LatencyTab latency={latencyData} />}
         {tab === 'models' && <ModelsTab models={models} />}
         {tab === 'requests' && <RequestsTab recent={recent} />}
         {tab === 'routing' && <RoutingTab routing={routing} />}
@@ -1919,6 +1925,113 @@ function QaTestingTab({ qaOverview, onRefresh }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+
+function LatencyTab({ latency }) {
+  if (!latency) return <div className="text-[var(--text-tertiary)] text-sm py-8 text-center">No latency data available yet.</div>;
+
+  const fmtMs = (v) => v != null ? `${Math.round(v)}ms` : '—';
+
+  // Waterfall: compute max total for scaling
+  const traces = latency.recent_traces || [];
+  const maxTotal = Math.max(...traces.map((t) => t.latency_ms || 0), 1);
+
+  return (
+    <div className="space-y-6">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <StatCard label="Avg TTFB" value={fmtMs(latency.avg_ttfb_ms)} accent />
+        <StatCard label="Avg Backend" value={fmtMs(latency.avg_backend_overhead_ms)} />
+        <StatCard label="Avg OR TTFB" value={fmtMs(latency.avg_openrouter_ttfb_ms)} />
+        <StatCard label="Avg Stream" value={fmtMs(latency.avg_streaming_duration_ms)} />
+        <StatCard label="Avg Total" value={fmtMs(latency.avg_total_ms)} />
+        <StatCard label="Traced Requests" value={latency.total_traced} />
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 text-xs text-[var(--text-tertiary)]">
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: '#eab308' }} /> Backend Overhead</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: '#3b82f6' }} /> OpenRouter TTFB</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: '#22c55e' }} /> Streaming</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: '#6b7280' }} /> Other</span>
+      </div>
+
+      {/* Waterfall chart */}
+      {traces.length > 0 && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-5">
+          <div className="text-xs text-[var(--text-tertiary)] uppercase tracking-wide mb-3" style={{ fontFamily: 'var(--font-ui)' }}>
+            Recent Request Waterfall (last 20)
+          </div>
+          <div className="space-y-1.5">
+            {traces.map((t, i) => {
+              const total = t.latency_ms || 0;
+              const overhead = t.backend_overhead_ms || 0;
+              const orTtfb = t.openrouter_ttfb_ms || 0;
+              const stream = t.streaming_duration_ms || 0;
+              const accounted = overhead + orTtfb + stream;
+              const other = Math.max(0, total - accounted);
+              const scale = (v) => `${Math.max(0.5, (v / maxTotal) * 100)}%`;
+
+              return (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-20 text-[10px] text-[var(--text-tertiary)] text-right truncate" title={t.model_used || ''}>
+                    {(t.model_used || '').split('/').pop()?.slice(0, 12) || '?'}
+                  </div>
+                  <div className="flex-1 flex items-center h-5 rounded overflow-hidden bg-[var(--bg-tertiary)]/30">
+                    {overhead > 0 && <div style={{ width: scale(overhead), background: '#eab308' }} className="h-full" title={`Backend: ${overhead}ms`} />}
+                    {orTtfb > 0 && <div style={{ width: scale(orTtfb), background: '#3b82f6' }} className="h-full" title={`OR TTFB: ${orTtfb}ms`} />}
+                    {stream > 0 && <div style={{ width: scale(stream), background: '#22c55e' }} className="h-full" title={`Stream: ${stream}ms`} />}
+                    {other > 0 && <div style={{ width: scale(other), background: '#6b7280' }} className="h-full" title={`Other: ${other}ms`} />}
+                  </div>
+                  <div className="w-16 text-[10px] text-[var(--text-tertiary)] text-right">
+                    {total}ms
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Per-model table */}
+      {latency.by_model && latency.by_model.length > 0 && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-[var(--border-secondary)]">
+            <span className="text-xs text-[var(--text-tertiary)] uppercase tracking-wide" style={{ fontFamily: 'var(--font-ui)' }}>Per-Model Latency</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] text-left border-b border-[var(--border-secondary)]">
+                  <th className="px-5 py-2 font-medium">Model</th>
+                  <th className="px-3 py-2 font-medium text-right">Count</th>
+                  <th className="px-3 py-2 font-medium text-right">Avg TTFB</th>
+                  <th className="px-3 py-2 font-medium text-right">Avg Backend</th>
+                  <th className="px-3 py-2 font-medium text-right">Avg OR TTFB</th>
+                  <th className="px-3 py-2 font-medium text-right">Avg Stream</th>
+                  <th className="px-3 py-2 font-medium text-right">Avg Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-secondary)]/50">
+                {latency.by_model.map((m) => (
+                  <tr key={m.model} className="text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/30">
+                    <td className="px-5 py-2 text-[var(--text-primary)]">{m.model}</td>
+                    <td className="px-3 py-2 text-right">{m.count}</td>
+                    <td className="px-3 py-2 text-right">{fmtMs(m.avg_ttfb_ms)}</td>
+                    <td className="px-3 py-2 text-right">{fmtMs(m.avg_backend_overhead_ms)}</td>
+                    <td className="px-3 py-2 text-right">{fmtMs(m.avg_openrouter_ttfb_ms)}</td>
+                    <td className="px-3 py-2 text-right">{fmtMs(m.avg_streaming_duration_ms)}</td>
+                    <td className="px-3 py-2 text-right">{fmtMs(m.avg_total_ms)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

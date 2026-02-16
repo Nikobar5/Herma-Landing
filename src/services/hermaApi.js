@@ -350,6 +350,12 @@ export function retireQaScenario(id, reason = '') {
   });
 }
 
+// --- Latency (Admin) ---
+
+export function getAdminLatency(days = 7) {
+  return authFetch(`/admin/analytics/latency?days=${days}`);
+}
+
 // --- C-Suite (Admin) ---
 
 export function getCsuiteOverview() {
