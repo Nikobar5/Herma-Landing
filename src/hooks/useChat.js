@@ -152,7 +152,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         { role: 'user', content: msgContent },
       ];
 
-      // Start streaming timeout
+      // Start streaming timeout — only after HTTP response is received
       const resetTimeout = () => {
         clearStreamTimeout();
         timeoutRef.current = setTimeout(() => {
@@ -165,11 +165,11 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
           abortRef.current = null;
         }, STREAM_TIMEOUT_MS);
       };
-      resetTimeout();
 
       try {
         await streamChat(allMessages, {
           signal: controller.signal,
+          onOpen: resetTimeout,
           onChunk: (delta) => {
             receivedContent = true;
             resetTimeout(); // Reset timeout on each chunk
@@ -253,7 +253,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
     abortRef.current = controller;
     let receivedContent = false;
 
-    // Start streaming timeout
+    // Start streaming timeout — only after HTTP response is received
     const resetTimeout = () => {
       clearStreamTimeout();
       timeoutRef.current = setTimeout(() => {
@@ -266,11 +266,11 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         abortRef.current = null;
       }, STREAM_TIMEOUT_MS);
     };
-    resetTimeout();
 
     try {
       await streamChat(convMessages, {
         signal: controller.signal,
+        onOpen: resetTimeout,
         onChunk: (delta) => {
           receivedContent = true;
           resetTimeout(); // Reset timeout on each chunk

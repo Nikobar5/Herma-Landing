@@ -364,7 +364,7 @@ export function getCsuiteOverview() {
 
 // --- Portal Chat (streaming) ---
 
-export async function streamChat(messages, { onChunk, onDone, onError, signal, model } = {}) {
+export async function streamChat(messages, { onChunk, onDone, onError, onOpen, signal, model } = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
@@ -402,6 +402,9 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal, m
     const body = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error(body.detail || `Request failed (${res.status})`);
   }
+
+  // Signal that HTTP response was received (connection established)
+  onOpen?.();
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
