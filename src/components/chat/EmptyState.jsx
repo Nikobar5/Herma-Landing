@@ -87,6 +87,13 @@ const EmptyState = ({ onSend, isStreaming, onStop }) => {
     }
   }, [sizeWarning]);
 
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      files.forEach((f) => f.preview && URL.revokeObjectURL(f.preview));
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const addFiles = useCallback((incoming) => {
     const valid = [];
     for (const f of incoming) {

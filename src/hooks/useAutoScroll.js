@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 
-export function useAutoScroll(deps = []) {
+export function useAutoScroll(deps = [], { isStreaming = false } = {}) {
   const containerRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [hasOverflow, setHasOverflow] = useState(false);
@@ -15,14 +15,14 @@ export function useAutoScroll(deps = []) {
   const scrollToBottom = useCallback(() => {
     const el = containerRef.current;
     if (el) {
-      el.scrollTop = el.scrollHeight;
+      el.scrollTo({ top: el.scrollHeight, behavior: 'instant' });
     }
   }, []);
 
   const handleScroll = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
-    const threshold = 40;
+    const threshold = 100;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
     setIsAtBottom(atBottom);
     setHasOverflow(el.scrollHeight > el.clientHeight + 10);

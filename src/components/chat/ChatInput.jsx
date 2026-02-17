@@ -30,6 +30,7 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
   const [files, setFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [sizeWarning, setSizeWarning] = useState(null);
+  const [stopped, setStopped] = useState(false);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -47,6 +48,13 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
       return () => clearTimeout(t);
     }
   }, [sizeWarning]);
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      files.forEach((f) => f.preview && URL.revokeObjectURL(f.preview));
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addFiles = useCallback((incoming) => {
     const valid = [];
@@ -202,15 +210,26 @@ const ChatInput = ({ onSend, onStop, isStreaming }) => {
               className="flex-1 resize-none bg-transparent outline-none text-base text-[var(--text-primary)] placeholder-[var(--text-tertiary)] py-1"
               style={{ fontFamily: 'var(--font-ui)', maxHeight: '200px' }}
             />
-            {isStreaming ? (
+            {isStreaming || stopped ? (
               <button
-                onClick={onStop}
-                className="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--error)] text-white flex items-center justify-center hover:bg-opacity-90 transition-colors shadow-md hover:shadow-lg transform active:scale-95"
+                onClick={() => {
+                  if (stopped) return;
+                  onStop();
+                  setStopped(true);
+                  setTimeout(() => setStopped(false), 500);
+                }}
+                className={`flex-shrink-0 h-10 rounded-xl text-white flex items-center justify-center transition-colors shadow-md hover:shadow-lg transform active:scale-95 ${
+                  stopped ? 'w-auto px-3 bg-[var(--text-tertiary)]' : 'w-10 bg-[var(--error)] hover:bg-opacity-90'
+                }`}
                 aria-label="Stop generating"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <rect x="6" y="6" width="12" height="12" rx="1" />
-                </svg>
+                {stopped ? (
+                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Stopped</span>
+                ) : (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" rx="1" />
+                  </svg>
+                )}
               </button>
             ) : (
               <button

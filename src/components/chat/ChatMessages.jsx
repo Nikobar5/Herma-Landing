@@ -6,7 +6,7 @@ const ChatMessages = ({ messages, isStreaming, onRegenerate }) => {
     <>
       {messages.map((msg, i) => (
         <ChatMessage
-          key={i}
+          key={msg.id || `msg-${i}`}
           message={msg}
           isLast={i === messages.length - 1}
           isStreaming={isStreaming && i === messages.length - 1 && msg.role === 'assistant'}

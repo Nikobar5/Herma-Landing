@@ -1,18 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
 
-const WaitingIndicator = () => (
-  <div className="flex items-center gap-3 py-2" style={{ fontFamily: 'var(--font-ui)' }}>
-    <span className="shimmer-text text-sm font-medium">Thinking</span>
-    <span className="flex items-center gap-1">
-      <span className="thinking-dot" />
-      <span className="thinking-dot" />
-      <span className="thinking-dot" />
-    </span>
-  </div>
-);
+const WaitingIndicator = () => {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-3 py-2" style={{ fontFamily: 'var(--font-ui)' }}>
+      <span className="shimmer-text text-sm font-medium">
+        Thinking{elapsed > 0 ? `... ${elapsed}s` : ''}
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="thinking-dot" />
+        <span className="thinking-dot" />
+        <span className="thinking-dot" />
+      </span>
+    </div>
+  );
+};
 
 const CitationSources = ({ annotations }) => {
   // Normalize annotations — OpenRouter Chat Completions API nests data under
@@ -63,6 +74,7 @@ const CitationSources = ({ annotations }) => {
 const ThinkingSection = ({ reasoning, isStreaming }) => {
   const [expanded, setExpanded] = useState(true);
   const [autoCollapsed, setAutoCollapsed] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
 
   // Auto-collapse when streaming ends (content has started)
   useEffect(() => {
@@ -71,6 +83,13 @@ const ThinkingSection = ({ reasoning, isStreaming }) => {
       setAutoCollapsed(true);
     }
   }, [isStreaming, autoCollapsed]);
+
+  // Elapsed timer while thinking
+  useEffect(() => {
+    if (!isStreaming) return;
+    const id = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [isStreaming]);
 
   const wordCount = reasoning ? reasoning.split(/\s+/).filter(Boolean).length : 0;
 
@@ -97,7 +116,7 @@ const ThinkingSection = ({ reasoning, isStreaming }) => {
               <span className="thinking-dot" style={{ width: 4, height: 4 }} />
             </span>
           )}
-          {isStreaming ? <span className="shimmer-text">Thinking</span> : 'Thinking'}
+          {isStreaming ? <span className="shimmer-text">Thinking{elapsed > 0 ? `... ${elapsed}s` : ''}</span> : 'Thinking'}
           {!expanded && !isStreaming && (
             <span className="text-xs text-[var(--text-tertiary)] opacity-60 ml-1">
               ({wordCount} words)
@@ -118,10 +137,110 @@ const ThinkingSection = ({ reasoning, isStreaming }) => {
   );
 };
 
+const markdownComponents = {
+  code({ node, inline, className, children, ...props }) {
+    const match = /language-(\w+)/.exec(className || '');
+    if (!inline && match) {
+      return (
+        <div className="not-prose my-4 rounded-xl overflow-hidden shadow-lg border border-[var(--border-secondary)]">
+          <CodeBlock language={match[1]}>
+            {String(children).replace(/\n$/, '')}
+          </CodeBlock>
+        </div>
+      );
+    }
+    if (!inline) {
+      return (
+        <div className="not-prose my-4 rounded-xl overflow-hidden shadow-lg border border-[var(--border-secondary)]">
+          <CodeBlock language="">
+            {String(children).replace(/\n$/, '')}
+          </CodeBlock>
+        </div>
+      );
+    }
+    return (
+      <code
+        className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded-md font-medium text-sm border border-[var(--border-secondary)]"
+        style={{ fontFamily: 'var(--font-code)' }}
+        {...props}
+      >
+        {children}
+      </code>
+    );
+  },
+  p({ children }) {
+    return <p className="mb-4 last:mb-0 leading-7 text-[var(--text-primary)]">{children}</p>;
+  },
+  ul({ children }) {
+    return <ul className="list-disc pl-5 mb-4 space-y-2 marker:text-[var(--accent-primary)]">{children}</ul>;
+  },
+  ol({ children }) {
+    return <ol className="list-decimal pl-5 mb-4 space-y-2 marker:font-bold marker:text-[var(--text-secondary)]">{children}</ol>;
+  },
+  li({ children }) {
+    return <li className="pl-1">{children}</li>;
+  },
+  a({ href, children }) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[var(--accent-primary)] font-medium underline decoration-2 decoration-[var(--accent-primary)]/30 hover:decoration-[var(--accent-primary)] transition-colors"
+      >
+        {children}
+      </a>
+    );
+  },
+  blockquote({ children }) {
+    return (
+      <blockquote className="border-l-4 border-[var(--accent-primary)] pl-4 py-1 my-4 bg-[var(--bg-tertiary)]/50 rounded-r-lg italic text-[var(--text-secondary)]">
+        {children}
+      </blockquote>
+    );
+  },
+  table({ children }) {
+    return (
+      <div className="overflow-x-auto my-6 rounded-xl border border-[var(--border-secondary)] shadow-sm">
+        <table className="min-w-full divide-y divide-[var(--border-secondary)]">{children}</table>
+      </div>
+    );
+  },
+  thead({ children }) {
+    return <thead className="bg-[var(--bg-tertiary)]">{children}</thead>;
+  },
+  tbody({ children }) {
+    return <tbody className="bg-[var(--bg-secondary)] divide-y divide-[var(--border-secondary)]">{children}</tbody>;
+  },
+  tr({ children }) {
+    return <tr>{children}</tr>;
+  },
+  th({ children }) {
+    return <th className="px-6 py-3 text-left text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider" style={{ fontFamily: 'var(--font-ui)' }}>{children}</th>;
+  },
+  td({ children }) {
+    return <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-tertiary)]">{children}</td>;
+  },
+  hr() {
+    return <hr className="my-8 border-[var(--border-secondary)]" />;
+  },
+  h1({ children }) { return <h1 className="text-2xl font-bold mt-8 mb-4 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h1> },
+  h2({ children }) { return <h2 className="text-xl font-bold mt-6 mb-3 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h2> },
+  h3({ children }) { return <h3 className="text-lg font-bold mt-5 mb-2 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h3> },
+};
+
+const remarkPlugins = [remarkGfm];
+
 const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
+
+  const renderedMarkdown = useMemo(() => (
+    <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents}>
+      {message.content}
+    </ReactMarkdown>
+  ), [message.content]);
 
   const handleCopy = async () => {
     try {
@@ -210,103 +329,11 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           />
         )}
 
-        <div className="prose prose-base prose-invert max-w-none text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              code({ node, inline, className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || '');
-                if (!inline && match) {
-                  return (
-                    <div className="not-prose my-4 rounded-xl overflow-hidden shadow-lg border border-[var(--border-secondary)]">
-                      <CodeBlock language={match[1]}>
-                        {String(children).replace(/\n$/, '')}
-                      </CodeBlock>
-                    </div>
-                  );
-                }
-                if (!inline) {
-                  return (
-                    <div className="not-prose my-4 rounded-xl overflow-hidden shadow-lg border border-[var(--border-secondary)]">
-                      <CodeBlock language="">
-                        {String(children).replace(/\n$/, '')}
-                      </CodeBlock>
-                    </div>
-                  );
-                }
-                return (
-                  <code
-                    className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded-md font-medium text-sm border border-[var(--border-secondary)]"
-                    style={{ fontFamily: 'var(--font-code)' }}
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                );
-              },
-              p({ children }) {
-                return <p className="mb-4 last:mb-0 leading-7 text-[var(--text-primary)]">{children}</p>;
-              },
-              ul({ children }) {
-                return <ul className="list-disc pl-5 mb-4 space-y-2 marker:text-[var(--accent-primary)]">{children}</ul>;
-              },
-              ol({ children }) {
-                return <ol className="list-decimal pl-5 mb-4 space-y-2 marker:font-bold marker:text-[var(--text-secondary)]">{children}</ol>;
-              },
-              li({ children }) {
-                return <li className="pl-1">{children}</li>;
-              },
-              a({ href, children }) {
-                return (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--accent-primary)] font-medium underline decoration-2 decoration-[var(--accent-primary)]/30 hover:decoration-[var(--accent-primary)] transition-colors"
-                  >
-                    {children}
-                  </a>
-                );
-              },
-              blockquote({ children }) {
-                return (
-                  <blockquote className="border-l-4 border-[var(--accent-primary)] pl-4 py-1 my-4 bg-[var(--bg-tertiary)]/50 rounded-r-lg italic text-[var(--text-secondary)]">
-                    {children}
-                  </blockquote>
-                );
-              },
-              table({ children }) {
-                return (
-                  <div className="overflow-x-auto my-6 rounded-xl border border-[var(--border-secondary)] shadow-sm">
-                    <table className="min-w-full divide-y divide-[var(--border-secondary)]">{children}</table>
-                  </div>
-                );
-              },
-              thead({ children }) {
-                return <thead className="bg-[var(--bg-tertiary)]">{children}</thead>;
-              },
-              tbody({ children }) {
-                return <tbody className="bg-[var(--bg-secondary)] divide-y divide-[var(--border-secondary)]">{children}</tbody>;
-              },
-              tr({ children }) {
-                return <tr>{children}</tr>;
-              },
-              th({ children }) {
-                return <th className="px-6 py-3 text-left text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider" style={{ fontFamily: 'var(--font-ui)' }}>{children}</th>;
-              },
-              td({ children }) {
-                return <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-tertiary)]">{children}</td>;
-              },
-              hr() {
-                return <hr className="my-8 border-[var(--border-secondary)]" />;
-              },
-              h1({ children }) { return <h1 className="text-2xl font-bold mt-8 mb-4 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h1> },
-              h2({ children }) { return <h2 className="text-xl font-bold mt-6 mb-3 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h2> },
-              h3({ children }) { return <h3 className="text-lg font-bold mt-5 mb-2 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{children}</h3> },
-            }}
-          >
-            {message.content}
-          </ReactMarkdown>
+        <div
+          className={`prose prose-base prose-invert max-w-none ${message.error ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'}`}
+          style={{ fontFamily: 'var(--font-ui)' }}
+        >
+          {renderedMarkdown}
 
           {isStreaming && isLast && message.content && (
             <span className="streaming-cursor" />
@@ -318,9 +345,9 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
           <CitationSources annotations={message.annotations} />
         )}
 
-        {/* Message Actions */}
+        {/* Message Actions — visible by default on mobile, hover-reveal on desktop */}
         {isAssistant && message.content && !isStreaming && (
-          <div className="flex items-center gap-4 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-4 mt-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
               className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] transition-colors"
@@ -362,4 +389,4 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   );
 };
 
-export default ChatMessage;
+export default React.memo(ChatMessage);

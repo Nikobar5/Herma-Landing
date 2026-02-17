@@ -61,9 +61,15 @@ const ChatPage = () => {
     fetchBalance();
   }, [fetchBalance]);
 
+  // Refresh balance after streaming completes (with delay for backend processing)
+  const wasStreamingRef = React.useRef(false);
   useEffect(() => {
-    if (!isStreaming) {
-      fetchBalance();
+    if (isStreaming) {
+      wasStreamingRef.current = true;
+    } else if (wasStreamingRef.current) {
+      wasStreamingRef.current = false;
+      const t = setTimeout(fetchBalance, 1000);
+      return () => clearTimeout(t);
     }
   }, [isStreaming, fetchBalance]);
 
@@ -75,6 +81,18 @@ const ChatPage = () => {
   );
 
   const isEmpty = !activeConversation || messages.length === 0;
+
+  // Keyboard shortcut: Ctrl/Cmd + Shift + O for new chat
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'O') {
+        e.preventDefault();
+        createConversation();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [createConversation]);
 
   const handleSidebarToggle = () => {
     if (window.innerWidth < 768) {
@@ -168,7 +186,7 @@ const ChatPage = () => {
 
               {/* Scroll to bottom */}
               {showScrollButton && (
-                <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-20">
+                <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30">
                   <ScrollToBottom onClick={scrollToBottom} />
                 </div>
               )}

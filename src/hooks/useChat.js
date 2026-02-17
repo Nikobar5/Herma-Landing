@@ -1,5 +1,7 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { streamChat } from '../services/hermaApi';
+
+const STREAM_TIMEOUT_MS = 120_000; // 120 seconds
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -75,6 +77,24 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
   const [isStreaming, setIsStreaming] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const abortRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  // Abort stream when switching conversations
+  useEffect(() => {
+    if (isStreaming && abortRef.current) {
+      abortRef.current.abort();
+      setIsStreaming(false);
+      abortRef.current = null;
+      clearTimeout(timeoutRef.current);
+    }
+  }, [activeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const clearStreamTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
 
   const dismissPaywall = useCallback(() => setShowPaywall(false), []);
 
@@ -131,10 +151,26 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         { role: 'user', content: msgContent },
       ];
 
+      // Start streaming timeout
+      const resetTimeout = () => {
+        clearStreamTimeout();
+        timeoutRef.current = setTimeout(() => {
+          controller.abort();
+          updateLastMessage(convId, (prev) => ({
+            content: prev.content || 'Response timed out. Please try again.',
+            error: true,
+          }));
+          setIsStreaming(false);
+          abortRef.current = null;
+        }, STREAM_TIMEOUT_MS);
+      };
+      resetTimeout();
+
       try {
         await streamChat(allMessages, {
           signal: controller.signal,
           onChunk: (delta) => {
+            resetTimeout(); // Reset timeout on each chunk
             if (delta.type === 'annotations') {
               updateLastMessage(convId, (prev) => ({
                 annotations: [...(prev.annotations || []), ...delta.annotations],
@@ -158,7 +194,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         });
       } catch (err) {
         if (err.name !== 'AbortError') {
-          if (err.message && err.message.includes('Insufficient credits')) {
+          if (err.status === 402 || (err.message && err.message.includes('Insufficient credits'))) {
             setShowPaywall(true);
           }
           updateLastMessage(convId, (prev) => ({
@@ -167,11 +203,12 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
           }));
         }
       } finally {
+        clearStreamTimeout();
         setIsStreaming(false);
         abortRef.current = null;
       }
     },
-    [isStreaming, activeId, activeConversation, addMessage, updateLastMessage, createConversation]
+    [isStreaming, activeId, activeConversation, addMessage, updateLastMessage, createConversation, clearStreamTimeout]
   );
 
   const stopGeneration = useCallback(() => {
@@ -179,8 +216,9 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       abortRef.current.abort();
       setIsStreaming(false);
       abortRef.current = null;
+      clearStreamTimeout();
     }
-  }, []);
+  }, [clearStreamTimeout]);
 
   const regenerateLastResponse = useCallback(async () => {
     if (!activeConversation || activeConversation.messages.length < 2) return;
@@ -205,10 +243,26 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
     const controller = new AbortController();
     abortRef.current = controller;
 
+    // Start streaming timeout
+    const resetTimeout = () => {
+      clearStreamTimeout();
+      timeoutRef.current = setTimeout(() => {
+        controller.abort();
+        updateLastMessage(activeId, (prev) => ({
+          content: prev.content || 'Response timed out. Please try again.',
+          error: true,
+        }));
+        setIsStreaming(false);
+        abortRef.current = null;
+      }, STREAM_TIMEOUT_MS);
+    };
+    resetTimeout();
+
     try {
       await streamChat(convMessages, {
         signal: controller.signal,
         onChunk: (delta) => {
+          resetTimeout(); // Reset timeout on each chunk
           if (delta.type === 'annotations') {
             updateLastMessage(activeId, (prev) => ({
               annotations: [...(prev.annotations || []), ...delta.annotations],
@@ -232,7 +286,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       });
     } catch (err) {
       if (err.name !== 'AbortError') {
-        if (err.message && err.message.includes('Insufficient credits')) {
+        if (err.status === 402 || (err.message && err.message.includes('Insufficient credits'))) {
           setShowPaywall(true);
         }
         updateLastMessage(activeId, (prev) => ({
@@ -241,10 +295,11 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         }));
       }
     } finally {
+      clearStreamTimeout();
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [activeConversation, activeId, addMessage, updateLastMessage, removeLastMessage]);
+  }, [activeConversation, activeId, addMessage, updateLastMessage, removeLastMessage, clearStreamTimeout]);
 
   return { isStreaming, sendMessage, stopGeneration, regenerateLastResponse, showPaywall, dismissPaywall };
 }

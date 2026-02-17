@@ -391,7 +391,9 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal, m
     throw new Error('Session expired');
   }
   if (res.status === 402) {
-    throw new Error('Insufficient credits. Please add more credits to continue.');
+    const err = new Error('Insufficient credits. Please add more credits to continue.');
+    err.status = 402;
+    throw err;
   }
   if (res.status === 429) {
     throw new Error('Rate limit exceeded. Please wait a moment and try again.');
