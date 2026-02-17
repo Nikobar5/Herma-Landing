@@ -18,8 +18,8 @@ const SmartRouterComparison = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { isAuthenticated } = useHermaAuth();
 
-  const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Smart Router', time: 0, loading: false, error: null });
-  const [stdResult, setStdResult] = useState({ content: '', cost: null, model: MODELS[0].label, time: 0, loading: false, error: null });
+  const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Smart Router', time: 0, loading: false, error: null, thinking: false });
+  const [stdResult, setStdResult] = useState({ content: '', cost: null, model: MODELS[0].label, time: 0, loading: false, error: null, thinking: false });
 
   const examples = [
     "Summarize this quarterly report",
@@ -34,8 +34,8 @@ const SmartRouterComparison = () => {
 
     setIsProcessing(true);
 
-    setHermaResult({ content: '', cost: null, model: 'Smart Router', time: 0, loading: true, error: null });
-    setStdResult({ content: '', cost: null, model: selectedModelLabel, time: 0, loading: true, error: null });
+    setHermaResult({ content: '', cost: null, model: 'Smart Router', time: 0, loading: true, error: null, thinking: false });
+    setStdResult({ content: '', cost: null, model: selectedModelLabel, time: 0, loading: true, error: null, thinking: false });
 
     const startTime = Date.now();
 
@@ -50,9 +50,11 @@ const SmartRouterComparison = () => {
         await streamChat([{ role: 'user', content: query }], {
           model: 'openrouter/auto',
           onChunk: (delta) => {
-            if (delta.type === 'content') {
+            if (delta.type === 'reasoning') {
+              setHermaResult(prev => ({ ...prev, thinking: true }));
+            } else if (delta.type === 'content') {
               content += delta.content;
-              setHermaResult(prev => ({ ...prev, content }));
+              setHermaResult(prev => ({ ...prev, content, thinking: false }));
             }
           },
           onDone: (usage) => {
@@ -84,9 +86,11 @@ const SmartRouterComparison = () => {
         await streamChat([{ role: 'user', content: query }], {
           model: selectedModel,
           onChunk: (delta) => {
-            if (delta.type === 'content') {
+            if (delta.type === 'reasoning') {
+              setStdResult(prev => ({ ...prev, thinking: true }));
+            } else if (delta.type === 'content') {
               content += delta.content;
-              setStdResult(prev => ({ ...prev, content }));
+              setStdResult(prev => ({ ...prev, content, thinking: false }));
             }
           },
           onDone: (usage) => {
@@ -186,11 +190,22 @@ const SmartRouterComparison = () => {
 
             <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base">
               {stdResult.loading && !stdResult.content ? (
-                <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200/50 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200/50 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200/50 rounded w-5/6"></div>
-                </div>
+                stdResult.thinking ? (
+                  <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                    <div className="flex gap-1">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                    <span className="text-sm italic">Thinking...</span>
+                  </div>
+                ) : (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-gray-200/50 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200/50 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200/50 rounded w-5/6"></div>
+                  </div>
+                )
               ) : stdResult.loading && stdResult.content ? (
                 <p className="whitespace-pre-wrap">{stdResult.content}</p>
               ) : stdResult.error ? (
@@ -244,11 +259,22 @@ const SmartRouterComparison = () => {
 
             <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base">
               {hermaResult.loading && !hermaResult.content ? (
-                <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-[var(--accent-primary)]/20 rounded w-3/4"></div>
-                  <div className="h-4 bg-[var(--accent-primary)]/20 rounded w-full"></div>
-                  <div className="h-4 bg-[var(--accent-primary)]/20 rounded w-5/6"></div>
-                </div>
+                hermaResult.thinking ? (
+                  <div className="flex items-center gap-2 text-[var(--accent-primary)]">
+                    <div className="flex gap-1">
+                      <span className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-1.5 h-1.5 bg-[var(--accent-primary)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                    <span className="text-sm italic">Thinking...</span>
+                  </div>
+                ) : (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-gray-200/50 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200/50 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200/50 rounded w-5/6"></div>
+                  </div>
+                )
               ) : hermaResult.loading && hermaResult.content ? (
                 <p className="whitespace-pre-wrap">{hermaResult.content}</p>
               ) : hermaResult.error ? (
