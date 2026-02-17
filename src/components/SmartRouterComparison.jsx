@@ -1,6 +1,79 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import CodeBlock from './chat/CodeBlock';
 import { streamChat } from '../services/hermaApi';
 import { useHermaAuth } from '../context/HermaAuthContext';
+
+const ComparisonMarkdown = ({ content }) => (
+  <div className="prose prose-sm prose-invert max-w-none text-[var(--text-primary)]">
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '');
+          if (!inline && (match || String(children).includes('\n'))) {
+            return (
+              <div className="not-prose my-3 rounded-xl overflow-hidden border border-[var(--border-secondary)]">
+                <CodeBlock language={match ? match[1] : ''}>
+                  {String(children).replace(/\n$/, '')}
+                </CodeBlock>
+              </div>
+            );
+          }
+          return (
+            <code
+              className="px-1 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded text-xs border border-[var(--border-secondary)]"
+              style={{ fontFamily: 'var(--font-code)' }}
+              {...props}
+            >
+              {children}
+            </code>
+          );
+        },
+        p({ children }) {
+          return <p className="mb-3 last:mb-0 leading-relaxed text-[var(--text-primary)]">{children}</p>;
+        },
+        ul({ children }) {
+          return <ul className="list-disc pl-4 mb-3 space-y-1 marker:text-[var(--accent-primary)]">{children}</ul>;
+        },
+        ol({ children }) {
+          return <ol className="list-decimal pl-4 mb-3 space-y-1">{children}</ol>;
+        },
+        li({ children }) {
+          return <li className="pl-0.5">{children}</li>;
+        },
+        a({ href, children }) {
+          return (
+            <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-primary)] underline decoration-[var(--accent-primary)]/30 hover:decoration-[var(--accent-primary)]">
+              {children}
+            </a>
+          );
+        },
+        blockquote({ children }) {
+          return <blockquote className="border-l-3 border-[var(--accent-primary)] pl-3 my-3 italic text-[var(--text-secondary)]">{children}</blockquote>;
+        },
+        h1({ children }) { return <h1 className="text-lg font-bold mt-4 mb-2 text-[var(--text-primary)]">{children}</h1>; },
+        h2({ children }) { return <h2 className="text-base font-bold mt-3 mb-2 text-[var(--text-primary)]">{children}</h2>; },
+        h3({ children }) { return <h3 className="text-sm font-bold mt-3 mb-1 text-[var(--text-primary)]">{children}</h3>; },
+        table({ children }) {
+          return (
+            <div className="overflow-x-auto my-3 rounded-lg border border-[var(--border-secondary)]">
+              <table className="min-w-full divide-y divide-[var(--border-secondary)] text-xs">{children}</table>
+            </div>
+          );
+        },
+        thead({ children }) { return <thead className="bg-[var(--bg-tertiary)]">{children}</thead>; },
+        tbody({ children }) { return <tbody className="divide-y divide-[var(--border-secondary)]">{children}</tbody>; },
+        th({ children }) { return <th className="px-3 py-2 text-left text-xs font-bold text-[var(--text-secondary)]">{children}</th>; },
+        td({ children }) { return <td className="px-3 py-2 text-xs text-[var(--text-tertiary)]">{children}</td>; },
+        hr() { return <hr className="my-4 border-[var(--border-secondary)]" />; },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  </div>
+);
 
 const MODELS = [
   { id: 'openai/gpt-4o', label: 'GPT-4o', provider: 'OpenAI' },
@@ -188,7 +261,7 @@ const SmartRouterComparison = () => {
               <span className="text-xs font-mono text-[var(--text-tertiary)]">Direct Model</span>
             </div>
 
-            <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base">
+            <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base overflow-y-auto max-h-[500px]">
               {stdResult.loading && !stdResult.content ? (
                 stdResult.thinking ? (
                   <div className="flex items-center gap-2 text-[var(--text-secondary)]">
@@ -207,7 +280,7 @@ const SmartRouterComparison = () => {
                   </div>
                 )
               ) : stdResult.loading && stdResult.content ? (
-                <p className="whitespace-pre-wrap">{stdResult.content}</p>
+                <ComparisonMarkdown content={stdResult.content} />
               ) : stdResult.error ? (
                 <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
                   {stdResult.error}
@@ -221,7 +294,7 @@ const SmartRouterComparison = () => {
                   )}
                 </div>
               ) : stdResult.content ? (
-                <p className="whitespace-pre-wrap">{stdResult.content}</p>
+                <ComparisonMarkdown content={stdResult.content} />
               ) : (
                 <p className="text-[var(--text-tertiary)] italic">Waiting for input...</p>
               )}
@@ -257,7 +330,7 @@ const SmartRouterComparison = () => {
               <span className="text-xs font-mono text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-2 py-0.5 rounded-full">Smart Router</span>
             </div>
 
-            <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base">
+            <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base overflow-y-auto max-h-[500px]">
               {hermaResult.loading && !hermaResult.content ? (
                 hermaResult.thinking ? (
                   <div className="flex items-center gap-2 text-[var(--accent-primary)]">
@@ -276,7 +349,7 @@ const SmartRouterComparison = () => {
                   </div>
                 )
               ) : hermaResult.loading && hermaResult.content ? (
-                <p className="whitespace-pre-wrap">{hermaResult.content}</p>
+                <ComparisonMarkdown content={hermaResult.content} />
               ) : hermaResult.error ? (
                 <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
                   {hermaResult.error}
@@ -290,7 +363,7 @@ const SmartRouterComparison = () => {
                   )}
                 </div>
               ) : hermaResult.content ? (
-                <p className="whitespace-pre-wrap">{hermaResult.content}</p>
+                <ComparisonMarkdown content={hermaResult.content} />
               ) : (
                 <p className="text-[var(--text-tertiary)] italic">Waiting for input...</p>
               )}
