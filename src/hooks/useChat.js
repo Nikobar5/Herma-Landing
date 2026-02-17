@@ -78,9 +78,14 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
   const [showPaywall, setShowPaywall] = useState(false);
   const abortRef = useRef(null);
   const timeoutRef = useRef(null);
+  const ownActiveIdChangeRef = useRef(false);
 
-  // Abort stream when switching conversations
+  // Abort stream when switching conversations (but not when sendMessage itself created the conversation)
   useEffect(() => {
+    if (ownActiveIdChangeRef.current) {
+      ownActiveIdChangeRef.current = false;
+      return;
+    }
     if (isStreaming && abortRef.current) {
       abortRef.current.abort();
       setIsStreaming(false);
@@ -105,6 +110,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
 
       let convId = activeId;
       if (!convId) {
+        ownActiveIdChangeRef.current = true;
         const conv = createConversation();
         convId = conv.id;
       }
