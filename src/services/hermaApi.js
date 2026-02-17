@@ -427,6 +427,14 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal, m
         }
         try {
           const parsed = JSON.parse(data);
+          // Handle SSE error events from backend
+          if (parsed.error) {
+            const errMsg = parsed.error.message || 'An error occurred';
+            const err = new Error(errMsg);
+            err.type = parsed.error.type;
+            onError?.(err);
+            throw err;
+          }
           if (parsed.usage) {
             lastUsage = parsed.usage;
           }
@@ -442,7 +450,8 @@ export async function streamChat(messages, { onChunk, onDone, onError, signal, m
           } else if (delta?.content) {
             onChunk?.({ type: 'content', content: delta.content });
           }
-        } catch {
+        } catch (parseErr) {
+          if (parseErr.type === 'stream_error' || parseErr.type === 'upstream_error') throw parseErr;
           // skip malformed JSON lines
         }
       }

@@ -138,6 +138,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       setIsStreaming(true);
       const controller = new AbortController();
       abortRef.current = controller;
+      let receivedContent = false;
 
       // Build messages array from current conversation + new user message
       const currentConv = activeId
@@ -170,6 +171,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         await streamChat(allMessages, {
           signal: controller.signal,
           onChunk: (delta) => {
+            receivedContent = true;
             resetTimeout(); // Reset timeout on each chunk
             if (delta.type === 'annotations') {
               updateLastMessage(convId, (prev) => ({
@@ -188,6 +190,13 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
           onDone: (usage) => {
             if (usage) {
               updateLastMessage(convId, { usage });
+            }
+            // Detect empty response — stream completed but no content was received
+            if (!receivedContent) {
+              updateLastMessage(convId, (prev) => ({
+                content: prev.content || 'No response received. Please try again.',
+                error: !prev.content,
+              }));
             }
           },
           onError: () => {},
@@ -242,6 +251,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
     setIsStreaming(true);
     const controller = new AbortController();
     abortRef.current = controller;
+    let receivedContent = false;
 
     // Start streaming timeout
     const resetTimeout = () => {
@@ -262,6 +272,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       await streamChat(convMessages, {
         signal: controller.signal,
         onChunk: (delta) => {
+          receivedContent = true;
           resetTimeout(); // Reset timeout on each chunk
           if (delta.type === 'annotations') {
             updateLastMessage(activeId, (prev) => ({
@@ -280,6 +291,12 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         onDone: (usage) => {
           if (usage) {
             updateLastMessage(activeId, { usage });
+          }
+          if (!receivedContent) {
+            updateLastMessage(activeId, (prev) => ({
+              content: prev.content || 'No response received. Please try again.',
+              error: !prev.content,
+            }));
           }
         },
         onError: () => {},
