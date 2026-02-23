@@ -17,7 +17,7 @@ const client = new OpenAI({
 
 // 2. Use exactly like OpenAI
 const response = await client.chat.completions.create({
-  model: 'herma-smart-router', // Routes to cheapest model
+  model: 'herma-auto', // Routes to the best model for the job
   messages: [{ role: 'user', content: 'Hello!' }],
 });`;
 

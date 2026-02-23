@@ -74,13 +74,13 @@ const ComplianceSection = () => {
               className="text-base sm:text-lg font-bold text-[var(--text-primary)] mb-2"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              SOC Compliant
+              SOC 2 Architecture
             </h3>
             <p
               className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              All private cloud API endpoints meet SOC 2 Type II compliance standards for secure data handling.
+              Our infrastructure is designed to meet SOC 2 Type II compliance standards for secure data handling.
             </p>
           </div>
 
@@ -203,13 +203,13 @@ const ComplianceSection = () => {
                     className="text-lg sm:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-3"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    HIPAA Compatible
+                    HIPAA-Ready Architecture
                   </h4>
                   <p
                     className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-3 sm:mb-4"
                     style={{ fontFamily: 'var(--font-body)' }}
                   >
-                    Healthcare organizations can use Herma with appropriate Business Associate Agreements and technical safeguards in place.
+                    Our architecture is designed to support HIPAA compliance with appropriate Business Associate Agreements and technical safeguards.
                   </p>
                   <button
                     onClick={() => copyToClipboard('hipaa')}

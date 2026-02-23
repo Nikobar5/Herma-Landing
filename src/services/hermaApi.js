@@ -364,7 +364,7 @@ export function getCsuiteOverview() {
 
 // --- Portal Chat (streaming) ---
 
-export async function streamChat(messages, { onChunk, onDone, onError, onOpen, signal, model } = {}) {
+export async function streamChat(messages, { onChunk, onDone, onError, onOpen, signal, model, skipMemory } = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
@@ -375,7 +375,10 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
   const body = { messages, stream: true };
   if (model) body.model = model;
 
-  const res = await fetch(`${API_URL}/portal/chat/completions`, {
+  const chatUrl = skipMemory
+    ? `${API_URL}/portal/chat/completions?skip_memory=true`
+    : `${API_URL}/portal/chat/completions`;
+  const res = await fetch(chatUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

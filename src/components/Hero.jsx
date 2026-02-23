@@ -29,14 +29,14 @@ const Hero = () => {
               >
                 <span className="text-[var(--text-primary)]">Cut AI Costs by 60%</span>
                 <br />
-                <span className="text-[var(--accent-primary)]">With Smart Routing</span>
+                <span className="text-[var(--accent-primary)]">With Herma</span>
               </h1>
 
               <p
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 font-normal max-w-3xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Herma's intelligent API routes your prompts to the most cost-effective model without sacrificing quality. Same output, fraction of the price.
+                Herma routes your prompts to the best model for the job — same quality, fraction of the price.
               </p>
 
               {/* CTA Button - Centered */}

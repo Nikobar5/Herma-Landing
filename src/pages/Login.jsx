@@ -16,7 +16,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,7 +43,7 @@ const Login = () => {
           password: formData.password,
         });
       }
-      navigate(from, { replace: true });
+      navigate(isLogin ? (from || '/dashboard') : '/chat', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

@@ -1,12 +1,118 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+
+// Herma pricing: $2/1M input, $8/1M output
+const HERMA_INPUT_PRICE = 2.0;
+const HERMA_OUTPUT_PRICE = 8.0;
+
+const FALLBACK_MODELS = [
+  { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', promptPrice: 2.5, completionPrice: 10 },
+  { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4', provider: 'Anthropic', promptPrice: 3, completionPrice: 15 },
+  { id: 'google/gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro', provider: 'Google', promptPrice: 2.5, completionPrice: 15 },
+  { id: 'openai/o3', name: 'o3', provider: 'OpenAI', promptPrice: 2, completionPrice: 8 },
+];
+
+// Volume presets (total tokens/month, displayed in M)
+const VOLUME_PRESETS = [
+  { label: '1M', tokens: 1_000_000 },
+  { label: '10M', tokens: 10_000_000 },
+  { label: '50M', tokens: 50_000_000 },
+  { label: '100M', tokens: 100_000_000 },
+  { label: '500M', tokens: 500_000_000 },
+];
+
+// Assume a 3:1 input:output token ratio (typical for chat applications)
+const INPUT_RATIO = 0.75;
+const OUTPUT_RATIO = 0.25;
+
+function formatDollars(amount) {
+  if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}k`;
+  if (amount >= 1) return `$${amount.toFixed(2)}`;
+  return `$${amount.toFixed(4)}`;
+}
 
 const ValueProposition = () => {
   const [headerRef, headerVisible] = useScrollAnimation(0.1);
-  const [cardsRef, cardsVisible] = useScrollAnimation(0.1);
+  const [calcRef, calcVisible] = useScrollAnimation(0.1);
+  const [models, setModels] = useState(FALLBACK_MODELS);
+  const [selectedModel, setSelectedModel] = useState(FALLBACK_MODELS[0].id);
+  const [totalTokens, setTotalTokens] = useState(10_000_000);
+  const [customInput, setCustomInput] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('https://openrouter.ai/api/v1/models');
+        if (!res.ok) return;
+        const data = await res.json();
+        const filtered = (data.data || [])
+          .filter(m => {
+            const prompt = parseFloat(m.pricing?.prompt || '0') * 1_000_000;
+            const completion = parseFloat(m.pricing?.completion || '0') * 1_000_000;
+            return prompt > HERMA_INPUT_PRICE && completion > HERMA_OUTPUT_PRICE;
+          })
+          .filter(m => /^(openai|anthropic|google|deepseek|mistralai|meta-llama)\//.test(m.id))
+          .filter(m => !m.id.includes(':free') && !m.id.includes(':beta'))
+          .map(m => ({
+            id: m.id,
+            name: m.name.replace(/^[^:]+:\s*/, ''),
+            provider: m.id.split('/')[0],
+            promptPrice: parseFloat(m.pricing.prompt) * 1_000_000,
+            completionPrice: parseFloat(m.pricing.completion) * 1_000_000,
+          }))
+          .sort((a, b) => b.completionPrice - a.completionPrice);
+
+        if (!cancelled && filtered.length > 0) {
+          setModels(filtered);
+          setSelectedModel(filtered[0].id);
+        }
+      } catch {
+        // Keep fallback models
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const selectedModelObj = models.find(m => m.id === selectedModel) || models[0];
+
+  const costs = useMemo(() => {
+    const inputTokens = totalTokens * INPUT_RATIO;
+    const outputTokens = totalTokens * OUTPUT_RATIO;
+
+    const directCost =
+      (inputTokens / 1_000_000) * selectedModelObj.promptPrice +
+      (outputTokens / 1_000_000) * selectedModelObj.completionPrice;
+
+    const hermaCost =
+      (inputTokens / 1_000_000) * HERMA_INPUT_PRICE +
+      (outputTokens / 1_000_000) * HERMA_OUTPUT_PRICE;
+
+    const savings = directCost - hermaCost;
+    const savingsPercent = directCost > 0 ? (savings / directCost) * 100 : 0;
+
+    return { directCost, hermaCost, savings, savingsPercent };
+  }, [totalTokens, selectedModelObj]);
+
+  const providerLabel = (provider) => {
+    const labels = { openai: 'OpenAI', anthropic: 'Anthropic', google: 'Google', deepseek: 'DeepSeek', mistralai: 'Mistral', 'meta-llama': 'Meta' };
+    return labels[provider] || provider;
+  };
+
+  const handleCustomVolume = (value) => {
+    setCustomInput(value);
+    const num = parseFloat(value);
+    if (!isNaN(num) && num > 0) {
+      setTotalTokens(num * 1_000_000);
+    }
+  };
+
+  const activePreset = VOLUME_PRESETS.find(p => p.tokens === totalTokens);
+  const barMaxWidth = costs.directCost > 0 ? 100 : 0;
+  const hermaBarWidth = costs.directCost > 0 ? (costs.hermaCost / costs.directCost) * 100 : 0;
 
   return (
-    <section className="pt-24 pb-12 sm:pb-16 bg-[var(--bg-primary)]" id="value-proposition">
+    <section className="pt-24 pb-12 sm:pb-16 bg-[var(--bg-primary)]" id="savings-calculator">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div
@@ -17,107 +123,184 @@ const ValueProposition = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] mb-4 tracking-tight px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Massive Cost Savings With Smart Routing
+            Calculate Your Savings
           </h2>
           <p
             className="text-base sm:text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-body)' }}
           >
-            Herma's intelligent API delivers enterprise-grade cost optimization by routing every request to the best model for the job.
+            Select your current model and monthly volume to see how much you could save with Herma.
           </p>
         </div>
 
-        {/* Cost Savings Stats */}
+        {/* Calculator Card */}
         <div
-          ref={cardsRef}
-          className={`grid md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-16 md:mb-20 animate-on-scroll animate-fade-left ${cardsVisible ? 'is-visible' : ''}`}
+          ref={calcRef}
+          className={`max-w-4xl mx-auto animate-on-scroll animate-fade-up ${calcVisible ? 'is-visible' : ''}`}
         >
-          {/* Cloud Routing Savings */}
-          <div className="relative bg-[var(--bg-secondary)] p-5 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-[var(--border-primary)] hover:border-[var(--border-accent)] group">
-            <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-[var(--accent-primary)] opacity-5 rounded-bl-full"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--accent-primary)] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                </svg>
-                <div
-                  className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--accent-primary)] tracking-tight whitespace-nowrap"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  20-40<span className="text-xl sm:text-2xl md:text-3xl">%</span>
+          <div className="bg-[var(--bg-secondary)] rounded-2xl sm:rounded-3xl shadow-xl border border-[var(--border-secondary)] overflow-hidden">
+            {/* Controls */}
+            <div className="p-6 sm:p-8 border-b border-[var(--border-secondary)]">
+              <div className="grid sm:grid-cols-2 gap-6">
+                {/* Model Selector */}
+                <div>
+                  <label
+                    className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    Current Model
+                  </label>
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] cursor-pointer"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    {models.map(m => (
+                      <option key={m.id} value={m.id}>
+                        {m.name} ({providerLabel(m.provider)}) — ${m.promptPrice}/${m.completionPrice} per 1M
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </div>
-              <h3
-                className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] mb-2 sm:mb-3"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                Model Routing Savings
-              </h3>
-              <p
-                className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                Unified routing across all cloud AI providers optimizes model selection, reducing costs while expanding model access.
-              </p>
-            </div>
-          </div>
 
-          {/* Privacy Routing Savings */}
-          <div className="relative bg-[var(--bg-secondary)] p-5 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-[var(--border-primary)] hover:border-purple-500/30 group">
-            <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-purple-500 opacity-5 rounded-bl-full"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <div
-                  className="text-3xl sm:text-4xl md:text-5xl font-bold text-purple-400 tracking-tight whitespace-nowrap"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  50<span className="text-xl sm:text-2xl md:text-3xl">%</span>
+                {/* Volume Input */}
+                <div>
+                  <label
+                    className="block text-sm font-semibold text-[var(--text-secondary)] mb-2"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    Monthly Volume (tokens)
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {VOLUME_PRESETS.map(preset => (
+                      <button
+                        key={preset.label}
+                        onClick={() => { setTotalTokens(preset.tokens); setCustomInput(''); }}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          activePreset?.tokens === preset.tokens
+                            ? 'bg-[var(--accent-primary)] text-white shadow-md'
+                            : 'bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'
+                        }`}
+                        style={{ fontFamily: 'var(--font-ui)' }}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                    <input
+                      type="text"
+                      value={customInput}
+                      onChange={(e) => handleCustomVolume(e.target.value)}
+                      placeholder="Custom (M)"
+                      className="w-24 px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    />
+                  </div>
                 </div>
               </div>
-              <h3
-                className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] mb-2 sm:mb-3"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                Privacy Routing Savings
-              </h3>
-              <p
-                className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                Smart filtering routes only truly sensitive data to premium private infrastructure, processing safe requests through cost-effective public models.
-              </p>
             </div>
-          </div>
 
-          {/* Total Savings */}
-          <div className="relative bg-[var(--bg-secondary)] p-5 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-emerald-500/30 hover:border-emerald-400/50 group">
-            <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-emerald-500 opacity-5 rounded-bl-full"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div
-                  className="text-3xl sm:text-4xl md:text-5xl font-bold text-emerald-400 tracking-tight whitespace-nowrap"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  60-70<span className="text-xl sm:text-2xl md:text-3xl">%</span>
+            {/* Results */}
+            <div className="p-6 sm:p-8">
+              {/* Cost Bars */}
+              <div className="space-y-6 mb-8">
+                {/* Direct Cost Bar */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className="text-sm font-medium text-[var(--text-secondary)]"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    >
+                      {selectedModelObj.name} (Direct)
+                    </span>
+                    <span
+                      className="text-lg font-bold text-[var(--text-primary)]"
+                      style={{ fontFamily: 'var(--font-heading)' }}
+                    >
+                      {formatDollars(costs.directCost)}/mo
+                    </span>
+                  </div>
+                  <div className="h-8 sm:h-10 bg-[var(--bg-tertiary)] rounded-lg overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-gray-400 to-gray-500 rounded-lg transition-all duration-700 ease-out flex items-center justify-end pr-3"
+                      style={{ width: `${barMaxWidth}%` }}
+                    >
+                      <span className="text-xs font-semibold text-white whitespace-nowrap">
+                        ${selectedModelObj.promptPrice} / ${selectedModelObj.completionPrice} per 1M
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Herma Cost Bar */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className="text-sm font-medium text-[var(--accent-primary)]"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    >
+                      With Herma
+                    </span>
+                    <span
+                      className="text-lg font-bold text-[var(--accent-primary)]"
+                      style={{ fontFamily: 'var(--font-heading)' }}
+                    >
+                      {formatDollars(costs.hermaCost)}/mo
+                    </span>
+                  </div>
+                  <div className="h-8 sm:h-10 bg-[var(--bg-tertiary)] rounded-lg overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-hover)] rounded-lg transition-all duration-700 ease-out flex items-center justify-end pr-3"
+                      style={{ width: `${Math.max(hermaBarWidth, 5)}%` }}
+                    >
+                      <span className="text-xs font-semibold text-white whitespace-nowrap">
+                        $2 / $8 per 1M
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <h3
-                className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] mb-2 sm:mb-3"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                Total Combined Savings
-              </h3>
+
+              {/* Savings Summary */}
+              <div className="bg-[var(--bg-tertiary)] rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-emerald-500/20">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-center sm:text-left">
+                    <p
+                      className="text-sm text-[var(--text-secondary)] mb-1"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    >
+                      Your Monthly Savings
+                    </p>
+                    <p
+                      className="text-3xl sm:text-4xl font-bold text-emerald-400"
+                      style={{ fontFamily: 'var(--font-heading)' }}
+                    >
+                      {formatDollars(costs.savings)}/mo
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="text-4xl sm:text-5xl font-bold text-emerald-400"
+                      style={{ fontFamily: 'var(--font-heading)' }}
+                    >
+                      {costs.savingsPercent.toFixed(0)}%
+                    </div>
+                    <div
+                      className="text-sm text-[var(--text-secondary)] leading-tight"
+                      style={{ fontFamily: 'var(--font-ui)' }}
+                    >
+                      cost<br />reduction
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footnote */}
               <p
-                className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
+                className="text-xs text-[var(--text-tertiary)] text-center mt-4"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Stack both optimizations to achieve industry-leading cost efficiency without sacrificing privacy, compliance, or model capabilities.
+                * Based on a 75/25 input/output token ratio. Herma flat pricing: $2/1M input tokens, $8/1M output tokens. Model prices from OpenRouter.
               </p>
             </div>
           </div>

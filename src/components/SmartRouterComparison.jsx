@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './chat/CodeBlock';
@@ -75,24 +75,76 @@ const ComparisonMarkdown = ({ content }) => (
   </div>
 );
 
-const MODELS = [
-  { id: 'openai/gpt-4o', label: 'GPT-4o', provider: 'OpenAI' },
-  { id: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', provider: 'OpenAI' },
-  { id: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4', provider: 'Anthropic' },
-  { id: 'anthropic/claude-3.5-haiku', label: 'Claude 3.5 Haiku', provider: 'Anthropic' },
-  { id: 'google/gemini-2.0-flash-001', label: 'Gemini 2.0 Flash', provider: 'Google' },
-  { id: 'meta-llama/llama-3.1-70b-instruct', label: 'Llama 3.1 70B', provider: 'Meta' },
-  { id: 'meta-llama/llama-3.1-8b-instruct', label: 'Llama 3.1 8B', provider: 'Meta' },
+// Herma pricing: $2/1M input, $8/1M output
+const HERMA_INPUT_PRICE = 2.0;   // per 1M tokens
+const HERMA_OUTPUT_PRICE = 8.0;  // per 1M tokens
+
+// Fallback models if OpenRouter API is unavailable
+const FALLBACK_MODELS = [
+  { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', promptPrice: 2.5, completionPrice: 10 },
+  { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4', provider: 'Anthropic', promptPrice: 3, completionPrice: 15 },
+  { id: 'google/gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro', provider: 'Google', promptPrice: 2.5, completionPrice: 15 },
+  { id: 'openai/o3', name: 'o3', provider: 'OpenAI', promptPrice: 2, completionPrice: 8 },
 ];
 
+function formatCost(promptTokens, completionTokens, promptPricePerM, completionPricePerM) {
+  const cost = (promptTokens / 1_000_000) * promptPricePerM + (completionTokens / 1_000_000) * completionPricePerM;
+  return cost < 0.01 ? `$${cost.toFixed(5)}` : `$${cost.toFixed(4)}`;
+}
+
 const SmartRouterComparison = () => {
+  const [models, setModels] = useState(FALLBACK_MODELS);
   const [query, setQuery] = useState('');
-  const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
+  const [selectedModel, setSelectedModel] = useState(FALLBACK_MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const { isAuthenticated } = useHermaAuth();
 
-  const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Smart Router', time: 0, loading: false, error: null, thinking: false });
-  const [stdResult, setStdResult] = useState({ content: '', cost: null, model: MODELS[0].label, time: 0, loading: false, error: null, thinking: false });
+  const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Herma Router', time: 0, loading: false, error: null, thinking: false });
+  const [stdResult, setStdResult] = useState({ content: '', cost: null, model: FALLBACK_MODELS[0].name, time: 0, loading: false, error: null, thinking: false });
+
+  // Fetch models from OpenRouter and filter to premium models where Herma is cheaper
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('https://openrouter.ai/api/v1/models');
+        if (!res.ok) return;
+        const data = await res.json();
+        const filtered = (data.data || [])
+          .filter(m => {
+            const prompt = parseFloat(m.pricing?.prompt || '0') * 1_000_000; // per 1M tokens
+            const completion = parseFloat(m.pricing?.completion || '0') * 1_000_000;
+            // Only show models where Herma saves on both input AND output
+            return prompt > HERMA_INPUT_PRICE && completion > HERMA_OUTPUT_PRICE;
+          })
+          .filter(m => {
+            // Only include models from our allowed provider families
+            return /^(openai|anthropic|google|deepseek|mistralai|meta-llama)\//.test(m.id);
+          })
+          .filter(m => {
+            // Exclude free tiers, beta, and niche variants
+            return !m.id.includes(':free') && !m.id.includes(':beta');
+          })
+          .map(m => ({
+            id: m.id,
+            name: m.name.replace(/^[^:]+:\s*/, ''), // Strip "Provider: " prefix
+            provider: m.id.split('/')[0],
+            promptPrice: parseFloat(m.pricing.prompt) * 1_000_000,
+            completionPrice: parseFloat(m.pricing.completion) * 1_000_000,
+          }))
+          .sort((a, b) => b.completionPrice - a.completionPrice); // Most expensive first
+
+        if (!cancelled && filtered.length > 0) {
+          setModels(filtered);
+          setSelectedModel(filtered[0].id);
+          setStdResult(prev => ({ ...prev, model: filtered[0].name }));
+        }
+      } catch {
+        // Keep fallback models
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const examples = [
     "Summarize this quarterly report",
@@ -100,19 +152,19 @@ const SmartRouterComparison = () => {
     "Draft a cold email to a potential client"
   ];
 
-  const selectedModelLabel = MODELS.find(m => m.id === selectedModel)?.label || selectedModel;
+  const selectedModelObj = models.find(m => m.id === selectedModel) || models[0];
 
   const handleCompare = async () => {
     if (!query) return;
 
     setIsProcessing(true);
 
-    setHermaResult({ content: '', cost: null, model: 'Smart Router', time: 0, loading: true, error: null, thinking: false });
-    setStdResult({ content: '', cost: null, model: selectedModelLabel, time: 0, loading: true, error: null, thinking: false });
+    setHermaResult({ content: '', cost: null, model: 'Herma Router', time: 0, loading: true, error: null, thinking: false });
+    setStdResult({ content: '', cost: null, model: selectedModelObj.name, time: 0, loading: true, error: null, thinking: false });
 
     const startTime = Date.now();
 
-    // 1. Herma Smart Router (auto-routed)
+    // 1. Herma Router (auto-routed, skip memory for generic demo)
     const hermaPromise = (async () => {
       if (!isAuthenticated) {
         setHermaResult(prev => ({ ...prev, loading: false, error: "Please log in to use the comparison." }));
@@ -122,6 +174,7 @@ const SmartRouterComparison = () => {
         let content = '';
         await streamChat([{ role: 'user', content: query }], {
           model: 'openrouter/auto',
+          skipMemory: true,
           onChunk: (delta) => {
             if (delta.type === 'reasoning') {
               setHermaResult(prev => ({ ...prev, thinking: true }));
@@ -131,12 +184,14 @@ const SmartRouterComparison = () => {
             }
           },
           onDone: (usage) => {
-            const cost = usage ? (usage.total_tokens * 0.000002).toFixed(5) : '0.00005';
+            const promptTokens = usage?.prompt_tokens || 0;
+            const completionTokens = usage?.completion_tokens || 0;
+            const cost = formatCost(promptTokens, completionTokens, HERMA_INPUT_PRICE, HERMA_OUTPUT_PRICE);
             setHermaResult(prev => ({
               ...prev,
               loading: false,
               time: ((Date.now() - startTime) / 1000).toFixed(2),
-              cost: `$${cost}`
+              cost
             }));
           },
           onError: (err) => {
@@ -148,7 +203,7 @@ const SmartRouterComparison = () => {
       }
     })();
 
-    // 2. Selected model (specific model via OpenRouter)
+    // 2. Selected model (specific model, also skip memory)
     const stdPromise = (async () => {
       if (!isAuthenticated) {
         setStdResult(prev => ({ ...prev, loading: false, error: "Please log in to use the comparison." }));
@@ -158,6 +213,7 @@ const SmartRouterComparison = () => {
         let content = '';
         await streamChat([{ role: 'user', content: query }], {
           model: selectedModel,
+          skipMemory: true,
           onChunk: (delta) => {
             if (delta.type === 'reasoning') {
               setStdResult(prev => ({ ...prev, thinking: true }));
@@ -167,12 +223,15 @@ const SmartRouterComparison = () => {
             }
           },
           onDone: (usage) => {
-            const cost = usage ? (usage.total_tokens * 0.000003).toFixed(5) : '0.00010';
+            // Show what the user would pay at the model's direct pricing
+            const promptTokens = usage?.prompt_tokens || 0;
+            const completionTokens = usage?.completion_tokens || 0;
+            const cost = formatCost(promptTokens, completionTokens, selectedModelObj.promptPrice, selectedModelObj.completionPrice);
             setStdResult(prev => ({
               ...prev,
               loading: false,
               time: ((Date.now() - startTime) / 1000).toFixed(2),
-              cost: `$${cost}`
+              cost
             }));
           },
           onError: (err) => {
@@ -188,6 +247,11 @@ const SmartRouterComparison = () => {
     setIsProcessing(false);
   };
 
+  const providerLabel = (provider) => {
+    const labels = { openai: 'OpenAI', anthropic: 'Anthropic', google: 'Google', deepseek: 'DeepSeek', mistralai: 'Mistral', 'meta-llama': 'Meta' };
+    return labels[provider] || provider;
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto mt-12 mb-20 animate-fade-up">
       <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-xl border border-[var(--border-secondary)] overflow-hidden">
@@ -198,18 +262,19 @@ const SmartRouterComparison = () => {
           </h3>
 
           {/* Model Selector */}
-          <div className="flex items-center justify-center gap-3 mb-5">
-            <span className="text-sm font-medium text-[var(--text-secondary)]">Compare against:</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-5 px-2">
+            <span className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">Compare against:</span>
             <select
               value={selectedModel}
               onChange={(e) => {
                 setSelectedModel(e.target.value);
-                setStdResult(prev => ({ ...prev, model: MODELS.find(m => m.id === e.target.value)?.label || e.target.value }));
+                const m = models.find(m => m.id === e.target.value);
+                setStdResult(prev => ({ ...prev, model: m?.name || e.target.value }));
               }}
-              className="px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] cursor-pointer"
+              className="w-full sm:w-auto px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] cursor-pointer"
             >
-              {MODELS.map(m => (
-                <option key={m.id} value={m.id}>{m.label} ({m.provider})</option>
+              {models.map(m => (
+                <option key={m.id} value={m.id}>{m.name} ({providerLabel(m.provider)})</option>
               ))}
             </select>
           </div>
@@ -256,9 +321,9 @@ const SmartRouterComparison = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs">AI</div>
-                <span className="font-semibold text-[var(--text-secondary)]">{selectedModelLabel}</span>
+                <span className="font-semibold text-[var(--text-secondary)]">{selectedModelObj.name}</span>
               </div>
-              <span className="text-xs font-mono text-[var(--text-tertiary)]">Direct Model</span>
+              <span className="text-xs font-mono text-[var(--text-tertiary)]">Direct Pricing</span>
             </div>
 
             <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base overflow-y-auto max-h-[500px]">
@@ -304,18 +369,18 @@ const SmartRouterComparison = () => {
             <div className={`transition-opacity duration-300 ${stdResult.cost ? 'opacity-100' : 'opacity-0'}`}>
               <div className="bg-[var(--bg-primary)] rounded-xl p-4 border border-[var(--border-secondary)]">
                 <div className="flex justify-between items-end mb-1">
-                  <span className="text-sm text-[var(--text-tertiary)]">Cost</span>
+                  <span className="text-sm text-[var(--text-tertiary)]">Direct Cost</span>
                   <span className="text-xl font-bold text-gray-500">{stdResult.cost}</span>
                 </div>
                 <div className="flex justify-between text-xs text-[var(--text-tertiary)] mt-2">
                   <span>Time: {stdResult.time}s</span>
-                  <span>Model: {selectedModelLabel}</span>
+                  <span>Model: {selectedModelObj.name}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Herma Smart Router Side */}
+          {/* Herma Router Side */}
           <div className="p-6 sm:p-8 bg-[var(--bg-secondary)]/50 relative overflow-hidden min-h-[300px] flex flex-col">
             {/* Highlight Glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent-primary)]/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
@@ -327,7 +392,7 @@ const SmartRouterComparison = () => {
                 </div>
                 <span className="font-semibold text-[var(--accent-primary)]">Herma Router</span>
               </div>
-              <span className="text-xs font-mono text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-2 py-0.5 rounded-full">Smart Router</span>
+              <span className="text-xs font-mono text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-2 py-0.5 rounded-full">Herma Pricing</span>
             </div>
 
             <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base overflow-y-auto max-h-[500px]">
@@ -369,11 +434,11 @@ const SmartRouterComparison = () => {
               )}
             </div>
 
-            {/* Stats Card - Optimized */}
+            {/* Stats Card - Herma */}
             <div className={`transition-opacity duration-300 ${hermaResult.cost ? 'opacity-100' : 'opacity-0'} relative z-10`}>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-[var(--accent-primary)] shadow-[0_0_20px_rgba(255,255,255,0.5)] dark:shadow-none">
                 <div className="flex justify-between items-end mb-1">
-                  <span className="text-sm text-[var(--text-primary)] font-medium">Smart Cost</span>
+                  <span className="text-sm text-[var(--text-primary)] font-medium">Herma Cost</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-green-500 bg-green-100 px-1.5 py-0.5 rounded uppercase tracking-wider">SAVINGS</span>
                     <span className="text-2xl font-bold text-[var(--accent-primary)]">{hermaResult.cost}</span>
@@ -381,7 +446,7 @@ const SmartRouterComparison = () => {
                 </div>
                 <div className="flex justify-between text-xs text-[var(--text-tertiary)] mt-2">
                   <span>Time: {hermaResult.time}s</span>
-                  <span>Model: Auto-routed</span>
+                  <span>$2/M input, $8/M output</span>
                 </div>
               </div>
             </div>
@@ -391,7 +456,7 @@ const SmartRouterComparison = () => {
         {/* Footer Info */}
         <div className="bg-[var(--bg-tertiary)] p-4 text-center border-t border-[var(--border-secondary)]">
           <p className="text-xs text-[var(--text-tertiary)]">
-            * Real-time comparison. Both requests route through Herma — one to the model you selected, one through our smart router.
+            * Real-time comparison. Left shows the model's retail pricing. Right shows what you pay through Herma ($2/M input, $8/M output).
           </p>
         </div>
       </div>
