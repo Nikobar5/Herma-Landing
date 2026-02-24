@@ -363,7 +363,7 @@ const SmartRouterComparison = () => {
               <span className="text-xs font-mono text-[var(--text-tertiary)]">Direct Pricing</span>
             </div>
 
-            <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base overflow-y-auto max-h-[500px]">
+            <div className="flex-grow text-left text-[var(--text-primary)] leading-relaxed mb-6 text-sm sm:text-base overflow-y-auto max-h-[500px]">
               {stdResult.loading && !stdResult.content ? (
                 stdResult.thinking ? (
                   <div className="flex items-center gap-2 text-[var(--text-secondary)]">
@@ -424,7 +424,7 @@ const SmartRouterComparison = () => {
               <span className="text-xs font-mono text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 px-2 py-0.5 rounded-full">Herma Pricing</span>
             </div>
 
-            <div className="flex-grow text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base overflow-y-auto max-h-[500px]">
+            <div className="flex-grow text-left text-[var(--text-primary)] leading-relaxed mb-6 relative z-10 text-sm sm:text-base overflow-y-auto max-h-[500px]">
               {hermaResult.loading && !hermaResult.content ? (
                 hermaResult.thinking ? (
                   <div className="flex items-center gap-2 text-[var(--accent-primary)]">
