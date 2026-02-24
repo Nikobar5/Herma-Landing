@@ -150,7 +150,7 @@ const Documentation = () => {
           >
             Base URL
           </h2>
-          <CodeBlock>{API_URL}/v1</CodeBlock>
+          <CodeBlock>{`${API_URL}/v1`}</CodeBlock>
         </section>
 
         {/* Authentication */}
