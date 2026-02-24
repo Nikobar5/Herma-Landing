@@ -28,6 +28,35 @@ const CodeBlock = ({ children, language }) => {
   );
 };
 
+const TabGroup = ({ tabs }) => {
+  const [active, setActive] = useState(0);
+
+  return (
+    <div>
+      <div className="flex gap-0 border-b border-[var(--border-primary)] mb-0">
+        {tabs.map((tab, i) => (
+          <button
+            key={tab.label}
+            onClick={() => setActive(i)}
+            className={`px-4 py-2.5 text-sm font-medium transition-colors relative ${
+              active === i
+                ? 'text-[var(--accent-primary)]'
+                : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+            }`}
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            {tab.label}
+            {active === i && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)]" />
+            )}
+          </button>
+        ))}
+      </div>
+      <CodeBlock>{tabs[active].code}</CodeBlock>
+    </div>
+  );
+};
+
 const Documentation = () => {
   const API_URL = 'https://herma.up.railway.app';
 
@@ -230,15 +259,15 @@ const Documentation = () => {
             Examples
           </h2>
 
-          {/* cURL */}
           <h3
             className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
-            cURL
+            Basic Request
           </h3>
           <div className="mb-8">
-            <CodeBlock>{`curl ${API_URL}/v1/chat/completions \\
+            <TabGroup tabs={[
+              { label: 'cURL', code: `curl ${API_URL}/v1/chat/completions \\
   -H "Authorization: Bearer hk-your-api-key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -246,18 +275,8 @@ const Documentation = () => {
     "messages": [
       {"role": "user", "content": "What is machine learning?"}
     ]
-  }'`}</CodeBlock>
-          </div>
-
-          {/* Python */}
-          <h3
-            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
-            style={{ fontFamily: 'var(--font-ui)' }}
-          >
-            Python (OpenAI SDK)
-          </h3>
-          <div className="mb-8">
-            <CodeBlock>{`from openai import OpenAI
+  }'` },
+              { label: 'Python', code: `from openai import OpenAI
 
 client = OpenAI(
     api_key="hk-your-api-key",
@@ -271,18 +290,50 @@ response = client.chat.completions.create(
     ]
 )
 
-print(response.choices[0].message.content)`}</CodeBlock>
+print(response.choices[0].message.content)` },
+              { label: 'Node.js', code: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "hk-your-api-key",
+  baseURL: "${API_URL}/v1"
+});
+
+const response = await client.chat.completions.create({
+  model: "herma-auto",
+  messages: [
+    { role: "user", content: "What is machine learning?" }
+  ]
+});
+
+console.log(response.choices[0].message.content);` },
+              { label: 'fetch', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer hk-your-api-key",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "herma-auto",
+    messages: [
+      { role: "user", content: "What is machine learning?" }
+    ]
+  })
+});
+
+const data = await response.json();
+console.log(data.choices[0].message.content);` },
+            ]} />
           </div>
 
-          {/* Python Streaming */}
           <h3
             className="text-lg font-semibold text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
-            Python (Streaming)
+            Streaming
           </h3>
           <div className="mb-8">
-            <CodeBlock>{`from openai import OpenAI
+            <TabGroup tabs={[
+              { label: 'Python', code: `from openai import OpenAI
 
 client = OpenAI(
     api_key="hk-your-api-key",
@@ -299,43 +350,27 @@ stream = client.chat.completions.create(
 
 for chunk in stream:
     if chunk.choices[0].delta.content:
-        print(chunk.choices[0].delta.content, end="")`}</CodeBlock>
-          </div>
-
-          {/* JavaScript */}
-          <h3
-            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
-            style={{ fontFamily: 'var(--font-ui)' }}
-          >
-            JavaScript (Node.js)
-          </h3>
-          <div className="mb-8">
-            <CodeBlock>{`import OpenAI from "openai";
+        print(chunk.choices[0].delta.content, end="")` },
+              { label: 'Node.js', code: `import OpenAI from "openai";
 
 const client = new OpenAI({
   apiKey: "hk-your-api-key",
   baseURL: "${API_URL}/v1"
 });
 
-const response = await client.chat.completions.create({
+const stream = await client.chat.completions.create({
   model: "herma-auto",
   messages: [
-    { role: "user", content: "What is machine learning?" }
-  ]
+    { role: "user", content: "Write a haiku about coding" }
+  ],
+  stream: true
 });
 
-console.log(response.choices[0].message.content);`}</CodeBlock>
-          </div>
-
-          {/* JavaScript fetch */}
-          <h3
-            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
-            style={{ fontFamily: 'var(--font-ui)' }}
-          >
-            JavaScript (fetch)
-          </h3>
-          <div className="mb-8">
-            <CodeBlock>{`const response = await fetch("${API_URL}/v1/chat/completions", {
+for await (const chunk of stream) {
+  const content = chunk.choices[0]?.delta?.content;
+  if (content) process.stdout.write(content);
+}` },
+              { label: 'fetch (SSE)', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
   method: "POST",
   headers: {
     "Authorization": "Bearer hk-your-api-key",
@@ -344,13 +379,29 @@ console.log(response.choices[0].message.content);`}</CodeBlock>
   body: JSON.stringify({
     model: "herma-auto",
     messages: [
-      { role: "user", content: "What is machine learning?" }
-    ]
+      { role: "user", content: "Write a haiku about coding" }
+    ],
+    stream: true
   })
 });
 
-const data = await response.json();
-console.log(data.choices[0].message.content);`}</CodeBlock>
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  const text = decoder.decode(value);
+  // Parse SSE lines: "data: {...}"
+  for (const line of text.split("\\n")) {
+    if (line.startsWith("data: ") && line.slice(6) !== "[DONE]") {
+      const chunk = JSON.parse(line.slice(6));
+      const content = chunk.choices?.[0]?.delta?.content;
+      if (content) process.stdout.write(content);
+    }
+  }
+}` },
+            ]} />
           </div>
         </section>
 
