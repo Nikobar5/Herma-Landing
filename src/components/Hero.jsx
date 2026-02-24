@@ -59,7 +59,7 @@ const Hero = () => {
             </div>
 
             {/* Smart Comparison Component */}
-            <div className="w-full mt-8 animate-hero-delayed-more">
+            <div id="see-the-difference" className="w-full mt-8 animate-hero-delayed-more">
               <SmartRouterComparison />
             </div>
           </div>

@@ -18,6 +18,10 @@ const Login = () => {
 
   const from = location.state?.from?.pathname;
 
+  // Check for ?redirect=comparison in the hash URL
+  const searchParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+  const redirectParam = searchParams.get('redirect');
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -43,7 +47,14 @@ const Login = () => {
           password: formData.password,
         });
       }
-      navigate(isLogin ? (from || '/dashboard') : '/chat', { replace: true });
+      if (redirectParam === 'comparison') {
+        navigate('/', { replace: true });
+        setTimeout(() => {
+          document.getElementById('see-the-difference')?.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+      } else {
+        navigate(isLogin ? (from || '/dashboard') : '/chat', { replace: true });
+      }
     } catch (err) {
       setError(err.message);
     } finally {

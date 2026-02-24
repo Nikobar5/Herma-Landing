@@ -364,6 +364,78 @@ export function getCsuiteOverview() {
 
 // --- Portal Chat (streaming) ---
 
+export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpen, signal, model } = {}) {
+  const body = { messages, stream: true };
+  if (model) body.model = model;
+
+  const res = await fetch(`${API_URL}/demo/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  });
+
+  if (res.status === 429) {
+    throw new Error('Demo rate limit reached. Sign up for unlimited access!');
+  }
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(errBody.detail || `Request failed (${res.status})`);
+  }
+
+  onOpen?.();
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let lastUsage = null;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+        const data = trimmed.slice(6);
+        if (data === '[DONE]') {
+          onDone?.(lastUsage);
+          return;
+        }
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.error) {
+            const err = new Error(parsed.error.message || 'An error occurred');
+            err.type = parsed.error.type;
+            onError?.(err);
+            throw err;
+          }
+          if (parsed.usage) lastUsage = parsed.usage;
+          const delta = parsed.choices?.[0]?.delta;
+          const reasoning = delta?.reasoning || delta?.reasoning_content;
+          if (reasoning) {
+            onChunk?.({ type: 'reasoning', content: reasoning });
+          } else if (delta?.content) {
+            onChunk?.({ type: 'content', content: delta.content });
+          }
+        } catch (parseErr) {
+          if (parseErr.type === 'stream_error' || parseErr.type === 'upstream_error') throw parseErr;
+        }
+      }
+    }
+    onDone?.(lastUsage);
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    onError?.(err);
+    throw err;
+  }
+}
+
 export async function streamChat(messages, { onChunk, onDone, onError, onOpen, signal, model, skipMemory } = {}) {
   const token = getToken();
   if (!token) {

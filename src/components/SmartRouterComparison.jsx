@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './chat/CodeBlock';
-import { streamChat } from '../services/hermaApi';
+import { streamChat, streamDemoChat } from '../services/hermaApi';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
 const ComparisonMarkdown = ({ content }) => (
@@ -79,6 +79,9 @@ const ComparisonMarkdown = ({ content }) => (
 const HERMA_INPUT_PRICE = 2.0;   // per 1M tokens
 const HERMA_OUTPUT_PRICE = 8.0;  // per 1M tokens
 
+const MAX_DEMO_QUERIES = 2;
+const DEMO_STORAGE_KEY = 'herma_demo_queries';
+
 // Fallback models if OpenRouter API is unavailable
 const FALLBACK_MODELS = [
   { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', promptPrice: 2.5, completionPrice: 10 },
@@ -99,8 +102,22 @@ const SmartRouterComparison = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { isAuthenticated } = useHermaAuth();
 
+  const [demoQueriesUsed, setDemoQueriesUsed] = useState(() => {
+    return parseInt(sessionStorage.getItem(DEMO_STORAGE_KEY) || '0', 10);
+  });
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
   const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Herma Router', time: 0, loading: false, error: null, thinking: false });
   const [stdResult, setStdResult] = useState({ content: '', cost: null, model: FALLBACK_MODELS[0].name, time: 0, loading: false, error: null, thinking: false });
+
+  // Clear demo counter when user logs in
+  useEffect(() => {
+    if (isAuthenticated) {
+      setDemoQueriesUsed(0);
+      sessionStorage.removeItem(DEMO_STORAGE_KEY);
+      setShowLoginPrompt(false);
+    }
+  }, [isAuthenticated]);
 
   // Fetch models from OpenRouter and filter to premium models where Herma is cheaper
   useEffect(() => {
@@ -157,6 +174,12 @@ const SmartRouterComparison = () => {
   const handleCompare = async () => {
     if (!query) return;
 
+    // Gate unauthenticated users after free comparisons
+    if (!isAuthenticated && demoQueriesUsed >= MAX_DEMO_QUERIES) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     setIsProcessing(true);
 
     setHermaResult({ content: '', cost: null, model: 'Herma Router', time: 0, loading: true, error: null, thinking: false });
@@ -164,17 +187,17 @@ const SmartRouterComparison = () => {
 
     const startTime = Date.now();
 
-    // 1. Herma Router (auto-routed, skip memory for generic demo)
+    // Choose stream function based on auth state
+    const chatFn = isAuthenticated ? streamChat : streamDemoChat;
+    const chatOpts = isAuthenticated ? { skipMemory: true } : {};
+
+    // 1. Herma Router (auto-routed)
     const hermaPromise = (async () => {
-      if (!isAuthenticated) {
-        setHermaResult(prev => ({ ...prev, loading: false, error: "Please log in to use the comparison." }));
-        return;
-      }
       try {
         let content = '';
-        await streamChat([{ role: 'user', content: query }], {
+        await chatFn([{ role: 'user', content: query }], {
           model: 'openrouter/auto',
-          skipMemory: true,
+          ...chatOpts,
           onChunk: (delta) => {
             if (delta.type === 'reasoning') {
               setHermaResult(prev => ({ ...prev, thinking: true }));
@@ -203,17 +226,13 @@ const SmartRouterComparison = () => {
       }
     })();
 
-    // 2. Selected model (specific model, also skip memory)
+    // 2. Selected model (specific model)
     const stdPromise = (async () => {
-      if (!isAuthenticated) {
-        setStdResult(prev => ({ ...prev, loading: false, error: "Please log in to use the comparison." }));
-        return;
-      }
       try {
         let content = '';
-        await streamChat([{ role: 'user', content: query }], {
+        await chatFn([{ role: 'user', content: query }], {
           model: selectedModel,
-          skipMemory: true,
+          ...chatOpts,
           onChunk: (delta) => {
             if (delta.type === 'reasoning') {
               setStdResult(prev => ({ ...prev, thinking: true }));
@@ -245,6 +264,13 @@ const SmartRouterComparison = () => {
 
     await Promise.all([hermaPromise, stdPromise]);
     setIsProcessing(false);
+
+    // Increment demo counter for unauthenticated users
+    if (!isAuthenticated) {
+      const newCount = demoQueriesUsed + 1;
+      setDemoQueriesUsed(newCount);
+      sessionStorage.setItem(DEMO_STORAGE_KEY, String(newCount));
+    }
   };
 
   const providerLabel = (provider) => {
@@ -252,8 +278,10 @@ const SmartRouterComparison = () => {
     return labels[provider] || provider;
   };
 
+  const demoRemaining = MAX_DEMO_QUERIES - demoQueriesUsed;
+
   return (
-    <div className="w-full max-w-5xl mx-auto mt-12 mb-20 animate-fade-up">
+    <div className="w-full max-w-5xl mx-auto mt-12 mb-20 animate-fade-up relative">
       <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-xl border border-[var(--border-secondary)] overflow-hidden">
         {/* Header / Input Area */}
         <div className="p-6 sm:p-8 border-b border-[var(--border-secondary)] bg-[var(--bg-tertiary)]/50">
@@ -309,6 +337,15 @@ const SmartRouterComparison = () => {
               </button>
             ))}
           </div>
+
+          {/* Free comparisons remaining indicator */}
+          {!isAuthenticated && (
+            <p className="text-center text-xs text-[var(--text-tertiary)] mt-3">
+              {demoRemaining > 0
+                ? `${demoRemaining} free comparison${demoRemaining !== 1 ? 's' : ''} remaining`
+                : 'Sign up for unlimited comparisons'}
+            </p>
+          )}
         </div>
 
         {/* Results Comparison Area */}
@@ -349,14 +386,6 @@ const SmartRouterComparison = () => {
               ) : stdResult.error ? (
                 <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
                   {stdResult.error}
-                  {!isAuthenticated && (
-                    <button
-                      onClick={() => window.location.hash = '#/login'}
-                      className="block mt-2 mx-auto px-4 py-2 bg-[var(--accent-primary)] text-white rounded text-xs hover:bg-[var(--accent-hover)]"
-                    >
-                      Log In
-                    </button>
-                  )}
                 </div>
               ) : stdResult.content ? (
                 <ComparisonMarkdown content={stdResult.content} />
@@ -418,14 +447,6 @@ const SmartRouterComparison = () => {
               ) : hermaResult.error ? (
                 <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
                   {hermaResult.error}
-                  {!isAuthenticated && (
-                    <button
-                      onClick={() => window.location.hash = '#/login'}
-                      className="block mt-2 mx-auto px-4 py-2 bg-[var(--accent-primary)] text-white rounded text-xs hover:bg-[var(--accent-hover)]"
-                    >
-                      Log In
-                    </button>
-                  )}
                 </div>
               ) : hermaResult.content ? (
                 <ComparisonMarkdown content={hermaResult.content} />
@@ -460,6 +481,40 @@ const SmartRouterComparison = () => {
           </p>
         </div>
       </div>
+
+      {/* Login Prompt Overlay */}
+      {showLoginPrompt && (
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-2xl flex items-center justify-center z-20">
+          <div className="bg-[var(--bg-secondary)] rounded-xl p-8 max-w-sm mx-4 text-center border border-[var(--border-secondary)] shadow-2xl">
+            <h4 className="text-lg font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+              You've used your free comparisons
+            </h4>
+            <p className="text-sm text-[var(--text-secondary)] mb-6">
+              Sign up for free to get unlimited access to the comparison tool and start saving on AI costs.
+            </p>
+            <div className="flex flex-col gap-3">
+              <a
+                href="#/login?redirect=comparison"
+                className="px-6 py-3 bg-[var(--accent-primary)] text-white font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors text-sm"
+              >
+                Sign Up Free
+              </a>
+              <a
+                href="#/login?redirect=comparison"
+                className="px-6 py-2 text-[var(--accent-primary)] hover:underline text-sm"
+              >
+                Already have an account? Log In
+              </a>
+            </div>
+            <button
+              onClick={() => setShowLoginPrompt(false)}
+              className="mt-4 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
