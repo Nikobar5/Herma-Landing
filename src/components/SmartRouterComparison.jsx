@@ -343,7 +343,7 @@ const SmartRouterComparison = () => {
             <p className="text-center text-xs text-[var(--text-tertiary)] mt-3">
               {demoRemaining > 0
                 ? `${demoRemaining} free comparison${demoRemaining !== 1 ? 's' : ''} remaining`
-                : 'Sign up for unlimited comparisons'}
+                : 'Sign up for more comparisons'}
             </p>
           )}
         </div>
@@ -490,7 +490,7 @@ const SmartRouterComparison = () => {
               You've used your free comparisons
             </h4>
             <p className="text-sm text-[var(--text-secondary)] mb-6">
-              Sign up for free to get unlimited access to the comparison tool and start saving on AI costs.
+              Sign up for free to get more comparisons and start saving on AI costs.
             </p>
             <div className="flex flex-col gap-3">
               <a
