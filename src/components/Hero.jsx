@@ -36,7 +36,7 @@ const Hero = () => {
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 font-normal max-w-3xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Herma routes your prompts to the best model for the job — same quality, fraction of the price.
+                Herma routes your prompts to the best model for the job. Same quality, fraction of the price.
               </p>
 
               {/* CTA Button - Centered */}
