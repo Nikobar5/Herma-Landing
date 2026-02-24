@@ -192,7 +192,7 @@ const ValueProposition = () => {
                       value={customInput}
                       onChange={(e) => handleCustomVolume(e.target.value)}
                       placeholder="Custom (M)"
-                      className="w-24 px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                      className="w-28 px-3 py-2 rounded-lg bg-[var(--bg-primary)] border-2 border-[var(--border-secondary)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     />
                   </div>
@@ -248,15 +248,14 @@ const ValueProposition = () => {
                       {formatDollars(costs.hermaCost)}/mo
                     </span>
                   </div>
-                  <div className="h-8 sm:h-10 bg-[var(--bg-tertiary)] rounded-lg overflow-hidden">
+                  <div className="relative h-8 sm:h-10 bg-[var(--bg-tertiary)] rounded-lg overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-hover)] rounded-lg transition-all duration-700 ease-out flex items-center justify-end pr-3"
+                      className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-hover)] rounded-lg transition-all duration-700 ease-out"
                       style={{ width: `${Math.max(hermaBarWidth, 5)}%` }}
-                    >
-                      <span className="text-xs font-semibold text-white whitespace-nowrap">
-                        $2 / $8 per 1M
-                      </span>
-                    </div>
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--accent-primary)] whitespace-nowrap bg-[var(--bg-tertiary)]/80 px-1.5 py-0.5 rounded">
+                      $2 / $8 per 1M
+                    </span>
                   </div>
                 </div>
               </div>
