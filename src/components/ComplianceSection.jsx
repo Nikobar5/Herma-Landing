@@ -1,19 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const ComplianceSection = () => {
-  const [copiedButton, setCopiedButton] = useState(null);
-  const email = 'hermalocal@gmail.com';
   const [headerRef, headerVisible] = useScrollAnimation(0.1);
   const [featuresRef, featuresVisible] = useScrollAnimation(0.1);
   const [complianceRef, complianceVisible] = useScrollAnimation(0.1);
-
-  const copyToClipboard = (buttonId) => {
-    navigator.clipboard.writeText(email).then(() => {
-      setCopiedButton(buttonId);
-      setTimeout(() => setCopiedButton(null), 2000);
-    });
-  };
 
   return (
     <section className="py-24 bg-[var(--bg-primary)]" id="compliance">
@@ -27,13 +18,13 @@ const ComplianceSection = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] mb-4 tracking-tight px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Enterprise-Grade Security & Compliance
+            Enterprise-Grade Security
           </h2>
           <p
             className="text-base sm:text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-body)' }}
           >
-            Airtight privacy guarantees backed by industry-leading security standards
+            Built with data minimization, encryption, and security best practices at every layer
           </p>
         </div>
 
@@ -42,28 +33,28 @@ const ComplianceSection = () => {
           ref={featuresRef}
           className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-12 md:mb-16 animate-on-scroll animate-fade-right ${featuresVisible ? 'is-visible' : ''}`}
         >
-          {/* Zero Data Retention */}
+          {/* Content Protection */}
           <div className="bg-[var(--bg-secondary)] p-4 sm:p-6 rounded-xl border border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:shadow-lg transition-all duration-300">
             <div className="mb-3 sm:mb-4">
               <svg className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--accent-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <h3
               className="text-base sm:text-lg font-bold text-[var(--text-primary)] mb-2"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              Zero Data Retention
+              Content Protection
             </h3>
             <p
               className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              Our private cloud API providers guarantee zero storage of your request data so nothing is logged or retained.
+              Your prompts and responses are encrypted and never used for model training. We collect only anonymized performance metrics to improve routing.
             </p>
           </div>
 
-          {/* SOC Compliance */}
+          {/* Secure Infrastructure */}
           <div className="bg-[var(--bg-secondary)] p-4 sm:p-6 rounded-xl border border-[var(--border-primary)] hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
             <div className="mb-3 sm:mb-4">
               <svg className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,38 +65,38 @@ const ComplianceSection = () => {
               className="text-base sm:text-lg font-bold text-[var(--text-primary)] mb-2"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              SOC 2 Architecture
+              Secure Infrastructure
             </h3>
             <p
               className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              Our infrastructure is designed to meet SOC 2 Type II compliance standards for secure data handling.
+              Deployed on SOC 2 Type II certified infrastructure with encryption at rest and in transit.
             </p>
           </div>
 
-          {/* Encryption at Rest */}
+          {/* Privacy by Design */}
           <div className="bg-[var(--bg-secondary)] p-4 sm:p-6 rounded-xl border border-[var(--border-primary)] hover:border-emerald-500/30 hover:shadow-lg transition-all duration-300">
             <div className="mb-3 sm:mb-4">
               <svg className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
               </svg>
             </div>
             <h3
               className="text-base sm:text-lg font-bold text-[var(--text-primary)] mb-2"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              Encryption at Rest
+              Privacy by Design
             </h3>
             <p
               className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              All stored data in private cloud APIs is encrypted with AES-256 encryption when at rest in our systems.
+              Built with data minimization principles. We collect only what's needed to deliver and improve our service.
             </p>
           </div>
 
-          {/* Encryption in Transit */}
+          {/* Enterprise Security */}
           <div className="bg-[var(--bg-secondary)] p-4 sm:p-6 rounded-xl border border-[var(--border-primary)] hover:border-orange-500/30 hover:shadow-lg transition-all duration-300">
             <div className="mb-3 sm:mb-4">
               <svg className="w-8 h-8 sm:w-10 sm:h-10 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,18 +107,18 @@ const ComplianceSection = () => {
               className="text-base sm:text-lg font-bold text-[var(--text-primary)] mb-2"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              Encryption in Transit
+              Enterprise Security
             </h3>
             <p
               className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              TLS 1.3 encryption protects all data in transit between your systems and our APIs.
+              TLS encryption, role-based access controls, and comprehensive audit logging for all system operations.
             </p>
           </div>
         </div>
 
-        {/* Compliance Standards */}
+        {/* Security Standards */}
         <div
           ref={complianceRef}
           className={`bg-[var(--bg-secondary)] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-xl border border-[var(--border-secondary)] mb-10 sm:mb-12 md:mb-16 animate-on-scroll animate-scale ${complianceVisible ? 'is-visible' : ''}`}
@@ -136,17 +127,17 @@ const ComplianceSection = () => {
             className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-[var(--text-primary)] mb-8 sm:mb-10 md:mb-12"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Regulatory Compliance
+            Security Standards
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
-            {/* GDPR */}
+            {/* Data Minimization */}
             <div className="bg-[var(--bg-tertiary)] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border-2 border-[var(--border-accent)]">
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--accent-muted)] rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </div>
                 </div>
@@ -155,40 +146,19 @@ const ComplianceSection = () => {
                     className="text-lg sm:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-3"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    GDPR Ready
+                    Data Minimization
                   </h4>
                   <p
-                    className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-3 sm:mb-4"
+                    className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
                     style={{ fontFamily: 'var(--font-body)' }}
                   >
-                    Our architecture supports GDPR compliance with data residency controls, right to deletion, and processing transparency.
+                    We collect derivative performance metrics, not raw content. Your conversations are processed in real-time and not retained in readable form.
                   </p>
-                  <button
-                    onClick={() => copyToClipboard('gdpr')}
-                    className="text-sm sm:text-base text-[var(--accent-primary)] font-semibold hover:underline inline-flex items-center gap-2 transition-all duration-200"
-                    style={{ fontFamily: 'var(--font-ui)' }}
-                  >
-                    {copiedButton === 'gdpr' ? (
-                      <>
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-[var(--success)]">Copied to clipboard!</span>
-                      </>
-                    ) : (
-                      <>
-                        Contact for details
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                        </svg>
-                      </>
-                    )}
-                  </button>
                 </div>
               </div>
             </div>
 
-            {/* HIPAA */}
+            {/* Infrastructure Security */}
             <div className="bg-[var(--bg-tertiary)] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border-2 border-purple-500/30">
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="flex-shrink-0">
@@ -203,35 +173,14 @@ const ComplianceSection = () => {
                     className="text-lg sm:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-3"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    HIPAA-Ready Architecture
+                    Infrastructure Security
                   </h4>
                   <p
-                    className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-3 sm:mb-4"
+                    className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed"
                     style={{ fontFamily: 'var(--font-body)' }}
                   >
-                    Our architecture is designed to support HIPAA compliance with appropriate Business Associate Agreements and technical safeguards.
+                    Built on enterprise-grade cloud infrastructure with SOC 2 Type II certified hosting, automated security monitoring, and encrypted data storage.
                   </p>
-                  <button
-                    onClick={() => copyToClipboard('hipaa')}
-                    className="text-sm sm:text-base text-purple-400 font-semibold hover:underline inline-flex items-center gap-2 transition-all duration-200"
-                    style={{ fontFamily: 'var(--font-ui)' }}
-                  >
-                    {copiedButton === 'hipaa' ? (
-                      <>
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-[var(--success)]">Copied to clipboard!</span>
-                      </>
-                    ) : (
-                      <>
-                        Contact for details
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                        </svg>
-                      </>
-                    )}
-                  </button>
                 </div>
               </div>
             </div>
