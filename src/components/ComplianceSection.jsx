@@ -50,7 +50,7 @@ const ComplianceSection = () => {
               className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              Your prompts and responses are encrypted and never used for model training. We collect only anonymized performance metrics to improve routing.
+              Your prompts and responses are encrypted and never used for model training. We collect only derivative performance metrics to improve routing.
             </p>
           </div>
 
