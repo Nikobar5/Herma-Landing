@@ -362,6 +362,36 @@ export function getCsuiteOverview() {
   return authFetch('/admin/analytics/csuite');
 }
 
+// --- Conversations (server-side storage) ---
+
+export function createConversation(title = 'New chat') {
+  return authFetch('/portal/conversations', {
+    method: 'POST',
+    body: JSON.stringify({ title }),
+  });
+}
+
+export function getConversations(limit = 50, offset = 0) {
+  return authFetch(`/portal/conversations?limit=${limit}&offset=${offset}`);
+}
+
+export function getConversation(id) {
+  return authFetch(`/portal/conversations/${id}`);
+}
+
+export function updateConversationTitle(id, title) {
+  return authFetch(`/portal/conversations/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ title }),
+  });
+}
+
+export function deleteConversation(id) {
+  return authFetch(`/portal/conversations/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 // --- Portal Chat (streaming) ---
 
 export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpen, signal, model } = {}) {
@@ -436,7 +466,7 @@ export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpe
   }
 }
 
-export async function streamChat(messages, { onChunk, onDone, onError, onOpen, signal, model, skipMemory } = {}) {
+export async function streamChat(messages, { onChunk, onDone, onError, onOpen, signal, model, skipMemory, conversationId } = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
@@ -447,8 +477,12 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
   const body = { messages, stream: true };
   if (model) body.model = model;
 
-  const chatUrl = skipMemory
-    ? `${API_URL}/portal/chat/completions?skip_memory=true`
+  const params = new URLSearchParams();
+  if (skipMemory) params.set('skip_memory', 'true');
+  if (conversationId) params.set('conversation_id', conversationId);
+  const qs = params.toString();
+  const chatUrl = qs
+    ? `${API_URL}/portal/chat/completions?${qs}`
     : `${API_URL}/portal/chat/completions`;
   const res = await fetch(chatUrl, {
     method: 'POST',

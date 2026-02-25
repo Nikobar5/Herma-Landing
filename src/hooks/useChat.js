@@ -111,7 +111,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       let convId = activeId;
       if (!convId) {
         ownActiveIdChangeRef.current = true;
-        const conv = createConversation();
+        const conv = await createConversation();
         convId = conv.id;
       }
 
@@ -175,6 +175,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       try {
         await streamChat(allMessages, {
           signal: controller.signal,
+          conversationId: convId,
           onOpen: resetTimeout,
           onChunk: (delta) => {
             receivedContent = true;
@@ -276,6 +277,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
     try {
       await streamChat(convMessages, {
         signal: controller.signal,
+        conversationId: activeId,
         onOpen: resetTimeout,
         onChunk: (delta) => {
           receivedContent = true;
