@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConversations } from '../hooks/useConversations';
 import { useChat } from '../hooks/useChat';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { getChatBalance } from '../services/hermaApi';
+import { trackChatStart } from '../services/analyticsTracker';
 import ChatSidebar from '../components/chat/ChatSidebar';
 import ChatMessages from '../components/chat/ChatMessages';
 import ChatInput from '../components/chat/ChatInput';
@@ -73,8 +74,13 @@ const ChatPage = () => {
     }
   }, [isStreaming, fetchBalance]);
 
+  const chatStartTrackedRef = useRef(false);
   const handleSend = useCallback(
     (content, files = []) => {
+      if (!chatStartTrackedRef.current) {
+        chatStartTrackedRef.current = true;
+        trackChatStart();
+      }
       sendMessage(content, files);
     },
     [sendMessage]

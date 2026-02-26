@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as hermaApi from '../services/hermaApi';
+import { trackSignup } from '../services/analyticsTracker';
 
 const HermaAuthContext = createContext();
 
@@ -38,6 +39,7 @@ export function HermaAuthProvider({ children }) {
   async function signup({ name, email, password, company }) {
     const data = await hermaApi.signup({ name, email, password, company });
     setUser({ customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false });
+    trackSignup();
     return data;
   }
 

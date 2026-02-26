@@ -37,6 +37,7 @@ import {
   retireQaScenario,
   getCsuiteOverview,
   getAdminLatency,
+  getSiteAnalytics,
 } from '../services/hermaApi';
 
 function fmt(n, decimals = 2) {
@@ -125,6 +126,7 @@ export default function AdminDashboard() {
   const [qaOverview, setQaOverview] = useState(null);
   const [csuiteData, setCsuiteData] = useState(null);
   const [latencyData, setLatencyData] = useState(null);
+  const [siteAnalytics, setSiteAnalytics] = useState(null);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [notifDropdownData, setNotifDropdownData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -135,7 +137,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs, lat] = await Promise.all([
+      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs, lat, sa] = await Promise.all([
         getAdminOverview(),
         getAdminDaily(30),
         getAdminHourly(24),
@@ -153,6 +155,7 @@ export default function AdminDashboard() {
         getQaOverview().catch(() => null),
         getCsuiteOverview().catch(() => null),
         getAdminLatency(7).catch(() => null),
+        getSiteAnalytics(30).catch(() => null),
       ]);
       setOverview(ov);
       setDaily(dy);
@@ -171,6 +174,7 @@ export default function AdminDashboard() {
       setQaOverview(qa);
       setCsuiteData(cs);
       setLatencyData(lat);
+      setSiteAnalytics(sa);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -228,6 +232,7 @@ export default function AdminDashboard() {
     { id: 'agents', label: 'Agents' },
     { id: 'memory', label: 'Memory' },
     { id: 'reports', label: 'Reports' },
+    { id: 'site-analytics', label: 'Site Analytics' },
   ];
 
   return (
@@ -371,6 +376,7 @@ export default function AdminDashboard() {
         {tab === 'agents' && <AgentsTab agents={agents} trustScores={trustScores} />}
         {tab === 'memory' && <MemoryTab memory={memory} />}
         {tab === 'reports' && <ReportsTab />}
+        {tab === 'site-analytics' && <SiteAnalyticsTab data={siteAnalytics} />}
       </div>
     </div>
   );
@@ -2025,6 +2031,164 @@ function LatencyTab({ latency }) {
                     <td className="px-3 py-2 text-right">{fmtMs(m.avg_openrouter_ttfb_ms)}</td>
                     <td className="px-3 py-2 text-right">{fmtMs(m.avg_streaming_duration_ms)}</td>
                     <td className="px-3 py-2 text-right">{fmtMs(m.avg_total_ms)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SiteAnalyticsTab({ data }) {
+  if (!data) return <div className="text-[var(--text-tertiary)] text-center py-12">No site analytics data yet.</div>;
+
+  return (
+    <div className="space-y-6">
+      {/* KPI row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Visitors (30d)" value={(data.unique_visitors_30d || 0).toLocaleString()} sub={`7d: ${data.unique_visitors_7d || 0} | Today: ${data.unique_visitors_today || 0}`} accent />
+        <StatCard label="Sessions (30d)" value={(data.sessions_30d || 0).toLocaleString()} />
+        <StatCard label="Page Views (30d)" value={(data.page_views_30d || 0).toLocaleString()} sub={`7d: ${data.page_views_7d || 0} | Today: ${data.page_views_today || 0}`} />
+        <StatCard label="Bounce Rate" value={data.bounce_rate != null ? `${data.bounce_rate}%` : '—'} />
+      </div>
+
+      {/* Conversion row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Sign-ups" value={data.signups || 0} />
+        <StatCard label="Chats Started" value={data.chats_started || 0} />
+        <StatCard label="Downloads" value={data.downloads || 0} />
+        <StatCard label="Avg Time on Page" value={data.avg_time_on_page != null ? `${data.avg_time_on_page}s` : '—'} />
+      </div>
+
+      {/* Mini charts */}
+      {data.daily?.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+            <div className="text-xs text-[var(--text-tertiary)] mb-2">Daily Page Views</div>
+            <MiniBar data={data.daily} valueKey="page_views" height={48} />
+          </div>
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+            <div className="text-xs text-[var(--text-tertiary)] mb-2">Daily Unique Visitors</div>
+            <MiniBar data={data.daily} valueKey="unique_visitors" height={48} />
+          </div>
+        </div>
+      )}
+
+      {/* Top Pages */}
+      {data.top_pages?.length > 0 && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+          <div className="text-sm font-medium text-[var(--text-primary)] mb-3">Top Pages</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] border-b border-[var(--border-secondary)]">
+                  <th className="text-left px-3 py-2">Path</th>
+                  <th className="text-right px-3 py-2">Views</th>
+                  <th className="text-right px-3 py-2">Unique Visitors</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.top_pages.map((p, i) => (
+                  <tr key={i} className="border-b border-[var(--border-secondary)]/50">
+                    <td className="px-3 py-2 text-[var(--text-secondary)] font-mono text-xs">{p.path}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-primary)]">{p.views}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-secondary)]">{p.unique_visitors}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Referrers */}
+      {data.referrers?.length > 0 && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+          <div className="text-sm font-medium text-[var(--text-primary)] mb-3">Referrers</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] border-b border-[var(--border-secondary)]">
+                  <th className="text-left px-3 py-2">Source</th>
+                  <th className="text-right px-3 py-2">Visits</th>
+                  <th className="text-right px-3 py-2">Unique Visitors</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.referrers.map((r, i) => (
+                  <tr key={i} className="border-b border-[var(--border-secondary)]/50">
+                    <td className="px-3 py-2 text-[var(--text-secondary)] text-xs truncate max-w-xs">{r.source}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-primary)]">{r.visits}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-secondary)]">{r.unique_visitors}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Device / Browser / OS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {data.devices?.length > 0 && (
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+            <div className="text-sm font-medium text-[var(--text-primary)] mb-3">Devices</div>
+            {data.devices.map((d, i) => (
+              <div key={i} className="flex justify-between text-sm py-1">
+                <span className="text-[var(--text-secondary)]">{d.device_type}</span>
+                <span className="text-[var(--text-primary)]">{d.count} ({d.pct}%)</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {data.browsers?.length > 0 && (
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+            <div className="text-sm font-medium text-[var(--text-primary)] mb-3">Browsers</div>
+            {data.browsers.map((b, i) => (
+              <div key={i} className="flex justify-between text-sm py-1">
+                <span className="text-[var(--text-secondary)]">{b.browser}</span>
+                <span className="text-[var(--text-primary)]">{b.count} ({b.pct}%)</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {data.os_breakdown?.length > 0 && (
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+            <div className="text-sm font-medium text-[var(--text-primary)] mb-3">Operating Systems</div>
+            {data.os_breakdown.map((o, i) => (
+              <div key={i} className="flex justify-between text-sm py-1">
+                <span className="text-[var(--text-secondary)]">{o.os}</span>
+                <span className="text-[var(--text-primary)]">{o.count} ({o.pct}%)</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* UTM Campaigns */}
+      {data.utm_campaigns?.length > 0 && (
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4">
+          <div className="text-sm font-medium text-[var(--text-primary)] mb-3">UTM Campaigns</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] border-b border-[var(--border-secondary)]">
+                  <th className="text-left px-3 py-2">Source</th>
+                  <th className="text-left px-3 py-2">Medium</th>
+                  <th className="text-left px-3 py-2">Campaign</th>
+                  <th className="text-right px-3 py-2">Visits</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.utm_campaigns.map((u, i) => (
+                  <tr key={i} className="border-b border-[var(--border-secondary)]/50">
+                    <td className="px-3 py-2 text-[var(--text-secondary)]">{u.utm_source || '—'}</td>
+                    <td className="px-3 py-2 text-[var(--text-secondary)]">{u.utm_medium || '—'}</td>
+                    <td className="px-3 py-2 text-[var(--text-secondary)]">{u.utm_campaign || '—'}</td>
+                    <td className="px-3 py-2 text-right text-[var(--text-primary)]">{u.visits}</td>
                   </tr>
                 ))}
               </tbody>

@@ -350,6 +350,12 @@ export function retireQaScenario(id, reason = '') {
   });
 }
 
+// --- Site Analytics (Admin) ---
+
+export function getSiteAnalytics(days = 30) {
+  return authFetch(`/admin/analytics/site-analytics?days=${days}`);
+}
+
 // --- Latency (Admin) ---
 
 export function getAdminLatency(days = 7) {

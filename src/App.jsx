@@ -22,73 +22,52 @@ import ChatPage from './pages/ChatPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HermaAuthProvider } from './context/HermaAuthContext';
-import ReactGA from 'react-ga4';
-import { initializeAnalytics, trackAppUsers } from './utils/analytics';
+import { initAnalytics, trackPageView, trackScrollDepth, trackTimeOnPage, trackPerformance } from './services/analyticsTracker';
 import SuccessPage from './components/SuccessPage';
 import Documentation from './pages/Documentation';
 
-initializeAnalytics();
-// Initialize with enhanced configuration options
-ReactGA.initialize('G-FSS7V9WPY5', {
-  debug: process.env.NODE_ENV === 'development', // Enable debug mode in development
-  testMode: false,
-  gaOptions: {
-    siteSpeedSampleRate: 100, // Collect site speed data for all users
-    cookieFlags: 'SameSite=None;Secure' // Enhanced cookie settings
-  },
-  // Track more user dimensions automatically
-  gtagOptions: {
-    send_page_view: false, // We'll handle this manually for better control
-    allow_google_signals: true, // Enable demographics and interests reports
-    allow_ad_personalization_signals: true, // Enable advertising features
-  }
-});
+initAnalytics();
 
-// Enhanced RouteTracker with additional data
 const RouteTracker = () => {
   const location = useLocation();
 
+  // Track page views on route change
   useEffect(() => {
-    // Track app users on each page change
-    trackAppUsers();
-
-    // Rest of your existing tracking code...
-    ReactGA.send({
-      hitType: "pageview",
-      page: location.pathname,
-      title: document.title,
-      location: window.location.href,
-      dimension1: window.innerWidth <= 768 ? 'mobile' : 'desktop'
-    });
-
-    ReactGA.event({
-      category: 'Navigation',
-      action: 'PageView',
-      label: location.pathname,
-      value: 1
-    });
+    trackPageView();
   }, [location]);
 
-  // Enhanced user timing information
+  // Track scroll depth
   useEffect(() => {
-    // Track time on page when user leaves
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        const timeSpent = Math.round(performance.now());
-        ReactGA.event({
-          category: 'Engagement',
-          action: 'TimeOnPage',
-          label: location.pathname,
-          value: Math.round(timeSpent / 1000) // Convert to seconds
-        });
+    const thresholds = [25, 50, 75, 100];
+    const fired = new Set();
+
+    const handleScroll = () => {
+      const scrollPct = Math.round(
+        ((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight) * 100
+      );
+      for (const t of thresholds) {
+        if (scrollPct >= t && !fired.has(t)) {
+          fired.add(t);
+          trackScrollDepth(t);
+        }
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location]);
 
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+  // Track time on page via visibilitychange
+  useEffect(() => {
+    const start = Date.now();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        const seconds = Math.round((Date.now() - start) / 1000);
+        if (seconds > 0) trackTimeOnPage(seconds);
+      }
     };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [location]);
 
   return null;
@@ -122,20 +101,12 @@ const Home = () => {
 };
 
 function App() {
-  // Track app load performance
   useEffect(() => {
-    // Report initial page load performance
     window.addEventListener('load', () => {
       if (window.performance) {
         const perfData = window.performance.timing;
         const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
-
-        ReactGA.event({
-          category: 'Performance',
-          action: 'PageLoad',
-          value: Math.round(pageLoadTime),
-          nonInteraction: true
-        });
+        if (pageLoadTime > 0) trackPerformance(Math.round(pageLoadTime));
       }
     });
   }, []);
