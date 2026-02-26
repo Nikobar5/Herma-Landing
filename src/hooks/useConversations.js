@@ -17,8 +17,29 @@ function titleFromContent(content) {
   return trimmed.length < text.trim().length ? trimmed + '…' : trimmed;
 }
 
+const CACHE_KEY = 'herma_conversations_cache';
+
+function readCache() {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw).map((c) => ({ ...c, messages: [], _loaded: false }));
+  } catch {
+    return [];
+  }
+}
+
+function writeCache(convs) {
+  try {
+    // Store only lightweight list data (no messages)
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(
+      convs.map(({ id, title, created_at, updated_at }) => ({ id, title, created_at, updated_at }))
+    ));
+  } catch {}
+}
+
 export function useConversations() {
-  const [conversations, setConversations] = useState([]);
+  const [conversations, setConversations] = useState(readCache);
   const [activeId, setActiveId] = useState(null);
   const [loading, setLoading] = useState(true);
   const fetchedRef = useRef(false);
@@ -31,17 +52,24 @@ export function useConversations() {
     apiGetConversations(50, 0)
       .then((convs) => {
         // Server returns {id, title, created_at, updated_at} — add empty messages array for local state
-        setConversations(convs.map((c) => ({
+        const mapped = convs.map((c) => ({
           ...c,
           messages: [],
           _loaded: false,
-        })));
+        }));
+        setConversations(mapped);
+        writeCache(mapped);
       })
       .catch(() => {
-        // Fail silently — conversations list will be empty
+        // Fail silently — cached conversations still shown
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Keep cache in sync whenever conversation list changes
+  useEffect(() => {
+    if (conversations.length > 0) writeCache(conversations);
+  }, [conversations]);
 
   const activeConversation = conversations.find((c) => c.id === activeId) || null;
 
