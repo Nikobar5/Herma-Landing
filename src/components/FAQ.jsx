@@ -5,43 +5,43 @@ const FAQ = () => {
   const faqItems = [
     {
       id: 1,
-      question: "How does Herma keep my data private while using cloud AI?",
-      answer: "Herma acts as a local data governor that intelligently filters your queries before they reach cloud services. When you ask a question or request a task, Herma first identifies and redacts all private and proprietary information locally on your device. Only the sanitized, non-sensitive portion of your query is sent to cloud AI models for processing. The private data is then seamlessly reinserted into the response on your local device, giving you the power of cloud AI without compromising your sensitive information."
+      question: "What is Herma?",
+      answer: "Herma is an intelligent AI gateway that gives you unified access to all major AI models — GPT-4o, Claude, Gemini, Mistral, DeepSeek, and more — through a single API and chat interface. Instead of managing separate accounts and APIs for each provider, Herma routes your requests to the best model for the job, tracks your usage and costs, and remembers context across conversations."
     },
     {
       id: 2,
-      question: "What makes Herma different from other AI assistants?",
-      answer: "Herma uniquely combines the best of both worlds: the power of large cloud AI models with the security of local processing. Unlike purely cloud-based assistants that see all your data, or purely local models with limited capabilities, Herma's hybrid approach provides enterprise-grade privacy protection while maintaining access to cutting-edge AI capabilities. It's your personal data firewall for the AI age."
+      question: "What makes Herma different from using AI providers directly?",
+      answer: "With Herma, you get one API key, one billing system, and one interface for every model. Herma's smart router analyzes your query and selects the optimal model based on the task — whether that's coding, creative writing, analysis, or general chat. You also get built-in memory that persists across sessions, real-time web search, and a unified dashboard to monitor usage and spending across all models."
     },
     {
       id: 3,
-      question: "How does the agentic system work?",
-      answer: "Herma features a fully agentic system that can interact with a variety of applications through a single chat interface. When you request a task, Herma's local data governor first filters out sensitive information, then uses cloud AI models to understand and execute complex multi-step workflows. Whether you need to analyze documents, generate content, or automate tasks across different apps, Herma handles it all while keeping your private data secure."
+      question: "How does smart model routing work?",
+      answer: "When you send a message, Herma's routing system classifies your query and recommends the best model for the task. You can also choose a specific model if you prefer. The router considers factors like query complexity, task type, and cost efficiency to make its recommendation. Over time, the system learns from usage patterns to improve its routing decisions."
     },
     {
       id: 4,
-      question: "What types of private information does Herma filter?",
-      answer: "Herma's local data governor automatically identifies and protects various types of sensitive information including personal identifiers (names, emails, phone numbers), financial data, proprietary business information, confidential documents, and any custom data patterns you specify. This filtering happens entirely on your device before any data reaches external cloud services."
+      question: "What models can I access through Herma?",
+      answer: "Herma supports models from Anthropic (Claude), OpenAI (GPT-4o, o1), Google (Gemini), Mistral, DeepSeek, and many more — all through a single OpenAI-compatible API. New models are added as they become available. You can use the auto-router to let Herma choose, or specify any supported model directly."
     },
     {
       id: 5,
-      question: "Does Herma work offline?",
-      answer: "Yes, Herma has robust offline capabilities for basic AI tasks and document analysis using local models. However, its true power shines when connected to the internet, where it can leverage powerful cloud AI models while maintaining privacy through local data filtering. You get the best of both worlds: offline functionality when needed, and enhanced capabilities when online."
+      question: "How does the memory system work?",
+      answer: "Herma automatically extracts and remembers key facts from your conversations — your preferences, context, and instructions. This memory is injected into future conversations so the AI already knows your background without you repeating yourself. Memories are stored securely, and sensitive information like passwords or API keys is automatically filtered out before storage."
     },
     {
       id: 6,
-      question: "Is Herma suitable for businesses and enterprises?",
-      answer: "Absolutely. Herma's local data governor makes it ideal for organizations concerned about data leakage while still wanting to leverage advanced AI capabilities. Companies can confidently use Herma for sensitive tasks like analyzing proprietary documents, handling customer data, or processing confidential information, knowing that their private data never leaves their control while still accessing the latest AI innovations."
+      question: "How does billing work?",
+      answer: "Herma uses a simple credit-based system. You purchase credits and they're deducted based on actual token usage at transparent per-model rates. There are no monthly subscriptions or hidden fees — you only pay for what you use. Your dashboard shows real-time cost tracking broken down by model, so you always know exactly where your credits are going."
     },
     {
       id: 7,
-      question: "How does Herma solve the AI data leakage problem?",
-      answer: "Herma directly addresses the growing concern about data leakage in AI systems by creating a secure bridge between local and cloud AI. Traditional cloud AI services require sending all your data externally, while local-only solutions lack power. Herma's innovative approach filters sensitive information locally, sends only non-sensitive context to cloud models, and reconstructs complete responses locally. This eliminates data leakage risks while maintaining AI effectiveness."
+      question: "Can I use Herma with my existing code?",
+      answer: "Yes. Herma provides an OpenAI-compatible API, so you can switch by changing just two lines of code — the base URL and your API key. Any application, library, or framework that works with the OpenAI API works with Herma out of the box. SDKs for Python, JavaScript, Go, and more are all compatible."
     },
     {
       id: 8,
-      question: "Can I control what information gets filtered?",
-      answer: "Yes, Herma provides granular control over its data filtering system. You can customize which types of information should be considered sensitive, add specific patterns or terms to protect, and adjust the filtering sensitivity based on your needs. The local data governor learns from your preferences to provide increasingly accurate protection while maintaining the functionality you need."
+      question: "Is Herma suitable for businesses and teams?",
+      answer: "Yes. Herma provides centralized billing, usage analytics, and cost controls that make it easy to manage AI spending across a team or organization. The admin dashboard gives full visibility into usage patterns, model performance, and costs. One account can power multiple applications and team members through API keys."
     }
   ];
 
