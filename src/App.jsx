@@ -19,6 +19,7 @@ import Usage from './pages/dashboard/Usage';
 import ApiKeys from './pages/dashboard/ApiKeys';
 import Billing from './pages/dashboard/Billing';
 import ChatPage from './pages/ChatPage';
+import VerifyEmail from './pages/VerifyEmail';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HermaAuthProvider } from './context/HermaAuthContext';
@@ -76,14 +77,14 @@ const RouteTracker = () => {
 // Conditionally render Header (hide on chat page — chat has its own top bar)
 const ConditionalHeader = () => {
   const location = useLocation();
-  if (location.pathname === '/chat' || location.pathname.startsWith('/admin')) return null;
+  if (location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname.startsWith('/admin')) return null;
   return <Header />;
 };
 
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat';
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/verify-email';
   if (hideFooter) return null;
   return <Footer />;
 };
@@ -120,6 +121,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route
               path="/dashboard"
               element={

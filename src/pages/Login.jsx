@@ -41,11 +41,16 @@ const Login = () => {
         if (formData.password.length < 8) {
           throw new Error('Password must be at least 8 characters');
         }
-        await signup({
+        const signupData = await signup({
           name: formData.name,
           email: formData.email,
           password: formData.password,
         });
+        // If email not verified, redirect to verification page
+        if (!signupData.email_verified) {
+          navigate('/verify-email', { replace: true });
+          return;
+        }
       }
       if (redirectParam === 'comparison') {
         navigate('/', { replace: true });

@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { streamChat } from '../services/hermaApi';
 
 const STREAM_TIMEOUT_MS = 120_000; // 120 seconds
@@ -79,6 +80,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
   const abortRef = useRef(null);
   const timeoutRef = useRef(null);
   const ownActiveIdChangeRef = useRef(false);
+  const navigate = useNavigate();
 
   // Abort stream when switching conversations (but not when sendMessage itself created the conversation)
   useEffect(() => {
@@ -210,6 +212,10 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         });
       } catch (err) {
         if (err.name !== 'AbortError') {
+          if (err.status === 403 && err.message?.includes('verify')) {
+            navigate('/verify-email', { replace: true });
+            return;
+          }
           if (err.status === 402 || (err.message && err.message.includes('Insufficient credits'))) {
             setShowPaywall(true);
           }
@@ -224,7 +230,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
         abortRef.current = null;
       }
     },
-    [isStreaming, activeId, activeConversation, addMessage, updateLastMessage, createConversation, clearStreamTimeout]
+    [isStreaming, activeId, activeConversation, addMessage, updateLastMessage, createConversation, clearStreamTimeout, navigate]
   );
 
   const stopGeneration = useCallback(() => {
@@ -311,6 +317,10 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       });
     } catch (err) {
       if (err.name !== 'AbortError') {
+        if (err.status === 403 && err.message?.includes('verify')) {
+          navigate('/verify-email', { replace: true });
+          return;
+        }
         if (err.status === 402 || (err.message && err.message.includes('Insufficient credits'))) {
           setShowPaywall(true);
         }
@@ -324,7 +334,7 @@ export function useChat({ activeId, addMessage, updateLastMessage, removeLastMes
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [activeConversation, activeId, addMessage, updateLastMessage, removeLastMessage, clearStreamTimeout]);
+  }, [activeConversation, activeId, addMessage, updateLastMessage, removeLastMessage, clearStreamTimeout, navigate]);
 
   return { isStreaming, sendMessage, stopGeneration, regenerateLastResponse, showPaywall, dismissPaywall };
 }

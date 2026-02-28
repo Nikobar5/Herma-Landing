@@ -32,15 +32,28 @@ export function HermaAuthProvider({ children }) {
 
   async function login({ email, password }) {
     const data = await hermaApi.login({ email, password });
-    setUser({ customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false });
+    const u = { customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false, email_verified: data.email_verified ?? true };
+    setUser(u);
+    localStorage.setItem('herma_user', JSON.stringify(u));
     return data;
   }
 
   async function signup({ name, email, password, company }) {
     const data = await hermaApi.signup({ name, email, password, company });
-    setUser({ customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false });
+    const u = { customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false, email_verified: data.email_verified || false };
+    setUser(u);
+    localStorage.setItem('herma_user', JSON.stringify(u));
     trackSignup();
     return data;
+  }
+
+  function setEmailVerified(verified) {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, email_verified: verified };
+      localStorage.setItem('herma_user', JSON.stringify(updated));
+      return updated;
+    });
   }
 
   function logout() {
@@ -57,6 +70,7 @@ export function HermaAuthProvider({ children }) {
     login,
     signup,
     logout,
+    setEmailVerified,
   };
 
   if (loading) return null;

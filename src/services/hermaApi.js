@@ -62,6 +62,7 @@ export async function signup({ name, email, password, company }) {
     name: data.name,
     email: data.email,
     is_admin: data.is_admin || false,
+    email_verified: data.email_verified || false,
   }));
   return data;
 }
@@ -85,8 +86,30 @@ export async function login({ email, password }) {
     name: data.name,
     email: data.email,
     is_admin: data.is_admin || false,
+    email_verified: data.email_verified || false,
   }));
   return data;
+}
+
+// --- Email verification ---
+
+export async function verifyEmail(token) {
+  const res = await fetch(`${API_URL}/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body.detail || `Verification failed (${res.status})`);
+  }
+
+  return res.json();
+}
+
+export function resendVerification() {
+  return authFetch('/auth/resend-verification', { method: 'POST' });
 }
 
 // --- Portal endpoints (JWT auth) ---
@@ -508,6 +531,12 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
   if (res.status === 402) {
     const err = new Error('Insufficient credits. Please add more credits to continue.');
     err.status = 402;
+    throw err;
+  }
+  if (res.status === 403) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    const err = new Error(body.detail || 'Forbidden');
+    err.status = 403;
     throw err;
   }
   if (res.status === 429) {
