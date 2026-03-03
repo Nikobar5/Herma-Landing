@@ -99,6 +99,13 @@ const Header = () => {
                 >
                   Docs
                 </Link>
+                <Link
+                  to="/about"
+                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  About
+                </Link>
                 {isAuthenticated ? (
                   <>
                     <Link

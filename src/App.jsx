@@ -26,6 +26,8 @@ import { HermaAuthProvider } from './context/HermaAuthContext';
 import { initAnalytics, trackPageView, trackScrollDepth, trackTimeOnPage, trackPerformance } from './services/analyticsTracker';
 import SuccessPage from './components/SuccessPage';
 import Documentation from './pages/Documentation';
+import About from './pages/About';
+import FAQPage from './pages/FAQPage';
 
 initAnalytics();
 
@@ -152,6 +154,8 @@ function App() {
               }
             />
             <Route path="/docs" element={<Documentation />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/faq" element={<FAQPage />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
