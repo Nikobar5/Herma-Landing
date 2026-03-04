@@ -68,7 +68,9 @@ const Footer = () => {
             >
               Need enterprise security or custom specifications?{' '}
               <a
-                href="mailto:hello@mail.hermaai.com"
+                href="https://calendly.com/nick-pianfetti-hermaai/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] underline transition-colors"
               >
                 Contact us
@@ -144,7 +146,7 @@ const Footer = () => {
               className="text-sm text-[var(--text-tertiary)] text-center"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              &copy; {currentYear} Herma AI, Inc. All rights reserved.
+              &copy; {currentYear} Herma AI LLC. All rights reserved.
             </p>
           </div>
         </div>

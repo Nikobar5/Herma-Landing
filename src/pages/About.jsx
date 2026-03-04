@@ -16,7 +16,7 @@ const About = () => {
     {
       name: 'Nicholas Pianfetti',
       role: 'COO & Co-Founder',
-      photo: '/nick-pianfetti.png',
+      photo: '/nick-pianfetti.jpeg',
       bio: 'Mechanical Engineering at Georgia Tech. Built robotic control systems at Tesla and brings latency optimization expertise from Jane Street. At Herma, Nick leads operations and infrastructure.',
       linkedin: 'https://www.linkedin.com/in/nicholas-pianfetti/',
     },
