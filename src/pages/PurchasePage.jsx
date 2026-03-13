@@ -97,7 +97,7 @@ const PurchasePage = () => {
                 onChange={(e) => setAmount(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handlePurchase()}
                 placeholder="10"
-                className="w-full pl-10 pr-4 py-4 text-2xl font-bold bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors"
+                className="w-full pl-10 pr-4 py-4 text-2xl font-bold bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 style={{ fontFamily: 'var(--font-heading)' }}
               />
             </div>
