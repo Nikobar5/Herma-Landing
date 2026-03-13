@@ -151,10 +151,10 @@ export function getLedger({ limit = 50, offset = 0 } = {}) {
   return authFetch(`/portal/ledger?limit=${limit}&offset=${offset}`);
 }
 
-export function createCheckout(packageId) {
+export function createCheckout(amount) {
   return authFetch('/portal/checkout', {
     method: 'POST',
-    body: JSON.stringify({ package: packageId }),
+    body: JSON.stringify({ amount }),
   });
 }
 

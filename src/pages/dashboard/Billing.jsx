@@ -2,12 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getBalance, getLedger, createCheckout } from '../../services/hermaApi';
 
-const CREDIT_PACKAGES = [
-  { id: '10', label: '$10', credits: '10.00', bonus: null },
-  { id: '25', label: '$25', credits: '25.00', bonus: '+$2.50 Bonus', popular: true },
-  { id: '50', label: '$50', credits: '50.00', bonus: '+$7.50 Bonus' },
-  { id: '100', label: '$100', credits: '100.00', bonus: '+$20.00 Bonus' },
-];
+const QUICK_AMOUNTS = [5, 10, 25, 50, 100];
 
 const TYPE_LABELS = {
   topup: 'Credit Top-up',
@@ -20,7 +15,8 @@ const Billing = () => {
   const [balance, setBalance] = useState(null);
   const [ledger, setLedger] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState('');
+  const [purchasing, setPurchasing] = useState(false);
+  const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const location = useLocation();
@@ -52,15 +48,19 @@ const Billing = () => {
     }
   }, [location.search, fetchData]);
 
-  const handlePurchase = async (packageId) => {
-    setPurchasing(packageId);
+  const parsedAmount = parseFloat(amount);
+  const isValidAmount = !isNaN(parsedAmount) && parsedAmount >= 5 && parsedAmount <= 1000;
+
+  const handlePurchase = async () => {
+    if (!isValidAmount) return;
+    setPurchasing(true);
     setError('');
     try {
-      const data = await createCheckout(packageId);
+      const data = await createCheckout(parsedAmount);
       window.location.href = data.checkout_url;
     } catch (err) {
       setError(err.message);
-      setPurchasing('');
+      setPurchasing(false);
     }
   };
 
@@ -106,45 +106,57 @@ const Billing = () => {
         </div>
       )}
 
-      {/* Credit Packages */}
-      <div>
-        <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Add Credits</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {CREDIT_PACKAGES.map((pkg) => (
+      {/* Add Credits */}
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-5">Add Credits</h2>
+
+        {/* Amount input */}
+        <div className="mb-4">
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-[var(--text-tertiary)]">$</span>
+            <input
+              type="number"
+              min="5"
+              max="1000"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePurchase()}
+              placeholder="10"
+              className="w-full pl-9 pr-4 py-3 text-xl font-bold bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            />
+          </div>
+          <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">Minimum $5 · Maximum $1,000</p>
+        </div>
+
+        {/* Quick amount buttons */}
+        <div className="flex flex-wrap gap-2 mb-5">
+          {QUICK_AMOUNTS.map((val) => (
             <button
-              key={pkg.id}
-              onClick={() => handlePurchase(pkg.id)}
-              disabled={!!purchasing}
-              className={`relative group flex flex-col items-center p-6 border rounded-xl transition-all duration-300 ${purchasing === pkg.id
-                  ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
-                  : 'bg-[var(--bg-secondary)] border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:-translate-y-1 hover:shadow-lg hover:shadow-[var(--accent-primary)]/5'
-                }`}
+              key={val}
+              onClick={() => setAmount(String(val))}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                amount === String(val)
+                  ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] border-[var(--accent-primary)]'
+                  : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'
+              }`}
+              style={{ fontFamily: 'var(--font-ui)' }}
             >
-              {pkg.popular && (
-                <span className="absolute -top-3 px-3 py-1 bg-[var(--accent-primary)] text-white text-xs font-bold rounded-full shadow-sm">
-                  MOST POPULAR
-                </span>
-              )}
-              <span className="text-2xl font-bold text-[var(--text-primary)] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
-                {pkg.label}
-              </span>
-              <span className="text-sm text-[var(--text-tertiary)] mb-4">
-                {pkg.credits} credits
-              </span>
-              {pkg.bonus && (
-                <span className="inline-block px-2 py-1 mb-4 text-xs font-semibold text-emerald-400 bg-emerald-500/10 rounded-md border border-emerald-500/20">
-                  {pkg.bonus}
-                </span>
-              )}
-              <div className={`mt-auto w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors ${purchasing === pkg.id
-                  ? 'bg-transparent text-[var(--accent-primary)]'
-                  : 'bg-[var(--bg-tertiary)] text-[var(--text-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-white'
-                }`}>
-                {purchasing === pkg.id ? 'Processing...' : 'Purchase'}
-              </div>
+              ${val}
             </button>
           ))}
         </div>
+
+        {/* Purchase button */}
+        <button
+          onClick={handlePurchase}
+          disabled={purchasing || !isValidAmount}
+          className="w-full px-6 py-3 font-semibold rounded-xl transition duration-300 disabled:opacity-40 disabled:cursor-not-allowed bg-[var(--accent-primary)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]"
+          style={{ fontFamily: 'var(--font-ui)' }}
+        >
+          {purchasing ? 'Processing...' : isValidAmount ? `Add $${parsedAmount.toFixed(2)} in Credits` : 'Add Credits'}
+        </button>
       </div>
 
       {/* Transaction History */}

@@ -3,16 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
 import { createCheckout, getBalance } from '../services/hermaApi';
 
-const CREDIT_PACKAGES = [
-  { id: '10', amount: '$10', credits: '$10.00', description: 'Starter' },
-  { id: '25', amount: '$25', credits: '$25.00', description: 'Popular', popular: true },
-  { id: '50', amount: '$50', credits: '$50.00', description: 'Professional' },
-  { id: '100', amount: '$100', credits: '$100.00', description: 'Enterprise' },
-];
+const QUICK_AMOUNTS = [5, 10, 25, 50, 100];
 
 const PurchasePage = () => {
   const { isAuthenticated } = useHermaAuth();
   const [balance, setBalance] = useState(null);
+  const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -25,17 +21,21 @@ const PurchasePage = () => {
     }
   }, [isAuthenticated]);
 
-  const handlePurchase = async (packageId) => {
+  const parsedAmount = parseFloat(amount);
+  const isValidAmount = !isNaN(parsedAmount) && parsedAmount >= 5 && parsedAmount <= 1000;
+
+  const handlePurchase = async () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
+    if (!isValidAmount) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const data = await createCheckout(packageId);
+      const data = await createCheckout(parsedAmount);
       window.location.href = data.checkout_url;
     } catch (err) {
       console.error('Checkout error:', err);
@@ -46,14 +46,14 @@ const PurchasePage = () => {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] pt-32">
-      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+      <div className="container mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h1
             className="text-4xl md:text-5xl font-bold mb-6 text-[var(--text-primary)]"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Add <span className="text-[var(--accent-primary)]">API Credits</span>
+            Add <span className="text-[var(--accent-primary)]">Credits</span>
           </h1>
           <p
             className="text-xl text-[var(--text-secondary)] mb-4"
@@ -70,47 +70,69 @@ const PurchasePage = () => {
         </div>
 
         {error && (
-          <div className="max-w-2xl mx-auto mb-8 p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 rounded-lg">
+          <div className="mb-6 p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 rounded-lg">
             <p className="text-[var(--error)] text-sm text-center" style={{ fontFamily: 'var(--font-body)' }}>{error}</p>
           </div>
         )}
 
-        {/* Credit Packages */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {CREDIT_PACKAGES.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`relative bg-[var(--bg-secondary)] rounded-2xl border p-8 flex flex-col items-center transition-all duration-300 hover:-translate-y-1 ${
-                pkg.popular ? 'border-[var(--accent-primary)] shadow-[var(--shadow-glow)]' : 'border-[var(--border-primary)] hover:border-[var(--border-accent)]'
-              }`}
-            >
-              {pkg.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span
-                    className="bg-[var(--accent-primary)] text-[var(--text-inverse)] px-4 py-1 rounded-full text-sm font-semibold"
-                    style={{ fontFamily: 'var(--font-ui)' }}
-                  >
-                    Most Popular
-                  </span>
-                </div>
-              )}
-              <div className="text-sm font-medium text-[var(--text-tertiary)] mb-2" style={{ fontFamily: 'var(--font-ui)' }}>{pkg.description}</div>
-              <div className="text-4xl font-bold text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>{pkg.amount}</div>
-              <div className="text-sm text-[var(--text-secondary)] mb-6" style={{ fontFamily: 'var(--font-body)' }}>in API credits</div>
+        {/* Credit Amount Input */}
+        <div className="bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-primary)] p-8 mb-8">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+            Buy Credits
+          </h2>
+
+          {/* Amount input */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2" style={{ fontFamily: 'var(--font-ui)' }}>
+              Amount
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-[var(--text-tertiary)]">$</span>
+              <input
+                type="number"
+                min="5"
+                max="1000"
+                step="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handlePurchase()}
+                placeholder="10"
+                className="w-full pl-10 pr-4 py-4 text-2xl font-bold bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
+              Minimum $5 · Maximum $1,000
+            </p>
+          </div>
+
+          {/* Quick amount buttons */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            {QUICK_AMOUNTS.map((val) => (
               <button
-                onClick={() => handlePurchase(pkg.id)}
-                disabled={loading}
-                className={`w-full px-6 py-3 font-semibold rounded-xl transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  pkg.popular
-                    ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]'
-                    : 'bg-transparent border-2 border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-muted)]'
+                key={val}
+                onClick={() => setAmount(String(val))}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  amount === String(val)
+                    ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] border-[var(--accent-primary)]'
+                    : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'
                 }`}
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
-                {loading ? 'Processing...' : 'Buy Credits'}
+                ${val}
               </button>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Purchase button */}
+          <button
+            onClick={handlePurchase}
+            disabled={loading || !isValidAmount}
+            className="w-full px-6 py-4 font-semibold text-lg rounded-xl transition duration-300 disabled:opacity-40 disabled:cursor-not-allowed bg-[var(--accent-primary)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]"
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            {loading ? 'Processing...' : isValidAmount ? `Add $${parsedAmount.toFixed(2)} in Credits` : 'Add Credits'}
+          </button>
         </div>
 
         {/* Trust Indicators */}
