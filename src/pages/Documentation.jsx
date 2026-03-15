@@ -498,11 +498,11 @@ while (true) {
             <ul className="space-y-2 text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
               <li className="flex items-start gap-2">
                 <span className="text-[var(--accent-primary)] mt-1">&#8226;</span>
-                <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>60 requests per minute</strong> per API key</span>
+                <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>500 requests per minute</strong> per API key</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[var(--accent-primary)] mt-1">&#8226;</span>
-                <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>5 concurrent requests</strong> per account</span>
+                <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>50 concurrent requests</strong> per account</span>
               </li>
             </ul>
           </div>
