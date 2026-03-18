@@ -112,6 +112,38 @@ export function resendVerification() {
   return authFetch('/auth/resend-verification', { method: 'POST' });
 }
 
+// --- Password reset ---
+
+export async function forgotPassword(email) {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body.detail || `Request failed (${res.status})`);
+  }
+
+  return res.json();
+}
+
+export async function resetPassword(token, password) {
+  const res = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, password }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body.detail || `Reset failed (${res.status})`);
+  }
+
+  return res.json();
+}
+
 // --- Portal endpoints (JWT auth) ---
 
 export function getBalance() {

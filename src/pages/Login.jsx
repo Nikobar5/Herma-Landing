@@ -173,6 +173,18 @@ const Login = () => {
               />
             </div>
 
+            {isLogin && (
+              <div className="text-right">
+                <Link
+                  to="/reset-password"
+                  className="text-xs text-[var(--accent-primary)] hover:underline"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            )}
+
             {!isLogin && (
               <div>
                 <label
