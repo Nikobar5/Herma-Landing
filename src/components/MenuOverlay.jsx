@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
+import FocusTrap from 'focus-trap-react';
 
 const MenuOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -28,11 +29,6 @@ const MenuOverlay = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleRequestDemo = () => {
-    window.open('https://calendly.com/hermalocal/30min', '_blank');
-    onClose();
-  };
-
   const handleLogout = () => {
     logout();
     onClose();
@@ -42,9 +38,13 @@ const MenuOverlay = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
+    <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
     <div
       className="fixed inset-0 bg-black/40 z-50 flex justify-end"
       onClick={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
     >
       <div className="w-64 bg-[var(--bg-secondary)] shadow-xl h-full overflow-y-auto animate-slide-in-right border-l border-[var(--border-primary)]">
         <div className="p-5 flex flex-col h-full">
@@ -78,6 +78,14 @@ const MenuOverlay = ({ isOpen, onClose }) => {
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               About
+            </Link>
+            <Link
+              to="/blog"
+              onClick={onClose}
+              className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Blog
             </Link>
             {isAuthenticated ? (
               <>
@@ -173,6 +181,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
         </div>
       </div>
     </div>
+    </FocusTrap>
   );
 };
 

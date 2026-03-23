@@ -69,7 +69,7 @@ const PrivacyPolicy = () => {
             We share information with third parties only in the following circumstances:
           </p>
           <ul>
-            <li><strong>AI Model Providers</strong> — Your request content is forwarded to third-party AI model providers (via OpenRouter) to process and generate responses. These providers have their own privacy policies governing data handling.</li>
+            <li><strong>AI Model Providers</strong> — Your request content is forwarded to third-party AI model providers to process and generate responses. These providers have their own privacy policies governing data handling.</li>
             <li><strong>Infrastructure Providers</strong> — We use cloud infrastructure providers to host and operate the Service.</li>
             <li><strong>Payment Processors</strong> — Stripe processes payments on our behalf, subject to <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">Stripe's Privacy Policy</a>.</li>
             <li><strong>Analytics</strong> — We use analytics services to understand website usage patterns.</li>

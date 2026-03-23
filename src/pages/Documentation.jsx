@@ -58,7 +58,7 @@ const TabGroup = ({ tabs }) => {
 };
 
 const Documentation = () => {
-  const API_URL = 'https://herma.up.railway.app';
+  const API_URL = 'https://api.hermaai.com';
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] pt-24 pb-16">
@@ -78,6 +78,13 @@ const Documentation = () => {
           >
             Herma provides an OpenAI-compatible API. Change two lines of code and you're up and running.
           </p>
+          <div
+            className="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg"
+          >
+            <span className="text-emerald-400 text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
+              Pricing: $2/M input tokens, $8/M output tokens — no subscriptions, no minimums
+            </span>
+          </div>
         </div>
 
         {/* Quick Start */}

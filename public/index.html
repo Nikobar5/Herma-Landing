@@ -1,24 +1,182 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#09090B" />
     <meta
       name="description"
-      content="Herma — Unifying AI under one intelligent gateway"
+      content="Herma AI is an intelligent LLM router that routes API queries to the optimal AI model for each task. OpenAI-compatible API with 60-90% cost savings versus frontier models. $2/M input, $8/M output tokens."
     />
 
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="alternate" type="application/rss+xml" title="Herma AI Blog" href="/rss.xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://api.hermaai.com" />
 
-    <title>Herma</title>
+    <title>Herma — Intelligent AI Model Router</title>
+
+    <!-- Organization schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Herma AI",
+      "url": "https://hermaai.com",
+      "description": "Intelligent AI model routing — same quality, 60-90% cheaper.",
+      "foundingDate": "2025",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "url": "https://calendly.com/nick-pianfetti-hermaai/30min"
+      }
+    }
+    </script>
+
+    <!-- WebApplication schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Herma",
+      "description": "Intelligent AI model router that routes API queries to the optimal model for each task. OpenAI-compatible API. 60-90% cost savings versus frontier models like GPT-4o, Claude, and Gemini.",
+      "url": "https://hermaai.com",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "USD",
+        "price": "0",
+        "description": "Pay-as-you-go: $2 per million input tokens, $8 per million output tokens. No subscriptions, no minimums. Free $1.00 starting credit."
+      },
+      "featureList": [
+        "Intelligent model routing based on query complexity",
+        "OpenAI-compatible API — change two lines of code to switch",
+        "60-90% cost savings vs frontier models",
+        "Supports Claude, GPT-4, Gemini, DeepSeek, Mistral, and more",
+        "Built-in quality judge ensures no quality degradation",
+        "Streaming support with tool/function calling",
+        "Built-in conversation memory across sessions",
+        "Real-time savings dashboard with frontier model comparison"
+      ]
+    }
+    </script>
+
+    <!-- FAQPage schema (server-rendered for AI crawlers) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Herma?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Herma is an intelligent AI gateway that gives you unified access to all major AI models — GPT-4o, Claude, Gemini, Mistral, DeepSeek, and more — through a single API and chat interface. Herma routes your requests to the best model for the job, tracks your usage and costs, and remembers context across conversations."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does Herma cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Herma charges $2 per million input tokens and $8 per million output tokens. There are no subscriptions, no minimums, and no hidden fees. New accounts start with $1.00 in free credits."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much can I save with intelligent routing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "On average, Herma's router saves 60-90% compared to always using the most expensive model. For simple questions and routine tasks, the router selects models that cost a fraction of frontier pricing while maintaining the same quality. For complex tasks, it automatically routes to the best available model."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does smart model routing work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "When you send a message, Herma's routing system classifies your query by category (coding, analysis, creative, math, factual) and difficulty (easy, medium, hard), then selects the optimal model. Hard tasks like system design always use frontier models. Simple tasks use cost-effective models that match frontier quality."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use Herma with my existing code?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Herma provides an OpenAI-compatible API, so you can switch by changing just two lines of code — the base URL and your API key. Any application that works with the OpenAI API works with Herma out of the box."
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- Rich noscript content for AI crawlers (GPTBot, ClaudeBot, PerplexityBot don't execute JS) -->
+    <noscript>
+      <h1>Herma — Intelligent AI Model Router</h1>
+      <p>Herma is an intelligent AI gateway that routes your API queries to the optimal model for each task. Same quality as frontier models like GPT-4o and Claude, 60-90% cheaper. OpenAI-compatible API — change two lines of code to switch.</p>
+
+      <h2>How It Works</h2>
+      <p>Herma classifies each query by category (coding, analysis, creative, math, factual) and difficulty (easy, medium, hard), then routes to the cheapest model that maintains frontier-level quality. Hard tasks always use the best models. Simple tasks use cost-effective alternatives that match quality.</p>
+
+      <h2>Pricing</h2>
+      <p>$2 per million input tokens, $8 per million output tokens. No subscriptions, no minimums. Pay only for what you use. New accounts start with $1.00 in free credits.</p>
+
+      <h2>Quality Validation</h2>
+      <p>Benchmarked against Claude Opus 4.6 on 8 established benchmarks: MMLU (98.2% of Opus quality), ARC-Challenge (100.7%), GSM8K (100.0%), HumanEval+ (102.1%), MBPP+ (105.8%). Average quality retention: 101.4% of frontier baseline.</p>
+
+      <h2>Quick Start</h2>
+      <pre>
+from openai import OpenAI
+client = OpenAI(
+    base_url="https://api.hermaai.com/v1",
+    api_key="your-herma-key"
+)
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+      </pre>
+
+      <h2>Features</h2>
+      <ul>
+        <li>Intelligent model routing based on query complexity</li>
+        <li>OpenAI-compatible API — works with LangChain, Vercel AI SDK, LlamaIndex</li>
+        <li>60-90% cost savings vs frontier models</li>
+        <li>Supports Claude, GPT-4, Gemini, DeepSeek, Mistral</li>
+        <li>Built-in quality judge ensures no quality degradation</li>
+        <li>Streaming support with tool/function calling</li>
+        <li>Real-time savings dashboard</li>
+        <li>Conversation memory across sessions</li>
+      </ul>
+
+      <h2>Frequently Asked Questions</h2>
+      <h3>What is Herma?</h3>
+      <p>Herma is an intelligent AI gateway that gives you unified access to all major AI models through a single API. It routes your requests to the best model for each task, saving 60-90% on costs while maintaining frontier quality.</p>
+
+      <h3>How much does Herma cost?</h3>
+      <p>$2 per million input tokens, $8 per million output tokens. No subscriptions. New accounts get $1.00 free credit.</p>
+
+      <h3>Can I use Herma with my existing code?</h3>
+      <p>Yes. Herma is OpenAI-compatible. Change the base URL and API key — two lines of code.</p>
+
+      <h2>Blog</h2>
+      <ul>
+        <li><a href="https://hermaai.com/#/blog/ev-routing">Why AI Routers Fail — And How Expected Value Fixes Them</a></li>
+        <li><a href="https://hermaai.com/#/blog/how-we-benchmark">How We Benchmark AI Routers: Methodology, Pitfalls, and What We Learned</a></li>
+        <li><a href="https://hermaai.com/#/blog/cost-quality-matrix">We Benchmarked 9 Models Across 800+ Queries: The LLM Cost-Quality Matrix</a></li>
+        <li><a href="https://hermaai.com/#/blog/shadow-routing">Shadow Routing: How to Test LLM Cost Optimization Without Risk</a></li>
+      </ul>
+
+      <p>Visit <a href="https://hermaai.com">hermaai.com</a> to try it free.</p>
+    </noscript>
     <div id="root"></div>
   </body>
 </html>

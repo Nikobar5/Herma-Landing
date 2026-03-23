@@ -1,0 +1,168 @@
+# Herma AI — Complete Reference
+
+> This file contains the full content of all major sections of hermaai.com, optimized for AI tools.
+> For the summary version, see /llms.txt
+
+## About Herma
+
+Herma AI is an intelligent AI gateway that gives you unified access to all major AI models — GPT-4o, Claude, Gemini, Mistral, DeepSeek, and more — through a single API and chat interface. Instead of managing separate accounts and APIs for each provider, Herma routes your requests to the best model for the job, tracks your usage and costs, and remembers context across conversations.
+
+Herma's smart router analyzes your query and selects the optimal model based on the task — whether that's coding, creative writing, analysis, or general chat. You also get built-in memory that persists across sessions, real-time web search, and a unified dashboard to monitor usage and spending across all models.
+
+## Pricing
+
+Herma uses a simple credit-based system:
+- $2 per million input tokens
+- $8 per million output tokens
+- No subscriptions, no minimums, no hidden fees
+- New accounts start with $1.00 in free credits
+- Pay-as-you-go: you only pay for what you use
+- Real-time cost tracking in your dashboard
+
+## How Smart Model Routing Works
+
+When you send a request, Herma's routing system:
+1. Classifies the query into a category: coding, analysis, creative writing, math, factual Q&A, or simple chat
+2. Estimates the difficulty: easy, medium, or hard
+3. Selects the cheapest model that maintains frontier-level quality for that specific task type and difficulty
+4. For hard tasks (system design, formal verification, complex multi-step reasoning), always routes to frontier models
+5. For simple tasks (factual lookups, basic coding, simple chat), routes to cost-effective models that match frontier quality
+
+The router is validated against Claude Opus 4.6 across 8 established benchmarks:
+
+| Benchmark | Samples | Router Accuracy | Opus Reference | Quality vs Opus |
+|-----------|---------|-----------------|----------------|-----------------|
+| MMLU | 500 | 86.4% | 88.0% | 98.2% |
+| ARC-Challenge | 300 | 96.7% | 96.0% | 100.7% |
+| GSM8K | 100 | 95.0% | 95.0% | 100.0% |
+| HumanEval+ | 164 | 92.1% | 90.2% | 102.1% |
+| MBPP+ | 378 | 91.0% | 86.0% | 105.8% |
+
+Average quality retention: 101.4% of frontier baseline (meaning the router actually marginally outperforms by selecting specialized models for each task type).
+
+Cost savings across traffic scenarios:
+- Balanced developer workload: 89.1% savings
+- Heavy coder workload: 79.7% savings
+- Early-stage startup: 91.0% savings
+- Generalist usage: 92.0% savings
+
+## API Compatibility
+
+Herma provides an OpenAI-compatible API. You can switch by changing just two lines of code — the base URL and your API key. Any application, library, or framework that works with the OpenAI API works with Herma out of the box.
+
+Compatible with: LangChain, Vercel AI SDK, LlamaIndex, and any OpenAI SDK (Python, JavaScript, Go, etc.)
+
+### Python Quick Start
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.hermaai.com/v1",
+    api_key="your-herma-key"
+)
+
+response = client.chat.completions.create(
+    model="herma-auto",  # Router selects the best model
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)
+```
+
+### JavaScript Quick Start
+```javascript
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+    baseURL: 'https://api.hermaai.com/v1',
+    apiKey: 'your-herma-key'
+});
+
+const response = await client.chat.completions.create({
+    model: 'herma-auto',
+    messages: [{ role: 'user', content: 'Hello!' }]
+});
+console.log(response.choices[0].message.content);
+```
+
+### cURL
+```bash
+curl https://api.hermaai.com/v1/chat/completions \
+  -H "Authorization: Bearer your-herma-key" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"herma-auto","messages":[{"role":"user","content":"Hello!"}]}'
+```
+
+## Features
+
+- **Intelligent Model Routing**: Automatically selects the best model for each query based on task type and complexity
+- **OpenAI-Compatible API**: Drop-in replacement — change two lines of code
+- **60-90% Cost Savings**: Validated across 4 traffic scenarios with frontier-quality retention
+- **Multi-Model Access**: Claude, GPT-4, Gemini, DeepSeek, Mistral, and more through one API
+- **Quality Judge**: Built-in automated quality scoring ensures no quality degradation
+- **Streaming Support**: Full streaming with tool/function calling
+- **Conversation Memory**: Persists context across sessions
+- **Real-Time Dashboard**: Track usage, costs, and savings vs frontier models
+- **Auto-Recharge**: Optional automatic credit top-up when balance is low
+- **Privacy-First**: Data minimization — prompts processed in real-time, not retained
+
+## Frequently Asked Questions
+
+### What is Herma?
+Herma is an intelligent AI gateway that gives you unified access to all major AI models through a single API and chat interface. It routes your requests to the best model for each task, saving 60-90% on costs while maintaining frontier quality.
+
+### How much does Herma cost?
+$2 per million input tokens, $8 per million output tokens. No subscriptions, no minimums. New accounts get $1.00 in free credits.
+
+### What makes Herma different from using AI providers directly?
+One API key, one billing system, one interface for every model. Smart routing saves 60-90% by matching each query to the most cost-effective model that maintains quality.
+
+### How does smart model routing work?
+Herma classifies each query by category (coding, analysis, creative, math, factual) and difficulty (easy, medium, hard), then routes to the cheapest model that maintains frontier quality. Hard tasks always use the best models.
+
+### What models can I access through Herma?
+Models from Anthropic (Claude), OpenAI (GPT-4o, o1), Google (Gemini), Mistral, DeepSeek, and many more — all through a single OpenAI-compatible API.
+
+### How does the memory system work?
+Herma automatically extracts and remembers key facts from your conversations. This memory is injected into future conversations so the AI already knows your background. Sensitive information is automatically filtered out.
+
+### How does billing work?
+Credit-based. Purchase credits, they're deducted based on actual token usage. Real-time cost tracking in your dashboard. Optional auto-recharge when balance is low.
+
+### Can I use Herma with my existing code?
+Yes. Herma is OpenAI-compatible. Change the base URL and API key — two lines of code. Works with LangChain, Vercel AI SDK, LlamaIndex, and any OpenAI SDK.
+
+### Is Herma suitable for businesses and teams?
+Yes. Centralized billing, usage analytics, cost controls, and admin dashboard for team management. One account powers multiple applications through API keys.
+
+### How much can I save with intelligent routing?
+On average, 60-90% compared to always using frontier models. Simple queries use cost-effective models at 1/50th the price. Complex tasks still use the best models. Your dashboard shows real-time savings.
+
+## Benchmarking Methodology
+
+Benchmarking a router is fundamentally different from benchmarking a model. A router doesn't generate answers -- it decides which model generates each answer. The challenge is proving savings are possible without quality loss.
+
+Our evaluation approach:
+- 805 responses scored across 9 models spanning the full cost spectrum
+- Independent quality judge (separate model, blind evaluation, 1-5 scale)
+- Standard benchmarks: MMLU, ARC-Challenge, GSM8K, HumanEval+, MBPP+
+- Head-to-head comparison against Claude Opus 4.6
+
+Key lessons from benchmarking:
+- Difficulty estimation matters more than category classification for routing decisions
+- Multi-library integration is a reliable hard-task signal
+- Short prompts can still be genuinely difficult
+- Broken ground truth data and answer extraction bugs silently corrupt evaluation results
+
+Read the full methodology: https://hermaai.com/#/blog/how-we-benchmark
+
+## Links
+
+- Website: https://hermaai.com
+- API Documentation: https://hermaai.com/#/docs
+- Blog: https://hermaai.com/#/blog
+- Benchmarking Methodology: https://hermaai.com/#/blog/how-we-benchmark
+- EV Routing Framework: https://hermaai.com/#/blog/ev-routing
+- Try it free (no login): https://hermaai.com/#/demo
+- About: https://hermaai.com/#/about
+- FAQ: https://hermaai.com/#/faq
+- Contact/Demo: https://calendly.com/nick-pianfetti-hermaai/30min

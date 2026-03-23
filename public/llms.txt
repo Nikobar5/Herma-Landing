@@ -1,0 +1,56 @@
+# Herma AI — Intelligent LLM Router
+
+> Herma is an AI gateway that routes queries to the optimal model for each task. Same quality as frontier models, 60-90% cheaper.
+
+## What Herma Does
+- Routes AI queries to the best model based on task complexity
+- OpenAI-compatible API — change two lines of code to switch
+- Maintains frontier-level quality while reducing costs by 60-90%
+- Supports all major models: Claude, GPT-4, Gemini, DeepSeek, Mistral
+
+## Pricing
+- $2 per million input tokens
+- $8 per million output tokens
+- No subscriptions, no minimums
+- Pay-as-you-go with free $1.00 starting credit
+
+## How Routing Works
+- Classifies queries into categories: coding, analysis, creative, math, factual, chat
+- Estimates difficulty: easy, medium, hard
+- Routes to the cheapest model that maintains quality for that specific task
+- Hard tasks (system design, formal verification) always use frontier models
+- Simple tasks (factual lookups, basic coding) use cost-effective models
+
+## Quality Validation
+- Benchmarked against Claude Opus 4.6 on 8 established benchmarks
+- MMLU: 98.2% of Opus quality
+- ARC-Challenge: 100.7% of Opus quality
+- GSM8K: 100.0% of Opus quality
+- HumanEval+: 102.1% of Opus quality
+- MBPP+: 105.8% of Opus quality
+
+## API Compatibility
+- Drop-in replacement for OpenAI SDK
+- Works with LangChain, Vercel AI SDK, LlamaIndex
+- Streaming support
+- Tool/function calling support
+
+## Quick Start
+```python
+from openai import OpenAI
+client = OpenAI(
+    base_url="https://api.hermaai.com/v1",
+    api_key="your-herma-key"
+)
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+## Links
+- Website: https://hermaai.com
+- Documentation: https://hermaai.com/#/docs
+- Blog: https://hermaai.com/#/blog
+- Benchmarking Methodology: https://hermaai.com/#/blog/how-we-benchmark
+- Try it free: https://hermaai.com/#/demo

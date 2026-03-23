@@ -23,8 +23,10 @@ export function HermaAuthProvider({ children }) {
         setUser(JSON.parse(stored));
       }
     } catch {
-      localStorage.removeItem('herma_token');
-      localStorage.removeItem('herma_user');
+      try {
+        localStorage.removeItem('herma_token');
+        localStorage.removeItem('herma_user');
+      } catch { /* storage unavailable */ }
     } finally {
       setLoading(false);
     }

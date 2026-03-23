@@ -124,7 +124,7 @@ export default function AdminDashboard() {
   const [notifCount, setNotifCount] = useState(0);
   const [budgets, setBudgets] = useState(null);
   const [qaOverview, setQaOverview] = useState(null);
-  const [csuiteData, setCsuiteData] = useState(null);
+  const [, setCsuiteData] = useState(null);
   const [latencyData, setLatencyData] = useState(null);
   const [siteAnalytics, setSiteAnalytics] = useState(null);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);

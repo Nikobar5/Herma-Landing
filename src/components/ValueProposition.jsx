@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 // Herma pricing: $2/1M input, $8/1M output
@@ -34,45 +34,12 @@ function formatDollars(amount) {
 const ValueProposition = () => {
   const [headerRef, headerVisible] = useScrollAnimation(0.1);
   const [calcRef, calcVisible] = useScrollAnimation(0.1);
-  const [models, setModels] = useState(FALLBACK_MODELS);
+  const [models] = useState(FALLBACK_MODELS);
   const [selectedModel, setSelectedModel] = useState(FALLBACK_MODELS[0].id);
   const [totalTokens, setTotalTokens] = useState(10_000_000);
   const [customInput, setCustomInput] = useState('');
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('https://openrouter.ai/api/v1/models');
-        if (!res.ok) return;
-        const data = await res.json();
-        const filtered = (data.data || [])
-          .filter(m => {
-            const prompt = parseFloat(m.pricing?.prompt || '0') * 1_000_000;
-            const completion = parseFloat(m.pricing?.completion || '0') * 1_000_000;
-            return prompt > HERMA_INPUT_PRICE && completion > HERMA_OUTPUT_PRICE;
-          })
-          .filter(m => /^(openai|anthropic|google|deepseek|mistralai|meta-llama)\//.test(m.id))
-          .filter(m => !m.id.includes(':free') && !m.id.includes(':beta'))
-          .map(m => ({
-            id: m.id,
-            name: m.name.replace(/^[^:]+:\s*/, ''),
-            provider: m.id.split('/')[0],
-            promptPrice: parseFloat(m.pricing.prompt) * 1_000_000,
-            completionPrice: parseFloat(m.pricing.completion) * 1_000_000,
-          }))
-          .sort((a, b) => b.completionPrice - a.completionPrice);
-
-        if (!cancelled && filtered.length > 0) {
-          setModels(filtered);
-          setSelectedModel(filtered[0].id);
-        }
-      } catch {
-        // Keep fallback models
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  // Models are defined statically in FALLBACK_MODELS above — no external fetch needed.
 
   const selectedModelObj = models.find(m => m.id === selectedModel) || models[0];
 
@@ -299,7 +266,7 @@ const ValueProposition = () => {
                 className="text-xs text-[var(--text-tertiary)] text-center mt-4"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                * Based on a 75/25 input/output token ratio. Herma flat pricing: $2/1M input tokens, $8/1M output tokens. Model prices from OpenRouter.
+                * Based on a 75/25 input/output token ratio. Herma flat pricing: $2/1M input tokens, $8/1M output tokens. Model prices from provider websites.
               </p>
             </div>
           </div>

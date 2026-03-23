@@ -48,11 +48,6 @@ const Header = () => {
     setMenuOpen(false);
   };
 
-  const handleRequestDemo = () => {
-    window.open('https://calendly.com/hermalocal/30min', '_blank');
-    closeMenu();
-  };
-
   return (
     <>
       <header
@@ -105,6 +100,13 @@ const Header = () => {
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   About
+                </Link>
+                <Link
+                  to="/blog"
+                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Blog
                 </Link>
                 {isAuthenticated ? (
                   <>

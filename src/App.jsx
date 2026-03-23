@@ -1,5 +1,5 @@
 // App.jsx - Main Application Component
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
@@ -8,27 +8,37 @@ import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import ComplianceSection from './components/ComplianceSection';
 import Footer from './components/Footer';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
-import Attributions from './pages/Attributions';
-import PurchasePage from './pages/PurchasePage';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Overview from './pages/dashboard/Overview';
-import Usage from './pages/dashboard/Usage';
-import ApiKeys from './pages/dashboard/ApiKeys';
-import Billing from './pages/dashboard/Billing';
-import ChatPage from './pages/ChatPage';
-import VerifyEmail from './pages/VerifyEmail';
-import ResetPassword from './pages/ResetPassword';
-import AdminDashboard from './pages/AdminDashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HermaAuthProvider } from './context/HermaAuthContext';
 import { initAnalytics, trackPageView, trackScrollDepth, trackTimeOnPage, trackPerformance } from './services/analyticsTracker';
-import SuccessPage from './components/SuccessPage';
-import Documentation from './pages/Documentation';
-import About from './pages/About';
-import FAQPage from './pages/FAQPage';
+
+// Lazy-loaded pages — each becomes a separate chunk
+const Login = lazy(() => import('./pages/Login'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Overview = lazy(() => import('./pages/dashboard/Overview'));
+const Usage = lazy(() => import('./pages/dashboard/Usage'));
+const ApiKeys = lazy(() => import('./pages/dashboard/ApiKeys'));
+const Billing = lazy(() => import('./pages/dashboard/Billing'));
+const Quality = lazy(() => import('./pages/dashboard/Quality'));
+const ChatPage = lazy(() => import('./pages/ChatPage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const DemoChat = lazy(() => import('./pages/DemoChat'));
+const PurchasePage = lazy(() => import('./pages/PurchasePage'));
+const SuccessPage = lazy(() => import('./components/SuccessPage'));
+const Documentation = lazy(() => import('./pages/Documentation'));
+const About = lazy(() => import('./pages/About'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+const Attributions = lazy(() => import('./pages/Attributions'));
+const BlogIndex = lazy(() => import('./pages/blog/BlogIndex'));
+const CostQualityMatrix = lazy(() => import('./pages/blog/CostQualityMatrix'));
+const ShadowRouting = lazy(() => import('./pages/blog/ShadowRouting'));
+const EVRouting = lazy(() => import('./pages/blog/EVRouting'));
+const HowWeBenchmark = lazy(() => import('./pages/blog/HowWeBenchmark'));
 
 initAnalytics();
 
@@ -80,14 +90,14 @@ const RouteTracker = () => {
 // Conditionally render Header (hide on chat page — chat has its own top bar)
 const ConditionalHeader = () => {
   const location = useLocation();
-  if (location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname.startsWith('/admin')) return null;
+  if (location.pathname === '/chat' || location.pathname === '/demo' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname.startsWith('/admin')) return null;
   return <Header />;
 };
 
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password';
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/demo' || location.pathname === '/verify-email' || location.pathname === '/reset-password';
   if (hideFooter) return null;
   return <Footer />;
 };
@@ -107,10 +117,10 @@ const Home = () => {
 function App() {
   useEffect(() => {
     window.addEventListener('load', () => {
-      if (window.performance) {
-        const perfData = window.performance.timing;
-        const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
-        if (pageLoadTime > 0) trackPerformance(Math.round(pageLoadTime));
+      const entries = performance.getEntriesByType('navigation');
+      if (entries.length > 0) {
+        const pageLoadTime = Math.round(entries[0].loadEventEnd);
+        if (pageLoadTime > 0) trackPerformance(pageLoadTime);
       }
     });
   }, []);
@@ -118,9 +128,11 @@ function App() {
   return (
     <Router>
       <HermaAuthProvider>
+        <ErrorBoundary>
         <div className="app">
           <RouteTracker />
           <ConditionalHeader />
+          <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -135,6 +147,7 @@ function App() {
               }
             >
               <Route index element={<Overview />} />
+              <Route path="quality" element={<Quality />} />
               <Route path="usage" element={<Usage />} />
               <Route path="api-keys" element={<ApiKeys />} />
               <Route path="billing" element={<Billing />} />
@@ -155,9 +168,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/demo" element={<DemoChat />} />
             <Route path="/docs" element={<Documentation />} />
             <Route path="/about" element={<About />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/blog" element={<BlogIndex />} />
+            <Route path="/blog/cost-quality-matrix" element={<CostQualityMatrix />} />
+            <Route path="/blog/shadow-routing" element={<ShadowRouting />} />
+            <Route path="/blog/ev-routing" element={<EVRouting />} />
+            <Route path="/blog/how-we-benchmark" element={<HowWeBenchmark />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
@@ -165,8 +184,10 @@ function App() {
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/cancel" element={<Home />} />
           </Routes>
+          </Suspense>
           <ConditionalFooter />
         </div>
+        </ErrorBoundary>
       </HermaAuthProvider>
     </Router>
   );

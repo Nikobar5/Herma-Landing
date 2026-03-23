@@ -6,7 +6,7 @@ const Hero = () => {
   const navigate = useNavigate();
 
   const handleTryItOut = () => {
-    navigate('/chat');
+    navigate('/demo');
   };
 
   return (
@@ -23,20 +23,31 @@ const Hero = () => {
           <div className="flex flex-col items-center text-center">
             {/* Main Headline */}
             <div className="w-full max-w-5xl mb-8">
+              {/* Differentiator badge */}
+              <div className="mb-6 animate-hero">
+                <span
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/5 text-[var(--accent-primary)]"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse" />
+                  Drop-in replacement for any AI model
+                </span>
+              </div>
+
               <h1
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-[1.1] tracking-tight animate-hero"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                <span className="text-[var(--text-primary)]">Cut AI Costs by 60%</span>
+                <span className="text-[var(--text-primary)]">Same AI Quality.</span>
                 <br />
-                <span className="text-[var(--accent-primary)]">With Herma</span>
+                <span className="text-[var(--accent-primary)]">60–90% Cheaper.</span>
               </h1>
 
               <p
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 font-normal max-w-3xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Herma routes your prompts to the best model for the job. Same quality, fraction of the price.
+                Swap your API key to Herma. We route each query to the cheapest model that matches frontier quality — automatically. No code changes, no quality loss.
               </p>
 
               {/* CTA Button - Centered */}

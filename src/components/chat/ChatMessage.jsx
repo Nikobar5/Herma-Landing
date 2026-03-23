@@ -26,7 +26,7 @@ const WaitingIndicator = () => {
 };
 
 const CitationSources = ({ annotations }) => {
-  // Normalize annotations — OpenRouter Chat Completions API nests data under
+  // Normalize annotations — Chat Completions API nests data under
   // url_citation: { url, title, content }, while the Responses API uses flat fields.
   const seen = new Set();
   const sources = [];

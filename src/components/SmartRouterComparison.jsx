@@ -82,7 +82,7 @@ const HERMA_OUTPUT_PRICE = 8.0;  // per 1M tokens
 const MAX_DEMO_QUERIES = 2;
 const DEMO_STORAGE_KEY = 'herma_demo_queries';
 
-// Fallback models if OpenRouter API is unavailable
+// Supported models and their retail pricing (per 1M tokens)
 const FALLBACK_MODELS = [
   { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', promptPrice: 2.5, completionPrice: 10 },
   { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4', provider: 'Anthropic', promptPrice: 3, completionPrice: 15 },
@@ -96,7 +96,7 @@ function formatCost(promptTokens, completionTokens, promptPricePerM, completionP
 }
 
 const SmartRouterComparison = () => {
-  const [models, setModels] = useState(FALLBACK_MODELS);
+  const [models] = useState(FALLBACK_MODELS);
   const [query, setQuery] = useState('');
   const [selectedModel, setSelectedModel] = useState(FALLBACK_MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -119,49 +119,7 @@ const SmartRouterComparison = () => {
     }
   }, [isAuthenticated]);
 
-  // Fetch models from OpenRouter and filter to premium models where Herma is cheaper
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('https://openrouter.ai/api/v1/models');
-        if (!res.ok) return;
-        const data = await res.json();
-        const filtered = (data.data || [])
-          .filter(m => {
-            const prompt = parseFloat(m.pricing?.prompt || '0') * 1_000_000; // per 1M tokens
-            const completion = parseFloat(m.pricing?.completion || '0') * 1_000_000;
-            // Only show models where Herma saves on both input AND output
-            return prompt > HERMA_INPUT_PRICE && completion > HERMA_OUTPUT_PRICE;
-          })
-          .filter(m => {
-            // Only include models from our allowed provider families
-            return /^(openai|anthropic|google|deepseek|mistralai|meta-llama)\//.test(m.id);
-          })
-          .filter(m => {
-            // Exclude free tiers, beta, and niche variants
-            return !m.id.includes(':free') && !m.id.includes(':beta');
-          })
-          .map(m => ({
-            id: m.id,
-            name: m.name.replace(/^[^:]+:\s*/, ''), // Strip "Provider: " prefix
-            provider: m.id.split('/')[0],
-            promptPrice: parseFloat(m.pricing.prompt) * 1_000_000,
-            completionPrice: parseFloat(m.pricing.completion) * 1_000_000,
-          }))
-          .sort((a, b) => b.completionPrice - a.completionPrice); // Most expensive first
-
-        if (!cancelled && filtered.length > 0) {
-          setModels(filtered);
-          setSelectedModel(filtered[0].id);
-          setStdResult(prev => ({ ...prev, model: filtered[0].name }));
-        }
-      } catch {
-        // Keep fallback models
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  // Models are defined statically in FALLBACK_MODELS above — no external fetch needed.
 
   const examples = [
     "Summarize this quarterly report",

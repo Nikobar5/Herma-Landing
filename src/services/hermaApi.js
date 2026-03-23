@@ -158,6 +158,10 @@ export function getUsageSummary(startDate, endDate) {
   return authFetch(`/portal/usage/summary${qs ? `?${qs}` : ''}`);
 }
 
+export function getDailySavings(days = 30, frontierModel = 'anthropic/claude-opus-4.6') {
+  return authFetch(`/portal/usage/daily-savings?days=${days}&frontier_model=${encodeURIComponent(frontierModel)}`);
+}
+
 export function getUsageLogs({ limit = 25, offset = 0 } = {}) {
   return authFetch(`/portal/usage?limit=${limit}&offset=${offset}`);
 }
@@ -187,6 +191,25 @@ export function createCheckout(amount) {
   return authFetch('/portal/checkout', {
     method: 'POST',
     body: JSON.stringify({ amount }),
+  });
+}
+
+export function getPayments({ limit = 50, offset = 0 } = {}) {
+  return authFetch(`/portal/payments?limit=${limit}&offset=${offset}`);
+}
+
+export function getRoutingQuality(days = 30) {
+  return authFetch(`/portal/routing-quality?days=${days}`);
+}
+
+export function getAutoRechargeSettings() {
+  return authFetch('/portal/auto-recharge');
+}
+
+export function updateAutoRechargeSettings({ enabled, threshold_usd, amount_usd }) {
+  return authFetch('/portal/auto-recharge', {
+    method: 'POST',
+    body: JSON.stringify({ enabled, threshold_usd, amount_usd }),
   });
 }
 

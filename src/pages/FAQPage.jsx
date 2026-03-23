@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { setStructuredData, removeStructuredData } from '../utils/seo';
 
 const faqItems = [
   {
@@ -40,11 +41,38 @@ const faqItems = [
     id: 8,
     question: "Is Herma suitable for businesses and teams?",
     answer: "Yes. Herma provides centralized billing, usage analytics, and cost controls that make it easy to manage AI spending across a team or organization. The admin dashboard gives full visibility into usage patterns, model performance, and costs. One account can power multiple applications and team members through API keys."
+  },
+  {
+    id: 9,
+    question: "How much does Herma cost?",
+    answer: "Herma charges $2 per million input tokens and $8 per million output tokens. There are no subscriptions, no minimums, and no hidden fees. You buy credits and they're deducted based on actual usage. New accounts start with $1.00 in free credits so you can try it before adding funds. Your dashboard shows exactly how much each request costs and how much you're saving compared to using frontier models directly."
+  },
+  {
+    id: 10,
+    question: "How much can I save with intelligent routing?",
+    answer: "On average, Herma's router saves 60-90% compared to always using the most expensive model. For simple questions, factual lookups, and routine coding tasks, the router selects models that cost a fraction of frontier pricing while maintaining the same quality. For complex tasks like system design or multi-step reasoning, it automatically routes to the best available model. Your savings dashboard shows a real-time comparison of what you're paying versus what it would have cost with a frontier model."
   }
 ];
 
 const FAQPage = () => {
   const [expandedId, setExpandedId] = useState(null);
+
+  useEffect(() => {
+    const faqSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    };
+    setStructuredData('ld-faq', faqSchema);
+    return () => removeStructuredData('ld-faq');
+  }, []);
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);

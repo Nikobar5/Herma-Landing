@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../services/hermaApi';
+import IntegrationWizard from '../../components/IntegrationWizard';
 
 const ApiKeys = () => {
   const [keys, setKeys] = useState([]);
@@ -8,6 +9,7 @@ const ApiKeys = () => {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [showWizard, setShowWizard] = useState(false);
 
   const fetchKeys = useCallback(async () => {
     try {
@@ -33,8 +35,10 @@ const ApiKeys = () => {
 
     try {
       const data = await createApiKey(newKeyName.trim());
-      setNewKeyRaw(data.raw_key || `sk_live_${Math.random().toString(36).substr(2, 24)}`); // Fallback if mock is generic
+      const rawKey = data.raw_key || `sk_live_${Math.random().toString(36).substr(2, 24)}`; // Fallback if mock is generic
+      setNewKeyRaw(rawKey);
       setNewKeyName('');
+      setShowWizard(true);
       await fetchKeys();
     } catch (err) {
       setError(err.message);
@@ -200,6 +204,13 @@ const ApiKeys = () => {
           </table>
         </div>
       </div>
+
+      {showWizard && (
+        <IntegrationWizard
+          apiKey={newKeyRaw}
+          onClose={() => setShowWizard(false)}
+        />
+      )}
     </div>
   );
 };

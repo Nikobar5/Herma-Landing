@@ -11,9 +11,13 @@ import ChatInput from '../components/chat/ChatInput';
 import EmptyState from '../components/chat/EmptyState';
 import PaywallModal from '../components/chat/PaywallModal';
 import ScrollToBottom from '../components/chat/ScrollToBottom';
+import LowBalanceBanner from '../components/chat/LowBalanceBanner';
+import OnboardingModal, { ONBOARDING_KEY } from '../components/OnboardingModal';
+import { useHermaAuth } from '../context/HermaAuthContext';
 
 const ChatPage = () => {
   const navigate = useNavigate();
+  const { user } = useHermaAuth();
 
   const {
     conversations,
@@ -48,6 +52,9 @@ const ChatPage = () => {
   const [subscription, setSubscription] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !!user && !localStorage.getItem(ONBOARDING_KEY)
+  );
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -150,6 +157,24 @@ const ChatPage = () => {
             </span>
           </button>
 
+          {/* Navigation links */}
+          <div className="hidden sm:flex items-center gap-1 ml-2">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => navigate('/docs')}
+              className="px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Docs
+            </button>
+          </div>
+
           <div className="flex-1" />
 
           {/* New Chat button */}
@@ -164,6 +189,9 @@ const ChatPage = () => {
             </svg>
           </button>
         </div>
+
+        {/* Low balance warning */}
+        <LowBalanceBanner balance={balance} />
 
         {/* Main content area */}
         <div className="flex-1 overflow-hidden relative flex flex-col">
@@ -214,6 +242,11 @@ const ChatPage = () => {
       </div>
 
       <PaywallModal isOpen={showPaywall} onClose={dismissPaywall} />
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        userName={user?.name}
+      />
     </div>
   );
 };
