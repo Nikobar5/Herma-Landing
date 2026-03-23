@@ -314,7 +314,7 @@ const IntegrationWizard = ({ apiKey, onClose }) => {
               </div>
 
               <a
-                href="#/docs"
+                href="/docs"
                 className="inline-flex items-center gap-2 text-[var(--accent-primary)] hover:text-[var(--accent-hover)] text-sm font-medium transition-colors"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >

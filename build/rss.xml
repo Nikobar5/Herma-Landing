@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Herma AI Blog</title>
-    <link>https://hermaai.com/#/blog</link>
+    <link>https://hermaai.com/blog</link>
     <description>Technical deep-dives on intelligent model routing from the Herma engineering team.</description>
     <language>en-us</language>
     <lastBuildDate>Sat, 22 Mar 2026 00:00:00 GMT</lastBuildDate>
@@ -10,34 +10,34 @@
 
     <item>
       <title>Why AI Routers Fail -- And How Expected Value Fixes Them</title>
-      <link>https://hermaai.com/#/blog/ev-routing</link>
+      <link>https://hermaai.com/blog/ev-routing</link>
       <description>Most AI routers treat quality as a linear tradeoff. It isn't. Here's the expected value framework that makes routing safe enough to actually use in production.</description>
       <pubDate>Sat, 22 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://hermaai.com/#/blog/ev-routing</guid>
+      <guid>https://hermaai.com/blog/ev-routing</guid>
     </item>
 
     <item>
       <title>How We Benchmark AI Routers: Methodology, Pitfalls, and What We Learned</title>
-      <link>https://hermaai.com/#/blog/how-we-benchmark</link>
+      <link>https://hermaai.com/blog/how-we-benchmark</link>
       <description>The real challenges of benchmarking a model routing system -- broken datasets, answer extraction bugs, and what we learned about classifier design.</description>
       <pubDate>Sat, 22 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://hermaai.com/#/blog/how-we-benchmark</guid>
+      <guid>https://hermaai.com/blog/how-we-benchmark</guid>
     </item>
 
     <item>
       <title>We Benchmarked 9 Models Across 800+ Queries: The LLM Cost-Quality Matrix</title>
-      <link>https://hermaai.com/#/blog/cost-quality-matrix</link>
+      <link>https://hermaai.com/blog/cost-quality-matrix</link>
       <description>Original benchmark data from 805 scored responses across 9 models. Find out which models match frontier quality at a fraction of the cost.</description>
       <pubDate>Fri, 21 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://hermaai.com/#/blog/cost-quality-matrix</guid>
+      <guid>https://hermaai.com/blog/cost-quality-matrix</guid>
     </item>
 
     <item>
       <title>Shadow Routing: How to Test LLM Cost Optimization Without Risk</title>
-      <link>https://hermaai.com/#/blog/shadow-routing</link>
+      <link>https://hermaai.com/blog/shadow-routing</link>
       <description>How to validate an LLM routing system in production without affecting users. Shadow mode, quality judging, and when to graduate to active routing.</description>
       <pubDate>Fri, 21 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://hermaai.com/#/blog/shadow-routing</guid>
+      <guid>https://hermaai.com/blog/shadow-routing</guid>
     </item>
   </channel>
 </rss>

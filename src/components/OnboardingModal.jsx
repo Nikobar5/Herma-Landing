@@ -124,7 +124,7 @@ const OnboardingModal = ({ isOpen, onClose, userName }) => {
         >
           Need help?{' '}
           <a
-            href="/#/docs"
+            href="/docs"
             className="text-[var(--accent-primary)] hover:underline"
           >
             Check our docs

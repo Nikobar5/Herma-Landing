@@ -452,13 +452,13 @@ const SmartRouterComparison = () => {
             </p>
             <div className="flex flex-col gap-3">
               <a
-                href="#/login?redirect=comparison"
+                href="/login?redirect=comparison"
                 className="px-6 py-3 bg-[var(--accent-primary)] text-white font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors text-sm"
               >
                 Sign Up Free
               </a>
               <a
-                href="#/login?redirect=comparison"
+                href="/login?redirect=comparison"
                 className="px-6 py-2 text-[var(--accent-primary)] hover:underline text-sm"
               >
                 Already have an account? Log In

@@ -52,7 +52,7 @@ All backend functionality is provided by the Herma API (FastAPI) deployed on Rai
 - `src/pages/dashboard/Billing.jsx` — Billing history and balance
 
 **Routing & Navigation**:
-- `src/App.jsx` — HashRouter with main route definitions
+- `src/App.jsx` — BrowserRouter with main route definitions
 - Routes: `/`, `/login`, `/upgrade`, `/success`, `/cancel`, `/dashboard`, `/docs`, `/privacy-policy`, `/terms-of-service`, `/attributions`
 
 ### Data Flow Patterns
@@ -107,6 +107,7 @@ REACT_APP_HERMA_API_URL=https://herma.up.railway.app
 
 ## Special Considerations
 
-**HashRouter Usage**:
-- Uses HashRouter for SPA compatibility
-- All routes prefixed with `#` in URLs (e.g., `/#/login`, `/#/success`)
+**BrowserRouter Usage**:
+- Uses BrowserRouter for clean URLs and SEO
+- Nginx `try_files` handles SPA fallback for all routes
+- URLs are clean paths (e.g., `/login`, `/success`)

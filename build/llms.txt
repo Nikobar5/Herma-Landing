@@ -50,7 +50,7 @@ response = client.chat.completions.create(
 
 ## Links
 - Website: https://hermaai.com
-- Documentation: https://hermaai.com/#/docs
-- Blog: https://hermaai.com/#/blog
-- Benchmarking Methodology: https://hermaai.com/#/blog/how-we-benchmark
-- Try it free: https://hermaai.com/#/demo
+- Documentation: https://hermaai.com/docs
+- Blog: https://hermaai.com/blog
+- Benchmarking Methodology: https://hermaai.com/blog/how-we-benchmark
+- Try it free: https://hermaai.com/demo

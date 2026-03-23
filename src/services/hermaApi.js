@@ -13,7 +13,7 @@ async function authFetch(path, options = {}) {
   const token = getToken();
   if (!token) {
     clearAuth();
-    window.location.hash = '#/login';
+    window.location.href = '/login';
     throw new Error('Not authenticated');
   }
 
@@ -27,7 +27,7 @@ async function authFetch(path, options = {}) {
 
   if (res.status === 401) {
     clearAuth();
-    window.location.hash = '#/login';
+    window.location.href = '/login';
     throw new Error('Session expired');
   }
 
@@ -554,7 +554,7 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
   const token = getToken();
   if (!token) {
     clearAuth();
-    window.location.hash = '#/login';
+    window.location.href = '/login';
     throw new Error('Not authenticated');
   }
 
@@ -580,7 +580,7 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
 
   if (res.status === 401) {
     clearAuth();
-    window.location.hash = '#/login';
+    window.location.href = '/login';
     throw new Error('Session expired');
   }
   if (res.status === 402) {

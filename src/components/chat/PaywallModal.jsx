@@ -112,7 +112,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
 
         <div className="text-center space-y-2">
           <a
-            href="/#/upgrade"
+            href="/upgrade"
             className="text-sm text-[var(--accent-primary)] hover:underline"
             style={{ fontFamily: 'var(--font-ui)' }}
           >

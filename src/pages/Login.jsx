@@ -18,8 +18,8 @@ const Login = () => {
 
   const from = location.state?.from?.pathname;
 
-  // Check for ?redirect=comparison in the hash URL
-  const searchParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+  // Check for ?redirect=comparison in the URL
+  const searchParams = new URLSearchParams(window.location.search);
   const redirectParam = searchParams.get('redirect');
 
   const handleChange = (e) => {

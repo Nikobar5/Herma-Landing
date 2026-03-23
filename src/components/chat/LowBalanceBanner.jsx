@@ -41,7 +41,7 @@ const LowBalanceBanner = ({ balance }) => {
           <span className="hidden sm:inline"> — add more to keep chatting</span>
         </span>
         <a
-          href="/#/upgrade"
+          href="/upgrade"
           className="ml-1 font-medium hover:underline"
           style={{ color: '#FBBF24' }}
         >

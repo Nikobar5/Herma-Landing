@@ -75,7 +75,7 @@ function send(payload) {
 export function trackPageView() {
   send({
     event_type: 'page_view',
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     page_title: document.title,
   });
 }
@@ -84,7 +84,7 @@ export function trackClick(name, data = {}) {
   send({
     event_type: 'click',
     event_name: name,
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: data,
   });
 }
@@ -93,7 +93,7 @@ export function trackDownload(platform) {
   send({
     event_type: 'download',
     event_name: platform,
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: { platform },
   });
 }
@@ -101,7 +101,7 @@ export function trackDownload(platform) {
 export function trackSignup() {
   send({
     event_type: 'signup',
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
   });
 }
 
@@ -116,7 +116,7 @@ export function trackScrollDepth(threshold) {
   send({
     event_type: 'scroll_depth',
     event_name: `${threshold}%`,
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: { threshold },
   });
 }
@@ -124,7 +124,7 @@ export function trackScrollDepth(threshold) {
 export function trackTimeOnPage(seconds) {
   send({
     event_type: 'time_on_page',
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: seconds,
   });
 }
@@ -133,7 +133,7 @@ export function trackFormInteraction(form, action) {
   send({
     event_type: 'form_interaction',
     event_name: `${form}:${action}`,
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: { form, action },
   });
 }
@@ -142,7 +142,7 @@ export function trackError(msg, source, stack) {
   send({
     event_type: 'error',
     event_name: msg?.substring(0, 100),
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: { message: msg, source, stack: stack?.substring(0, 500) },
   });
 }
@@ -150,7 +150,7 @@ export function trackError(msg, source, stack) {
 export function trackPerformance(ms) {
   send({
     event_type: 'performance',
-    page_path: window.location.hash.replace('#', '') || '/',
+    page_path: window.location.pathname || '/',
     event_data: { load_time_ms: ms },
   });
 }

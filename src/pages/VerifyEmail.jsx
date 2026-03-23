@@ -9,8 +9,8 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
   const { user, setEmailVerified, isAuthenticated } = useHermaAuth();
 
-  // Parse token from hash URL: /#/verify-email?token=abc
-  const searchParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+  // Parse token from URL: /verify-email?token=abc
+  const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get('token');
 
   const [status, setStatus] = useState('idle'); // idle | loading | success | error

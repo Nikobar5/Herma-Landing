@@ -109,7 +109,7 @@ const Documentation = () => {
               </h3>
               <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
                 Sign up at{' '}
-                <a href="/#/login" className="text-[var(--accent-primary)] underline font-medium">hermaai.com</a>{' '}
+                <a href="/login" className="text-[var(--accent-primary)] underline font-medium">hermaai.com</a>{' '}
                 and add credits from the Billing page.
               </p>
             </div>
@@ -126,7 +126,7 @@ const Documentation = () => {
               </h3>
               <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
                 Go to{' '}
-                <a href="/#/dashboard/api-keys" className="text-[var(--accent-primary)] underline font-medium">Dashboard &rarr; API Keys</a>{' '}
+                <a href="/dashboard/api-keys" className="text-[var(--accent-primary)] underline font-medium">Dashboard &rarr; API Keys</a>{' '}
                 and create a key. It starts with <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>hk-</code>.
                 Copy it immediately — you won't see it again.
               </p>
@@ -534,7 +534,7 @@ while (true) {
               Create an account, add credits, and start making API calls in minutes.
             </p>
             <a
-              href="/#/login"
+              href="/login"
               className="inline-block px-8 py-3 bg-white text-[var(--accent-primary)] font-semibold rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
               style={{ fontFamily: 'var(--font-ui)' }}
             >

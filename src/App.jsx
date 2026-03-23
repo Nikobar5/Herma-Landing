@@ -1,6 +1,6 @@
 // App.jsx - Main Application Component
 import React, { useEffect, lazy, Suspense } from 'react';
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Hero from './components/Hero';

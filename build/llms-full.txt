@@ -153,16 +153,16 @@ Key lessons from benchmarking:
 - Short prompts can still be genuinely difficult
 - Broken ground truth data and answer extraction bugs silently corrupt evaluation results
 
-Read the full methodology: https://hermaai.com/#/blog/how-we-benchmark
+Read the full methodology: https://hermaai.com/blog/how-we-benchmark
 
 ## Links
 
 - Website: https://hermaai.com
-- API Documentation: https://hermaai.com/#/docs
-- Blog: https://hermaai.com/#/blog
-- Benchmarking Methodology: https://hermaai.com/#/blog/how-we-benchmark
-- EV Routing Framework: https://hermaai.com/#/blog/ev-routing
-- Try it free (no login): https://hermaai.com/#/demo
-- About: https://hermaai.com/#/about
-- FAQ: https://hermaai.com/#/faq
+- API Documentation: https://hermaai.com/docs
+- Blog: https://hermaai.com/blog
+- Benchmarking Methodology: https://hermaai.com/blog/how-we-benchmark
+- EV Routing Framework: https://hermaai.com/blog/ev-routing
+- Try it free (no login): https://hermaai.com/demo
+- About: https://hermaai.com/about
+- FAQ: https://hermaai.com/faq
 - Contact/Demo: https://calendly.com/nick-pianfetti-hermaai/30min

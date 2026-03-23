@@ -5,8 +5,8 @@ import { forgotPassword, resetPassword } from '../services/hermaApi';
 const ResetPassword = () => {
   const navigate = useNavigate();
 
-  // Parse token from hash URL: /#/reset-password?token=abc
-  const searchParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+  // Parse token from URL: /reset-password?token=abc
+  const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get('token');
 
   const [email, setEmail] = useState('');

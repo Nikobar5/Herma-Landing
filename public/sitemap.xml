@@ -6,57 +6,57 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/demo</loc>
+    <loc>https://hermaai.com/demo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/docs</loc>
+    <loc>https://hermaai.com/docs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/blog</loc>
+    <loc>https://hermaai.com/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/blog/cost-quality-matrix</loc>
+    <loc>https://hermaai.com/blog/cost-quality-matrix</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/blog/shadow-routing</loc>
+    <loc>https://hermaai.com/blog/shadow-routing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/blog/ev-routing</loc>
+    <loc>https://hermaai.com/blog/ev-routing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/blog/how-we-benchmark</loc>
+    <loc>https://hermaai.com/blog/how-we-benchmark</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/about</loc>
+    <loc>https://hermaai.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/faq</loc>
+    <loc>https://hermaai.com/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/upgrade</loc>
+    <loc>https://hermaai.com/upgrade</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://hermaai.com/#/login</loc>
+    <loc>https://hermaai.com/login</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

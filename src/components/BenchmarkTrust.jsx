@@ -246,7 +246,7 @@ const BenchmarkTrust = () => {
           className={`text-center animate-on-scroll animate-fade-up ${ctaVisible ? 'is-visible' : ''}`}
         >
           <a
-            href="#/blog/how-we-benchmark"
+            href="/blog/how-we-benchmark"
             className="inline-flex items-center gap-2 text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-semibold text-base sm:text-lg transition-colors duration-200"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
