@@ -139,12 +139,12 @@ const ValueProposition = () => {
                   >
                     Monthly Volume (tokens)
                   </label>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                     {VOLUME_PRESETS.map(preset => (
                       <button
                         key={preset.label}
                         onClick={() => { setTotalTokens(preset.tokens); setCustomInput(''); }}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                           activePreset?.tokens === preset.tokens
                             ? 'bg-[var(--accent-primary)] text-white shadow-md'
                             : 'bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'
@@ -159,7 +159,7 @@ const ValueProposition = () => {
                       value={customInput}
                       onChange={(e) => handleCustomVolume(e.target.value)}
                       placeholder="Custom (M)"
-                      className="w-28 px-3 py-2 rounded-lg bg-[var(--bg-primary)] border-2 border-[var(--border-secondary)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]"
+                      className="w-24 sm:w-28 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-[var(--bg-primary)] border-2 border-[var(--border-secondary)] text-[var(--text-primary)] text-xs sm:text-sm placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     />
                   </div>
@@ -189,10 +189,10 @@ const ValueProposition = () => {
                   </div>
                   <div className="h-8 sm:h-10 bg-[var(--bg-tertiary)] rounded-lg overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-gray-400 to-gray-500 rounded-lg transition-all duration-700 ease-out flex items-center justify-end pr-3"
+                      className="h-full bg-gradient-to-r from-gray-400 to-gray-500 rounded-lg transition-all duration-700 ease-out flex items-center justify-end pr-2 sm:pr-3"
                       style={{ width: `${barMaxWidth}%` }}
                     >
-                      <span className="text-xs font-semibold text-white whitespace-nowrap">
+                      <span className="text-[10px] sm:text-xs font-semibold text-white whitespace-nowrap">
                         ${selectedModelObj.promptPrice} / ${selectedModelObj.completionPrice} per 1M
                       </span>
                     </div>
@@ -220,7 +220,7 @@ const ValueProposition = () => {
                       className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-hover)] rounded-lg transition-all duration-700 ease-out"
                       style={{ width: `${Math.max(hermaBarWidth, 5)}%` }}
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--accent-primary)] whitespace-nowrap bg-[var(--bg-tertiary)]/80 px-1.5 py-0.5 rounded">
+                    <span className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-[10px] sm:text-xs font-bold text-[var(--accent-primary)] whitespace-nowrap bg-[var(--bg-tertiary)]/80 px-1 sm:px-1.5 py-0.5 rounded">
                       $2 / $8 per 1M
                     </span>
                   </div>

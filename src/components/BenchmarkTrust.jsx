@@ -92,7 +92,7 @@ const BenchmarkTrust = () => {
             <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-[var(--accent-primary)] via-purple-500 to-emerald-500 opacity-30 group-hover:opacity-50 blur-[1px] transition-opacity duration-500" />
             <div className="relative bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-transparent">
               <p
-                className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-purple-400 bg-clip-text text-transparent mb-2"
+                className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-purple-400 bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
                 <AnimatedNumber target={98} suffix="" duration={1200} />-<AnimatedNumber target={106} suffix="%" duration={1400} />
@@ -173,19 +173,19 @@ const BenchmarkTrust = () => {
                 <thead>
                   <tr className="border-b border-[var(--border-secondary)]">
                     <th
-                      className="text-left px-6 sm:px-8 py-3 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider"
+                      className="text-left px-4 sm:px-6 md:px-8 py-3 text-[10px] sm:text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     >
                       Benchmark
                     </th>
                     <th
-                      className="text-center px-4 py-3 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider"
+                      className="text-center px-2 sm:px-4 py-3 text-[10px] sm:text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     >
                       Samples
                     </th>
                     <th
-                      className="text-right px-6 sm:px-8 py-3 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider"
+                      className="text-right px-4 sm:px-6 md:px-8 py-3 text-[10px] sm:text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider"
                       style={{ fontFamily: 'var(--font-ui)' }}
                     >
                       Quality vs Frontier
@@ -201,23 +201,23 @@ const BenchmarkTrust = () => {
                       }`}
                       style={{ animationDelay: tableVisible ? `${i * 80}ms` : '0ms' }}
                     >
-                      <td className="px-6 sm:px-8 py-4">
+                      <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4">
                         <span
-                          className="text-sm sm:text-base font-semibold text-[var(--text-primary)]"
+                          className="text-xs sm:text-sm md:text-base font-semibold text-[var(--text-primary)]"
                           style={{ fontFamily: 'var(--font-ui)' }}
                         >
                           {bench.name}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-center">
+                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center">
                         <span
-                          className="text-sm text-[var(--text-secondary)]"
+                          className="text-xs sm:text-sm text-[var(--text-secondary)]"
                           style={{ fontFamily: 'var(--font-ui)' }}
                         >
                           {bench.samples.toLocaleString()}
                         </span>
                       </td>
-                      <td className="px-6 sm:px-8 py-4 text-right">
+                      <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-right">
                         <span
                           className={`inline-flex items-center gap-1.5 text-sm sm:text-base font-bold ${
                             bench.quality >= 100 ? 'text-emerald-400' : 'text-[var(--accent-primary)]'

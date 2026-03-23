@@ -271,25 +271,25 @@ const SmartRouterComparison = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask a question..."
-              className="w-full px-5 py-4 pr-32 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] shadow-sm text-lg"
+              className="w-full px-4 sm:px-5 py-3 sm:py-4 pr-24 sm:pr-32 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] shadow-sm text-base sm:text-lg"
               onKeyDown={(e) => e.key === 'Enter' && handleCompare()}
             />
             <button
               onClick={handleCompare}
               disabled={isProcessing || !query}
-              className="absolute right-2 top-2 bottom-2 px-6 bg-[var(--accent-primary)] text-white font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-2 top-2 bottom-2 px-3 sm:px-6 text-sm sm:text-base bg-[var(--accent-primary)] text-white font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? 'Routing...' : 'Compare'}
             </button>
           </div>
 
           {/* Examples */}
-          <div className="flex flex-wrap justify-center gap-3 mt-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-4 px-1">
             {examples.map((ex, i) => (
               <button
                 key={i}
                 onClick={() => setQuery(ex)}
-                className="text-xs sm:text-sm px-3 py-1.5 rounded-full bg-[var(--bg-primary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors"
+                className="text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 rounded-full bg-[var(--bg-primary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors max-w-full text-center"
               >
                 "{ex}"
               </button>
@@ -307,12 +307,12 @@ const SmartRouterComparison = () => {
         </div>
 
         {/* Results Comparison Area */}
-        <div className="grid md:grid-cols-2 gap-0 relative">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-0 relative">
           {/* Vertical Divider for Desktop */}
           <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-[var(--border-secondary)] -ml-px z-10"></div>
 
           {/* Selected Model Side */}
-          <div className="p-6 sm:p-8 bg-[var(--bg-secondary)] relative group min-h-[300px] flex flex-col">
+          <div className="p-4 sm:p-6 md:p-8 bg-[var(--bg-secondary)] relative group min-h-[250px] sm:min-h-[300px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs">AI</div>
@@ -356,10 +356,10 @@ const SmartRouterComparison = () => {
             <div className={`transition-opacity duration-300 ${stdResult.cost ? 'opacity-100' : 'opacity-0'}`}>
               <div className="bg-[var(--bg-primary)] rounded-xl p-4 border border-[var(--border-secondary)]">
                 <div className="flex justify-between items-end mb-1">
-                  <span className="text-sm text-[var(--text-tertiary)]">Direct Cost</span>
-                  <span className="text-xl font-bold text-gray-500">{stdResult.cost}</span>
+                  <span className="text-xs sm:text-sm text-[var(--text-tertiary)]">Direct Cost</span>
+                  <span className="text-lg sm:text-xl font-bold text-gray-500">{stdResult.cost}</span>
                 </div>
-                <div className="flex justify-between text-xs text-[var(--text-tertiary)] mt-2">
+                <div className="flex justify-between text-[10px] sm:text-xs text-[var(--text-tertiary)] mt-2">
                   <span>Time: {stdResult.time}s</span>
                   <span>Model: {selectedModelObj.name}</span>
                 </div>
@@ -367,8 +367,11 @@ const SmartRouterComparison = () => {
             </div>
           </div>
 
+          {/* Horizontal Divider for Mobile */}
+          <div className="md:hidden h-px bg-[var(--border-secondary)]"></div>
+
           {/* Herma Router Side */}
-          <div className="p-6 sm:p-8 bg-[var(--bg-secondary)]/50 relative overflow-hidden min-h-[300px] flex flex-col">
+          <div className="p-4 sm:p-6 md:p-8 bg-[var(--bg-secondary)]/50 relative overflow-hidden min-h-[250px] sm:min-h-[300px] flex flex-col">
             {/* Highlight Glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent-primary)]/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
 
@@ -417,13 +420,13 @@ const SmartRouterComparison = () => {
             <div className={`transition-opacity duration-300 ${hermaResult.cost ? 'opacity-100' : 'opacity-0'} relative z-10`}>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-[var(--accent-primary)] shadow-[0_0_20px_rgba(255,255,255,0.5)] dark:shadow-none">
                 <div className="flex justify-between items-end mb-1">
-                  <span className="text-sm text-[var(--text-primary)] font-medium">Herma Cost</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-green-500 bg-green-100 px-1.5 py-0.5 rounded uppercase tracking-wider">SAVINGS</span>
-                    <span className="text-2xl font-bold text-[var(--accent-primary)]">{hermaResult.cost}</span>
+                  <span className="text-xs sm:text-sm text-[var(--text-primary)] font-medium">Herma Cost</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-[10px] sm:text-xs font-bold text-green-500 bg-green-100 px-1 sm:px-1.5 py-0.5 rounded uppercase tracking-wider">SAVINGS</span>
+                    <span className="text-lg sm:text-2xl font-bold text-[var(--accent-primary)]">{hermaResult.cost}</span>
                   </div>
                 </div>
-                <div className="flex justify-between text-xs text-[var(--text-tertiary)] mt-2">
+                <div className="flex justify-between text-[10px] sm:text-xs text-[var(--text-tertiary)] mt-2">
                   <span>Time: {hermaResult.time}s</span>
                   <span>$2/M input, $8/M output</span>
                 </div>
@@ -433,8 +436,8 @@ const SmartRouterComparison = () => {
         </div>
 
         {/* Footer Info */}
-        <div className="bg-[var(--bg-tertiary)] p-4 text-center border-t border-[var(--border-secondary)]">
-          <p className="text-xs text-[var(--text-tertiary)]">
+        <div className="bg-[var(--bg-tertiary)] p-3 sm:p-4 text-center border-t border-[var(--border-secondary)]">
+          <p className="text-[10px] sm:text-xs text-[var(--text-tertiary)] px-1">
             * Real-time comparison. Left shows the model's retail pricing. Right shows what you pay through Herma ($2/M input, $8/M output).
           </p>
         </div>

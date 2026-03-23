@@ -63,7 +63,7 @@ const FAQ = () => {
         </div>
 
         {/* FAQ Accordion */}
-        <div className="space-y-4 bg-white rounded-2xl p-8 shadow-xl border border-blue-100">
+        <div className="space-y-4 bg-white rounded-2xl p-4 sm:p-8 shadow-xl border border-blue-100">
           {faqItems.map((item) => (
             <div 
               key={item.id} 

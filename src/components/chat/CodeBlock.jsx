@@ -39,18 +39,20 @@ const CodeBlock = ({ language, children }) => {
           )}
         </button>
       </div>
-      <SyntaxHighlighter
-        language={language || 'text'}
-        style={oneDark}
-        customStyle={{
-          margin: 0,
-          borderRadius: 0,
-          fontSize: '0.875rem',
-          fontFamily: 'var(--font-code)',
-        }}
-      >
-        {children}
-      </SyntaxHighlighter>
+      <div className="overflow-x-auto">
+        <SyntaxHighlighter
+          language={language || 'text'}
+          style={oneDark}
+          customStyle={{
+            margin: 0,
+            borderRadius: 0,
+            fontFamily: 'var(--font-code)',
+          }}
+          className="text-xs sm:text-sm"
+        >
+          {children}
+        </SyntaxHighlighter>
+      </div>
     </div>
   );
 };

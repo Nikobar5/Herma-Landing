@@ -83,11 +83,12 @@ const response = await client.chat.completions.create({
               </div>
 
               {/* Syntax Highlighter */}
-              <div className="p-4 overflow-x-auto">
+              <div className="p-3 sm:p-4 overflow-x-auto">
                 <SyntaxHighlighter
                   language="javascript"
                   style={atomDark}
-                  customStyle={{ background: 'transparent', padding: 0, margin: 0, fontSize: '0.9rem' }}
+                  customStyle={{ background: 'transparent', padding: 0, margin: 0 }}
+                  className="text-xs sm:text-sm"
                   wrapLongLines={true}
                 >
                   {codeString}

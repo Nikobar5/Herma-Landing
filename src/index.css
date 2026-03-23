@@ -16,9 +16,10 @@ code {
     monospace;
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling + prevent horizontal overflow on mobile */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Custom animations */
