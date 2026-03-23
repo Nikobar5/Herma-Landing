@@ -7,6 +7,7 @@ import Hero from './components/Hero';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import ComplianceSection from './components/ComplianceSection';
+import BenchmarkTrust from './components/BenchmarkTrust';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -109,6 +110,7 @@ const Home = () => {
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
+      <BenchmarkTrust />
       <ComplianceSection />
     </>
   );
