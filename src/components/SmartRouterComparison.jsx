@@ -85,8 +85,10 @@ const DEMO_STORAGE_KEY = 'herma_demo_queries';
 // Supported models and their retail pricing (per 1M tokens)
 const FALLBACK_MODELS = [
   { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', promptPrice: 2.5, completionPrice: 10 },
-  { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4', provider: 'Anthropic', promptPrice: 3, completionPrice: 15 },
-  { id: 'google/gemini-2.5-pro-preview-05-06', name: 'Gemini 2.5 Pro', provider: 'Google', promptPrice: 2.5, completionPrice: 15 },
+  { id: 'anthropic/claude-sonnet-4.6', name: 'Claude Sonnet 4.6', provider: 'Anthropic', promptPrice: 3, completionPrice: 15 },
+  { id: 'anthropic/claude-opus-4.6', name: 'Claude Opus 4.6', provider: 'Anthropic', promptPrice: 15, completionPrice: 75 },
+  { id: 'openai/gpt-5.2', name: 'GPT-5.2', provider: 'OpenAI', promptPrice: 1.75, completionPrice: 14 },
+  { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'Google', promptPrice: 2.5, completionPrice: 15 },
   { id: 'openai/o3', name: 'o3', provider: 'OpenAI', promptPrice: 2, completionPrice: 8 },
 ];
 
@@ -277,7 +279,7 @@ const SmartRouterComparison = () => {
             <button
               onClick={handleCompare}
               disabled={isProcessing || !query}
-              className="absolute right-2 top-2 bottom-2 px-3 sm:px-6 text-sm sm:text-base bg-[var(--accent-primary)] text-white font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] px-3 sm:px-6 text-sm sm:text-base bg-[var(--accent-primary)] text-white font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? 'Routing...' : 'Compare'}
             </button>
@@ -289,7 +291,7 @@ const SmartRouterComparison = () => {
               <button
                 key={i}
                 onClick={() => setQuery(ex)}
-                className="text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 rounded-full bg-[var(--bg-primary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors max-w-full text-center"
+                className="text-xs sm:text-sm px-3 sm:px-3 py-2.5 sm:py-1.5 rounded-full bg-[var(--bg-primary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors max-w-full text-center min-h-[44px] flex items-center"
               >
                 "{ex}"
               </button>

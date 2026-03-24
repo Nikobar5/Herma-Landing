@@ -53,7 +53,7 @@ All backend functionality is provided by the Herma API (FastAPI) deployed on Rai
 
 **Routing & Navigation**:
 - `src/App.jsx` — BrowserRouter with main route definitions
-- Routes: `/`, `/login`, `/upgrade`, `/success`, `/cancel`, `/dashboard`, `/docs`, `/privacy-policy`, `/terms-of-service`, `/attributions`
+- Routes: `/`, `/login`, `/verify-email`, `/reset-password`, `/demo`, `/docs`, `/about`, `/faq`, `/blog`, `/blog/*`, `/upgrade`, `/success`, `/cancel`, `/chat`, `/dashboard`, `/admin`, `/privacy-policy`, `/terms-of-service`, `/attributions`
 
 ### Data Flow Patterns
 

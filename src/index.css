@@ -17,7 +17,7 @@ code {
 }
 
 /* Smooth scrolling + prevent horizontal overflow on mobile */
-html {
+html, body {
   scroll-behavior: smooth;
   overflow-x: hidden;
 }

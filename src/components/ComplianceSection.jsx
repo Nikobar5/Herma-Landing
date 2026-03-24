@@ -7,7 +7,7 @@ const ComplianceSection = () => {
   const [complianceRef, complianceVisible] = useScrollAnimation(0.1);
 
   return (
-    <section className="py-24 bg-[var(--bg-primary)]" id="compliance">
+    <section className="py-24 bg-[var(--bg-primary)] overflow-hidden" id="compliance">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div

@@ -12,17 +12,32 @@ const SuccessPage = () => {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // Short delay to let the webhook process the payment
-    const timer = setTimeout(() => {
+    let cancelled = false;
+    let attempt = 0;
+    const maxAttempts = 4;
+    const delays = [1000, 2000, 3000, 4000];
+
+    const fetchBalance = () => {
       getBalance()
         .then((data) => {
-          setBalance(data.balance ?? data.balance_usd ?? 0);
+          if (cancelled) return;
+          const bal = data.balance ?? data.balance_usd ?? 0;
+          setBalance(bal);
+          setLoading(false);
         })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }, 2000);
+        .catch(() => {
+          if (cancelled) return;
+          attempt++;
+          if (attempt < maxAttempts) {
+            setTimeout(fetchBalance, delays[attempt]);
+          } else {
+            setLoading(false);
+          }
+        });
+    };
 
-    return () => clearTimeout(timer);
+    const timer = setTimeout(fetchBalance, delays[0]);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [isAuthenticated]);
 
   if (!isAuthenticated) {

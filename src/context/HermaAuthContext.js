@@ -75,7 +75,15 @@ export function HermaAuthProvider({ children }) {
     setEmailVerified,
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <HermaAuthContext.Provider value={{ ...value, loading: true }}>
+        <div className="flex items-center justify-center min-h-screen bg-gray-950">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      </HermaAuthContext.Provider>
+    );
+  }
 
   return (
     <HermaAuthContext.Provider value={value}>

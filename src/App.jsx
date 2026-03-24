@@ -41,6 +41,16 @@ const ShadowRouting = lazy(() => import('./pages/blog/ShadowRouting'));
 const EVRouting = lazy(() => import('./pages/blog/EVRouting'));
 const HowWeBenchmark = lazy(() => import('./pages/blog/HowWeBenchmark'));
 
+const NotFound = lazy(() => Promise.resolve({
+  default: () => (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+      <h1 className="text-6xl font-bold text-gray-200 mb-4">404</h1>
+      <p className="text-xl text-gray-400 mb-6">Page not found</p>
+      <a href="/" className="text-blue-400 hover:text-blue-300 underline">Back to home</a>
+    </div>
+  ),
+}));
+
 initAnalytics();
 
 const RouteTracker = () => {
@@ -185,6 +195,7 @@ function App() {
             <Route path="/attributions" element={<Attributions />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/cancel" element={<Home />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>
           <ConditionalFooter />

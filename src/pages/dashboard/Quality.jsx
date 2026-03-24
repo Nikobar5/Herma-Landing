@@ -126,6 +126,7 @@ const Quality = () => {
 
   const totalRequests = data?.total_requests || 0;
   const quality = data?.quality || {};
+  const savings = data?.savings || {};
   const modelDist = (data?.model_distribution || []).map((m, i) => {
     const parts = m.model.split('/');
     return {
@@ -278,6 +279,31 @@ const Quality = () => {
               <p className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>Distinct models routed to</p>
             </div>
           </div>
+
+          {/* Savings Banner */}
+          {savings.savings_pct > 0 && (
+            <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <h2
+                    className="text-xl font-bold text-[var(--text-primary)] tracking-tight"
+                    style={{ fontFamily: 'var(--font-heading)' }}
+                  >
+                    You saved {savings.savings_pct}% vs frontier
+                  </h2>
+                  <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+                    ${savings.actual_cost_usd?.toFixed(4)} actual vs ${savings.frontier_cost_usd?.toFixed(4)} at frontier prices
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-emerald-400" style={{ fontFamily: 'var(--font-heading)' }}>
+                    ${savings.savings_usd?.toFixed(4)}
+                  </div>
+                  <div className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>saved</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Model Distribution Chart */}
           <div className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-2xl p-6">

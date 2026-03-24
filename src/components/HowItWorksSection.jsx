@@ -22,7 +22,7 @@ const response = await client.chat.completions.create({
 });`;
 
   return (
-    <section className="pt-12 sm:pt-16 pb-24 bg-[var(--bg-primary)]" id="how-it-works">
+    <section className="pt-12 sm:pt-16 pb-24 bg-[var(--bg-primary)] overflow-hidden" id="how-it-works">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
