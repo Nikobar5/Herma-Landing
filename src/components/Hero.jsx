@@ -47,11 +47,11 @@ const Hero = () => {
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 font-normal max-w-3xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Swap your API key to Herma. We route each query to the cheapest model that matches frontier quality — automatically. No code changes, no quality loss.
+                Swap your API key to Herma. We route each query to the cheapest model that matches frontier quality, automatically. No code changes, no quality loss.
               </p>
 
-              {/* CTA Button - Centered */}
-              <div className="flex items-center justify-center mb-4 animate-hero-delayed-more">
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 animate-hero-delayed-more">
                 <button
                   onClick={handleTryItOut}
                   className="group relative overflow-hidden px-8 py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] min-w-[200px]"
@@ -59,12 +59,44 @@ const Hero = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   <span className="relative flex items-center justify-center gap-2">
-                    Try it out
+                    Try the demo
                     <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
                 </button>
+                <button
+                  onClick={() => navigate('/docs')}
+                  className="px-8 py-4 border border-[var(--border-secondary)] text-[var(--text-secondary)] font-semibold rounded-lg hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all duration-200 min-w-[200px]"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  View the docs
+                </button>
+              </div>
+
+              {/* Trust signals */}
+              <div
+                className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-[var(--text-tertiary)] animate-hero-delayed-more"
+                style={{ fontFamily: 'var(--font-ui)' }}
+              >
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  No signup required
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  OpenAI-compatible API
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  6/8 benchmarks at 100%+ quality
+                </span>
               </div>
 
             </div>

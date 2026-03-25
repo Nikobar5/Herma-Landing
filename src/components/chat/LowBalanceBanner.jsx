@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-const LOW_BALANCE_THRESHOLD = 0.25;
+const LOW_BALANCE_THRESHOLD = 0.50;
+const CRITICAL_THRESHOLD = 0.10;
 
 const LowBalanceBanner = ({ balance }) => {
   const [dismissed, setDismissed] = useState(false);
@@ -10,12 +11,17 @@ const LowBalanceBanner = ({ balance }) => {
     return null;
   }
 
+  const isCritical = balance < CRITICAL_THRESHOLD;
+  const accentColor = isCritical ? '#EF4444' : '#FBBF24';
+  const bgColor = isCritical ? 'rgba(239, 68, 68, 0.08)' : 'rgba(251, 191, 36, 0.08)';
+  const borderColor = isCritical ? 'rgba(239, 68, 68, 0.15)' : 'rgba(251, 191, 36, 0.15)';
+
   return (
     <div
       className="flex items-center justify-between px-4 py-2 text-sm flex-shrink-0"
       style={{
-        background: 'rgba(251, 191, 36, 0.08)',
-        borderBottom: '1px solid rgba(251, 191, 36, 0.15)',
+        background: bgColor,
+        borderBottom: `1px solid ${borderColor}`,
         fontFamily: 'var(--font-ui)',
         animation: 'lowBalanceFadeIn 0.3s ease-out',
       }}
@@ -24,7 +30,7 @@ const LowBalanceBanner = ({ balance }) => {
         {/* Warning icon */}
         <svg
           className="w-4 h-4 flex-shrink-0"
-          style={{ color: '#FBBF24' }}
+          style={{ color: accentColor }}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -37,13 +43,16 @@ const LowBalanceBanner = ({ balance }) => {
           />
         </svg>
         <span style={{ color: 'var(--text-secondary)' }}>
-          Running low on credits
-          <span className="hidden sm:inline"> — add more to keep chatting</span>
+          {isCritical ? (
+            <>Balance: ${Number(balance).toFixed(2)} — you're almost out</>
+          ) : (
+            <>Balance: ${Number(balance).toFixed(2)}<span className="hidden sm:inline"> — running low on credits</span></>
+          )}
         </span>
         <a
           href="/upgrade"
           className="ml-1 font-medium hover:underline"
-          style={{ color: '#FBBF24' }}
+          style={{ color: accentColor }}
         >
           Add Credits
         </a>

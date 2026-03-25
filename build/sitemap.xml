@@ -21,6 +21,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hermaai.com/blog/how-llm-routers-work</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hermaai.com/blog/llm-api-gateway-vs-router</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://hermaai.com/blog/cost-quality-matrix</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -39,6 +49,21 @@
     <loc>https://hermaai.com/blog/how-we-benchmark</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hermaai.com/blog/best-llm-routers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hermaai.com/blog/agentic-routing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hermaai.com/blog/save-on-ai-costs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hermaai.com/about</loc>

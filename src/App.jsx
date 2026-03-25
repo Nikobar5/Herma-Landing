@@ -8,6 +8,7 @@ import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import ComplianceSection from './components/ComplianceSection';
 import BenchmarkTrust from './components/BenchmarkTrust';
+import RoutePreview from './components/RoutePreview';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -40,6 +41,11 @@ const CostQualityMatrix = lazy(() => import('./pages/blog/CostQualityMatrix'));
 const ShadowRouting = lazy(() => import('./pages/blog/ShadowRouting'));
 const EVRouting = lazy(() => import('./pages/blog/EVRouting'));
 const HowWeBenchmark = lazy(() => import('./pages/blog/HowWeBenchmark'));
+const BestLLMRouters = lazy(() => import('./pages/blog/BestLLMRouters'));
+const AgenticRouting = lazy(() => import('./pages/blog/AgenticRouting'));
+const SaveOnAICosts = lazy(() => import('./pages/blog/SaveOnAICosts'));
+const APIGatewayVsRouter = lazy(() => import('./pages/blog/APIGatewayVsRouter'));
+const HowRoutersWork = lazy(() => import('./pages/blog/HowRoutersWork'));
 
 const NotFound = lazy(() => Promise.resolve({
   default: () => (
@@ -115,11 +121,29 @@ const ConditionalFooter = () => {
 
 // Home component to wrap main page content
 const Home = () => {
+  useEffect(() => {
+    // Organization structured data for rich search results
+    const script = document.createElement('script');
+    script.id = 'ld-organization';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Herma AI',
+      url: 'https://hermaai.com',
+      description: 'Intelligent LLM router — same AI quality, 60-90% cheaper. OpenAI-compatible API.',
+      sameAs: ['https://github.com/Nikobar5/herma-eval'],
+    });
+    document.head.appendChild(script);
+    return () => { document.getElementById('ld-organization')?.remove(); };
+  }, []);
+
   return (
     <>
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
+      <RoutePreview />
       <BenchmarkTrust />
       <ComplianceSection />
     </>
@@ -189,6 +213,11 @@ function App() {
             <Route path="/blog/shadow-routing" element={<ShadowRouting />} />
             <Route path="/blog/ev-routing" element={<EVRouting />} />
             <Route path="/blog/how-we-benchmark" element={<HowWeBenchmark />} />
+            <Route path="/blog/best-llm-routers" element={<BestLLMRouters />} />
+            <Route path="/blog/agentic-routing" element={<AgenticRouting />} />
+            <Route path="/blog/save-on-ai-costs" element={<SaveOnAICosts />} />
+            <Route path="/blog/llm-api-gateway-vs-router" element={<APIGatewayVsRouter />} />
+            <Route path="/blog/how-llm-routers-work" element={<HowRoutersWork />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />

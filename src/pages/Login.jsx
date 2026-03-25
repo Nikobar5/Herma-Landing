@@ -21,6 +21,9 @@ const Login = () => {
   // Check for ?redirect=comparison in the URL
   const searchParams = new URLSearchParams(window.location.search);
   const redirectParam = searchParams.get('redirect');
+  // Generic ?next=/path param — used when redirecting unauthenticated users
+  // from protected pages so they return to their intended destination after login.
+  const nextParam = searchParams.get('next');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -57,6 +60,9 @@ const Login = () => {
         setTimeout(() => {
           document.getElementById('see-the-difference')?.scrollIntoView({ behavior: 'smooth' });
         }, 300);
+      } else if (nextParam) {
+        // Return the user to their intended destination (e.g. /upgrade, /success)
+        navigate(nextParam, { replace: true });
       } else {
         navigate(isLogin ? (from || '/dashboard') : '/chat', { replace: true });
       }
@@ -90,7 +96,7 @@ const Login = () => {
         >
           {isLogin
             ? 'Access your API dashboard'
-            : 'Get started with Herma API'}
+            : 'Get started with $1.00 in free credits'}
         </p>
       </div>
 

@@ -6,9 +6,9 @@ const HERMA_INPUT_PRICE = 2.0;
 const HERMA_OUTPUT_PRICE = 8.0;
 
 const FALLBACK_MODELS = [
+  { id: 'anthropic/claude-opus-4.6', name: 'Claude Opus 4.6', provider: 'Anthropic', promptPrice: 15, completionPrice: 75 },
   { id: 'openai/gpt-4o', name: 'GPT-4o', provider: 'OpenAI', promptPrice: 2.5, completionPrice: 10 },
   { id: 'anthropic/claude-sonnet-4.6', name: 'Claude Sonnet 4.6', provider: 'Anthropic', promptPrice: 3, completionPrice: 15 },
-  { id: 'anthropic/claude-opus-4.6', name: 'Claude Opus 4.6', provider: 'Anthropic', promptPrice: 15, completionPrice: 75 },
   { id: 'openai/gpt-5.2', name: 'GPT-5.2', provider: 'OpenAI', promptPrice: 1.75, completionPrice: 14 },
   { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'Google', promptPrice: 2.5, completionPrice: 15 },
   { id: 'openai/o3', name: 'o3', provider: 'OpenAI', promptPrice: 2, completionPrice: 8 },

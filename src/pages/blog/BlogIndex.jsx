@@ -5,6 +5,46 @@ import { setPageMeta, resetPageMeta } from '../../utils/seo';
 
 const blogPosts = [
   {
+    slug: 'how-llm-routers-work',
+    title: 'How LLM Routers Work: A Technical Deep Dive',
+    description:
+      'Inside the routing pipeline: query classification, model selection, shadow validation, and expected value optimization. A technical guide for AI engineers.',
+    tag: 'Engineering',
+    date: 'March 2026',
+  },
+  {
+    slug: 'llm-api-gateway-vs-router',
+    title: 'LLM API Gateway vs Model Router: What\'s the Difference?',
+    description:
+      'API gateways handle plumbing. Model routers handle intelligence. Learn the difference and why modern AI apps need both — and how to get them in one integration.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
+    slug: 'save-on-ai-costs',
+    title: 'How to Save 65% on AI API Costs Without Losing Quality',
+    description:
+      'Most AI apps overpay by sending every query to frontier models. Learn how intelligent model routing cuts costs by 65% while maintaining quality — with benchmark data to prove it.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
+    slug: 'agentic-routing',
+    title: 'LLM Routing for Agentic AI: Why Single-Turn Routers Fail',
+    description:
+      'Agentic AI workflows break traditional LLM routers. Multi-turn tool use, context persistence, and error recovery demand a different routing strategy.',
+    tag: 'Engineering',
+    date: 'March 2026',
+  },
+  {
+    slug: 'best-llm-routers',
+    title: 'Best LLM Routers in 2026: A Technical Comparison',
+    description:
+      'Compare the top LLM routers — RouteLLM, Martian, Unify, OpenRouter, and Herma. Evaluation criteria, architecture differences, and which router fits your use case.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
     slug: 'ev-routing',
     title: 'Why AI Routers Fail -- And How Expected Value Fixes Them',
     description:

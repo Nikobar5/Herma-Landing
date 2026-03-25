@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
+import FunnelTab from './dashboard/FunnelTab';
 import {
   getAdminOverview,
   getAdminDaily,
@@ -38,6 +39,7 @@ import {
   getCsuiteOverview,
   getAdminLatency,
   getSiteAnalytics,
+  getRetentionOverview,
 } from '../services/hermaApi';
 
 function fmt(n, decimals = 2) {
@@ -127,6 +129,7 @@ export default function AdminDashboard() {
   const [, setCsuiteData] = useState(null);
   const [latencyData, setLatencyData] = useState(null);
   const [siteAnalytics, setSiteAnalytics] = useState(null);
+  const [retention, setRetention] = useState(null);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [notifDropdownData, setNotifDropdownData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -137,7 +140,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs, lat, sa] = await Promise.all([
+      const [ov, dy, hr, md, rc, mem, rt, ql, ag, hier, trust, perms, nc, bud, qa, cs, lat, sa, ret] = await Promise.all([
         getAdminOverview(),
         getAdminDaily(30),
         getAdminHourly(24),
@@ -156,6 +159,7 @@ export default function AdminDashboard() {
         getCsuiteOverview().catch(() => null),
         getAdminLatency(7).catch(() => null),
         getSiteAnalytics(30).catch(() => null),
+        getRetentionOverview().catch(() => null),
       ]);
       setOverview(ov);
       setDaily(dy);
@@ -175,6 +179,7 @@ export default function AdminDashboard() {
       setCsuiteData(cs);
       setLatencyData(lat);
       setSiteAnalytics(sa);
+      setRetention(ret);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -232,7 +237,9 @@ export default function AdminDashboard() {
     { id: 'agents', label: 'Agents' },
     { id: 'memory', label: 'Memory' },
     { id: 'reports', label: 'Reports' },
+    { id: 'retention', label: 'Retention' },
     { id: 'site-analytics', label: 'Site Analytics' },
+    { id: 'funnel', label: 'Funnel' },
   ];
 
   return (
@@ -376,7 +383,9 @@ export default function AdminDashboard() {
         {tab === 'agents' && <AgentsTab agents={agents} trustScores={trustScores} />}
         {tab === 'memory' && <MemoryTab memory={memory} />}
         {tab === 'reports' && <ReportsTab />}
+        {tab === 'retention' && <RetentionTab data={retention} />}
         {tab === 'site-analytics' && <SiteAnalyticsTab data={siteAnalytics} />}
+        {tab === 'funnel' && <FunnelTab />}
       </div>
     </div>
   );
@@ -2038,6 +2047,84 @@ function LatencyTab({ latency }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function RetentionTab({ data }) {
+  if (!data) return <div className="text-[var(--text-tertiary)] text-center py-12">No retention data yet.</div>;
+
+  const statusColor = (s) => s === 'active' ? 'text-green-400' : s === 'at_risk' ? 'text-yellow-400' : 'text-red-400';
+  const statusBg = (s) => s === 'active' ? 'bg-green-400/10' : s === 'at_risk' ? 'bg-yellow-400/10' : 'bg-red-400/10';
+
+  return (
+    <div className="space-y-6">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <StatCard label="Total" value={data.total} />
+        <StatCard label="Active (7d)" value={data.active} accent />
+        <StatCard label="At Risk (8-30d)" value={data.at_risk} />
+        <StatCard label="Churned (30d+)" value={data.churned} />
+      </div>
+
+      {/* Customer table */}
+      <div className="bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-secondary)] overflow-hidden">
+        <div className="px-5 py-3 border-b border-[var(--border-primary)]">
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+            Customer Retention Detail
+          </h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--border-primary)] text-[var(--text-tertiary)]">
+                <th className="text-left py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Email</th>
+                <th className="text-center py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Status</th>
+                <th className="text-right py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>7d Reqs</th>
+                <th className="text-right py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>30d Reqs</th>
+                <th className="text-right py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Total</th>
+                <th className="text-right py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Trend</th>
+                <th className="text-right py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Spend</th>
+                <th className="text-right py-2 px-4 font-medium" style={{ fontFamily: 'var(--font-ui)' }}>Last Seen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.customers.map((c) => (
+                <tr key={c.customer_id} className="border-b border-[var(--border-primary)] hover:bg-[var(--bg-primary)]/50">
+                  <td className="py-2 px-4 text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-code)' }}>
+                    {c.email}
+                  </td>
+                  <td className="py-2 px-4 text-center">
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${statusColor(c.status)} ${statusBg(c.status)}`}>
+                      {c.status}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4 text-right text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-code)' }}>
+                    {c.requests_7d}
+                  </td>
+                  <td className="py-2 px-4 text-right text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-code)' }}>
+                    {c.requests_30d}
+                  </td>
+                  <td className="py-2 px-4 text-right text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-code)' }}>
+                    {c.total_requests}
+                  </td>
+                  <td className="py-2 px-4 text-right" style={{ fontFamily: 'var(--font-code)' }}>
+                    <span className={c.weekly_trend >= 1 ? 'text-green-400' : c.weekly_trend > 0 ? 'text-yellow-400' : 'text-[var(--text-tertiary)]'}>
+                      {c.weekly_trend > 0 ? `${c.weekly_trend.toFixed(1)}x` : '—'}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4 text-right text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-code)' }}>
+                    {fmtUsd(c.total_spend)}
+                  </td>
+                  <td className="py-2 px-4 text-right text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+                    {c.days_since_last_request === 0 ? 'today' : `${c.days_since_last_request}d ago`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

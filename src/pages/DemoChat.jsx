@@ -213,6 +213,22 @@ const DemoMessage = React.memo(({ message, isLast, isStreaming }) => {
                 </>
               )}
             </button>
+            {message.routing && (
+              <span
+                className="inline-flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]"
+                style={{ fontFamily: 'var(--font-code)' }}
+              >
+                <svg className="w-3 h-3 text-[var(--accent-primary)]" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                </svg>
+                {message.routing.model_used}
+                {message.routing.prompt_tokens > 0 && (
+                  <span className="text-[var(--text-tertiary)]">
+                    {' '}({message.routing.prompt_tokens + message.routing.completion_tokens} tokens)
+                  </span>
+                )}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -292,6 +308,13 @@ const DemoChat = () => {
               const updated = [...prev];
               const last = updated[updated.length - 1];
               updated[updated.length - 1] = { ...last, content: last.content + chunk.content };
+              return updated;
+            });
+          } else if (chunk.type === 'routing') {
+            setMessages((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              updated[updated.length - 1] = { ...last, routing: chunk.routing };
               return updated;
             });
           }

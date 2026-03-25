@@ -412,6 +412,78 @@ while (true) {
           </div>
         </section>
 
+        {/* Models */}
+        <section className="mb-12">
+          <h2
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Models
+          </h2>
+          <p
+            className="text-[var(--text-secondary)] mb-6"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Use <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code> and
+            Herma will route each request to the best model for the task — same quality, lower cost. Or specify a model directly.
+          </p>
+
+          <div
+            className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] overflow-hidden mb-6"
+            style={{ borderRadius: 'var(--radius-md)' }}
+          >
+            <table className="w-full text-sm" style={{ fontFamily: 'var(--font-ui)' }}>
+              <thead>
+                <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-primary)]">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Model</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Description</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-primary)]">
+                <tr>
+                  <td className="px-4 py-3">
+                    <code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code>
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">Recommended</span>
+                  </td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Automatic routing — Herma picks the best model for each request</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>anthropic/*</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Claude models (Opus, Sonnet, Haiku)</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>openai/*</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">GPT models (GPT-4o, GPT-4, GPT-3.5)</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>google/gemini-2.5*</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Gemini 2.5 models</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>deepseek/*</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">DeepSeek models</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>mistralai/*</code></td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Mistral models</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            className="bg-[var(--accent-muted)] border border-[var(--border-accent)] p-5 sm:p-6"
+            style={{ borderRadius: 'var(--radius-md)' }}
+          >
+            <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+              <strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>How auto-routing works:</strong>{' '}
+              Herma analyzes each request and routes it to the model that delivers the best quality for that specific task.
+              Simple questions go to efficient models. Complex reasoning, code generation, and multi-step tasks go to frontier models.
+              You get top-tier quality at a fraction of the cost.
+            </p>
+          </div>
+        </section>
+
         {/* Response Format */}
         <section className="mb-12">
           <h2
@@ -488,6 +560,72 @@ while (true) {
               </tbody>
             </table>
           </div>
+        </section>
+
+        {/* Classify Endpoint */}
+        <section className="mb-12">
+          <h2
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Test the Router
+          </h2>
+          <p className="text-[var(--text-secondary)] mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+            See exactly what the router would do with your queries before committing.
+            The classify endpoint is free and requires no authentication.
+          </p>
+          <CodeBlock language="bash">{`curl -X POST https://api.hermaai.com/v1/classify \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "messages": [
+      {"role": "user", "content": "Implement a distributed cache with LRU eviction"}
+    ]
+  }'`}</CodeBlock>
+          <p className="text-[var(--text-tertiary)] mt-3 mb-4 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+            Response:
+          </p>
+          <CodeBlock language="json">{`{
+  "classification": {
+    "category": "coding",
+    "difficulty": "hard",
+    "is_agentic": false
+  },
+  "routing": {
+    "model": "anthropic/claude-opus-4.6",
+    "cell": "coding:hard",
+    "confidence": "opus_required",
+    "pass_rate": 1.0
+  },
+  "cost_estimate": {
+    "frontier_cost_usd": 0.0675,
+    "routed_cost_usd": 0.0675,
+    "savings_pct": 0.0
+  }
+}`}</CodeBlock>
+          <p className="text-[var(--text-secondary)] mt-4 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+            Hard queries stay on frontier models (no savings, no quality risk).
+            Try a simpler query to see the savings.
+          </p>
+        </section>
+
+        {/* List Models */}
+        <section className="mb-12">
+          <h2
+            className="text-2xl font-bold text-[var(--text-primary)] mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            List Available Models
+          </h2>
+          <p className="text-[var(--text-secondary)] mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+            The standard OpenAI <code className="bg-[var(--bg-secondary)] px-1.5 py-0.5 rounded text-[var(--accent-primary)] text-sm">/v1/models</code> endpoint
+            lets tools like Cursor, Continue, and Cody auto-discover available models.
+          </p>
+          <CodeBlock language="bash">{`curl https://api.hermaai.com/v1/models \\
+  -H "Authorization: Bearer YOUR_API_KEY"`}</CodeBlock>
+          <p className="text-[var(--text-secondary)] mt-3 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+            Returns <code className="bg-[var(--bg-secondary)] px-1 py-0.5 rounded text-[var(--accent-primary)] text-sm">herma-auto</code> (the
+            intelligent router) plus all supported upstream models.
+          </p>
         </section>
 
         {/* Rate Limits */}

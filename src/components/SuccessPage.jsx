@@ -4,18 +4,26 @@ import { useNavigate } from 'react-router-dom';
 import { getBalance } from '../services/hermaApi';
 
 const SuccessPage = () => {
-  const { isAuthenticated } = useHermaAuth();
+  const { isAuthenticated, loading: authLoading } = useHermaAuth();
   const navigate = useNavigate();
   const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      // Preserve intent — user will be sent back to /success after login
+      navigate('/login?next=/success');
+      return;
+    }
 
     let cancelled = false;
     let attempt = 0;
+    // Webhook processing can take a few seconds after Stripe redirects.
+    // Poll with increasing delays: 2s, 4s, 6s, 8s (up to ~20s total wait).
     const maxAttempts = 4;
-    const delays = [1000, 2000, 3000, 4000];
+    const delays = [2000, 4000, 6000, 8000];
 
     const fetchBalance = () => {
       getBalance()
@@ -38,21 +46,25 @@ const SuccessPage = () => {
 
     const timer = setTimeout(fetchBalance, delays[0]);
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authLoading, navigate]);
 
-  if (!isAuthenticated) {
+  // Auto-redirect countdown to dashboard (not chat — user may want to verify balance first)
+  useEffect(() => {
+    if (!isAuthenticated || loading) return;
+    if (countdown <= 0) {
+      navigate('/dashboard/billing');
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, loading, countdown, navigate]);
+
+  // While auth context is hydrating from localStorage, show a neutral spinner
+  // rather than the "Please Sign In" screen which users see as an error.
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>Please Sign In</h2>
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
-            style={{ fontFamily: 'var(--font-ui)' }}
-          >
-            Sign In
-          </button>
-        </div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent-primary)]"></div>
       </div>
     );
   }
@@ -87,7 +99,8 @@ const SuccessPage = () => {
             {loading ? (
               <div>
                 <div className="animate-spin inline-block w-8 h-8 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full mb-4"></div>
-                <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>Loading your balance...</p>
+                <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>Confirming your payment...</p>
+                <p className="text-xs text-[var(--text-tertiary)] mt-2" style={{ fontFamily: 'var(--font-body)' }}>This usually takes a few seconds.</p>
               </div>
             ) : (
               <>
@@ -96,6 +109,9 @@ const SuccessPage = () => {
                   ${Number(balance).toFixed(2)}
                 </div>
                 <div className="text-sm text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>in API credits</div>
+                <p className="text-xs text-[var(--text-tertiary)] mt-3" style={{ fontFamily: 'var(--font-body)' }}>
+                  Credits may take up to 30 seconds to appear. Check your billing page if the balance looks incorrect.
+                </p>
               </>
             )}
           </div>
@@ -105,8 +121,19 @@ const SuccessPage = () => {
         <div className="bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-primary)] p-6 mb-8">
           <div className="grid sm:grid-cols-3 gap-4">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/chat')}
               className="px-6 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-300 flex items-center justify-center gap-2"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Start Chatting
+            </button>
+
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-6 py-3 bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-semibold rounded-lg hover:bg-[var(--bg-hover)] transition duration-300 flex items-center justify-center gap-2 border border-[var(--border-secondary)]"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,27 +143,27 @@ const SuccessPage = () => {
             </button>
 
             <button
-              onClick={() => navigate('/upgrade')}
-              className="px-6 py-3 bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-semibold rounded-lg hover:bg-[var(--bg-hover)] transition duration-300 flex items-center justify-center gap-2 border border-[var(--border-secondary)]"
-              style={{ fontFamily: 'var(--font-ui)' }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Buy More Credits
-            </button>
-
-            <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard/billing')}
               className="px-6 py-3 border-2 border-[var(--border-secondary)] text-[var(--text-secondary)] font-semibold rounded-lg hover:border-[var(--border-accent)] hover:text-[var(--text-primary)] transition duration-300 flex items-center justify-center gap-2"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              Home
+              Billing
             </button>
           </div>
+          {!loading && (
+            <p className="text-center text-xs text-[var(--text-tertiary)] mt-4" style={{ fontFamily: 'var(--font-ui)' }}>
+              Redirecting to billing in {countdown}s...{' '}
+              <button
+                onClick={() => setCountdown(999)}
+                className="underline hover:text-[var(--text-secondary)] transition-colors"
+              >
+                Stay here
+              </button>
+            </p>
+          )}
         </div>
 
         {/* Help */}

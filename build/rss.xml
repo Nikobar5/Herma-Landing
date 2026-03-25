@@ -5,8 +5,48 @@
     <link>https://hermaai.com/blog</link>
     <description>Technical deep-dives on intelligent model routing from the Herma engineering team.</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 22 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 24 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://hermaai.com/rss.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>How LLM Routers Work: A Technical Deep Dive</title>
+      <link>https://hermaai.com/blog/how-llm-routers-work</link>
+      <description>Inside the routing pipeline: query classification, model selection, shadow validation, and expected value optimization. A technical guide for AI engineers.</description>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://hermaai.com/blog/how-llm-routers-work</guid>
+    </item>
+
+    <item>
+      <title>LLM API Gateway vs Model Router: What's the Difference?</title>
+      <link>https://hermaai.com/blog/llm-api-gateway-vs-router</link>
+      <description>API gateways handle plumbing. Model routers handle intelligence. Learn the difference and why modern AI apps need both — and how to get them in one integration.</description>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://hermaai.com/blog/llm-api-gateway-vs-router</guid>
+    </item>
+
+    <item>
+      <title>How to Save 65% on AI API Costs Without Losing Quality</title>
+      <link>https://hermaai.com/blog/save-on-ai-costs</link>
+      <description>Most AI apps overpay by sending every query to frontier models. Learn how intelligent model routing cuts costs by 65% while maintaining quality.</description>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://hermaai.com/blog/save-on-ai-costs</guid>
+    </item>
+
+    <item>
+      <title>LLM Routing for Agentic AI: Why Single-Turn Routers Fail</title>
+      <link>https://hermaai.com/blog/agentic-routing</link>
+      <description>Agentic AI workflows break traditional LLM routers. Multi-turn tool use, context persistence, and error recovery demand a different routing strategy.</description>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://hermaai.com/blog/agentic-routing</guid>
+    </item>
+
+    <item>
+      <title>Best LLM Routers in 2026: A Technical Comparison</title>
+      <link>https://hermaai.com/blog/best-llm-routers</link>
+      <description>Compare the top LLM routers — RouteLLM, Martian, Unify, OpenRouter, and Herma. Evaluation criteria, architecture differences, and which router fits your use case.</description>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://hermaai.com/blog/best-llm-routers</guid>
+    </item>
 
     <item>
       <title>Why AI Routers Fail -- And How Expected Value Fixes Them</title>

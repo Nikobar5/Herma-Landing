@@ -5,24 +5,24 @@ const PLANS = [
   {
     id: 'starter',
     name: 'Starter',
-    price: '$10/mo',
-    billed: '$12 billed',
-    credits: '$12 in credits/mo',
+    price: '$10',
+    credits: '$12',
+    bonus: '20%',
   },
   {
     id: 'pro',
     name: 'Pro',
-    price: '$25/mo',
-    billed: '$32 billed',
-    credits: '$32 in credits/mo',
+    price: '$25',
+    credits: '$32',
+    bonus: '28%',
     popular: true,
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: '$50/mo',
-    billed: '$65 billed',
-    credits: '$65 in credits/mo',
+    price: '$50',
+    credits: '$65',
+    bonus: '30%',
   },
 ];
 
@@ -63,7 +63,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
         </div>
 
         <p className="text-sm text-[var(--text-secondary)] mb-6" style={{ fontFamily: 'var(--font-body)' }}>
-          Subscribe for monthly credits, or buy a one-time credit package.
+          Subscribe to get bonus credits every month, or buy a one-time package.
         </p>
 
         <div className="space-y-3 mb-6">
@@ -92,18 +92,22 @@ const PaywallModal = ({ isOpen, onClose }) => {
                         Popular
                       </span>
                     )}
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">
+                      +{plan.bonus} bonus
+                    </span>
                   </div>
-                  <span className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                    {plan.credits}
+                  <span className="text-xs text-[var(--text-tertiary)] mt-0.5 block" style={{ fontFamily: 'var(--font-ui)' }}>
+                    Pay {plan.price}/mo &rarr; get {plan.credits} in credits
                   </span>
                 </div>
                 <div className="text-right">
                   <span
-                    className="font-bold text-[var(--text-primary)]"
+                    className="text-lg font-bold text-[var(--text-primary)]"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    {plan.billed}
+                    {plan.price}
                   </span>
+                  <span className="text-xs text-[var(--text-tertiary)] block">/month</span>
                 </div>
               </div>
             </button>

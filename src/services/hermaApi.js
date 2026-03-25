@@ -434,10 +434,22 @@ export function getSiteAnalytics(days = 30) {
   return authFetch(`/admin/analytics/site-analytics?days=${days}`);
 }
 
+// --- Retention (Admin) ---
+
+export function getRetentionOverview() {
+  return authFetch('/admin/analytics/retention');
+}
+
 // --- Latency (Admin) ---
 
 export function getAdminLatency(days = 7) {
   return authFetch(`/admin/analytics/latency?days=${days}`);
+}
+
+// --- Funnel (Admin) ---
+
+export function getAdminFunnel(days = 30) {
+  return authFetch(`/admin/analytics/funnel?days=${days}`);
 }
 
 // --- C-Suite (Admin) ---
@@ -530,6 +542,10 @@ export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpe
             throw err;
           }
           if (parsed.usage) lastUsage = parsed.usage;
+          if (parsed.herma_routing) {
+            onChunk?.({ type: 'routing', routing: parsed.herma_routing });
+            continue;
+          }
           const delta = parsed.choices?.[0]?.delta;
           const reasoning = delta?.reasoning || delta?.reasoning_content;
           if (reasoning) {

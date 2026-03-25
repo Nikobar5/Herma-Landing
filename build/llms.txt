@@ -48,6 +48,16 @@ response = client.chat.completions.create(
 )
 ```
 
+## API Endpoints
+- POST /v1/chat/completions — Chat completion requests (OpenAI-compatible)
+- GET /v1/models — List available models (herma-auto + upstream)
+- POST /v1/classify — Test the router: see classification, model selection, savings (free, no auth)
+
+## Open-Source
+- herma-eval: Benchmark toolkit for LLM routers (pip install herma-eval)
+  - 7 benchmarks: GSM8K, HumanEval+, MMLU, MBPP+, ARC-Challenge, LiveCodeBench, Aider Polyglot
+  - https://github.com/Nikobar5/herma-eval
+
 ## Links
 - Website: https://hermaai.com
 - Documentation: https://hermaai.com/docs
