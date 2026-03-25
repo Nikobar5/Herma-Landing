@@ -74,30 +74,6 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* Trust signals */}
-              <div
-                className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-[var(--text-tertiary)] animate-hero-delayed-more"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  No signup required
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  OpenAI-compatible API
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  6/8 benchmarks at 100%+ quality
-                </span>
-              </div>
 
             </div>
 

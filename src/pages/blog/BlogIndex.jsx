@@ -5,6 +5,14 @@ import { setPageMeta, resetPageMeta } from '../../utils/seo';
 
 const blogPosts = [
   {
+    slug: 'llm-api-pricing-comparison',
+    title: 'LLM API Pricing Comparison 2026: What Every Model Actually Costs',
+    description:
+      'Side-by-side pricing for GPT-4o, Claude 3.5, Gemini, DeepSeek, and Llama. Real workload cost estimates and how intelligent routing cuts your bill by 60-90%.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
     slug: 'how-llm-routers-work',
     title: 'How LLM Routers Work: A Technical Deep Dive',
     description:

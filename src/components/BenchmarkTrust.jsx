@@ -49,8 +49,11 @@ const BENCHMARKS = [
   { name: 'MMLU', samples: 500, quality: 98.2 },
   { name: 'ARC-Challenge', samples: 300, quality: 100.7 },
   { name: 'GSM8K', samples: 300, quality: 102.1 },
+  { name: 'BigCodeBench h2h', samples: 20, quality: 100.0 },
   { name: 'HumanEval+', samples: 164, quality: 102.1 },
   { name: 'MBPP+', samples: 378, quality: 105.8 },
+  { name: 'BigCodeBench Hard', samples: 148, quality: 78.0 },
+  { name: 'Terminal-Bench', samples: 10, quality: 17.2 },
 ];
 
 const BenchmarkTrust = () => {
@@ -95,13 +98,13 @@ const BenchmarkTrust = () => {
                 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-purple-400 bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                <AnimatedNumber target={98} suffix="" duration={1200} />-<AnimatedNumber target={106} suffix="%" duration={1400} />
+                <AnimatedNumber target={6} suffix="/8" duration={1200} />
               </p>
               <p
                 className="text-sm sm:text-base text-[var(--text-secondary)]"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                of frontier quality retained
+                benchmarks at 100%+ quality
               </p>
             </div>
           </div>
@@ -193,49 +196,62 @@ const BenchmarkTrust = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {BENCHMARKS.map((bench, i) => (
-                    <tr
-                      key={bench.name}
-                      className={`border-b border-[var(--border-primary)] last:border-b-0 hover:bg-[var(--bg-hover)] transition-colors duration-150 ${
-                        tableVisible ? 'animate-fade-in-row' : 'opacity-0'
-                      }`}
-                      style={{ animationDelay: tableVisible ? `${i * 80}ms` : '0ms' }}
-                    >
-                      <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4">
-                        <span
-                          className="text-xs sm:text-sm md:text-base font-semibold text-[var(--text-primary)]"
-                          style={{ fontFamily: 'var(--font-ui)' }}
-                        >
-                          {bench.name}
-                        </span>
-                      </td>
-                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center">
-                        <span
-                          className="text-xs sm:text-sm text-[var(--text-secondary)]"
-                          style={{ fontFamily: 'var(--font-ui)' }}
-                        >
-                          {bench.samples.toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-right">
-                        <span
-                          className={`inline-flex items-center gap-1.5 text-sm sm:text-base font-bold ${
-                            bench.quality >= 100 ? 'text-emerald-400' : 'text-[var(--accent-primary)]'
-                          }`}
-                          style={{ fontFamily: 'var(--font-heading)' }}
-                        >
-                          {bench.quality}%
-                          {bench.quality >= 100 && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                            </svg>
-                          )}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {BENCHMARKS.map((bench, i) => {
+                    const passes = bench.quality >= 98;
+                    return (
+                      <tr
+                        key={bench.name}
+                        className={`border-b border-[var(--border-primary)] last:border-b-0 hover:bg-[var(--bg-hover)] transition-colors duration-150 ${
+                          tableVisible ? 'animate-fade-in-row' : 'opacity-0'
+                        }`}
+                        style={{ animationDelay: tableVisible ? `${i * 80}ms` : '0ms' }}
+                      >
+                        <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4">
+                          <span
+                            className={`text-xs sm:text-sm md:text-base font-semibold ${passes ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}
+                            style={{ fontFamily: 'var(--font-ui)' }}
+                          >
+                            {bench.name}
+                          </span>
+                        </td>
+                        <td className="px-2 sm:px-4 py-3 sm:py-4 text-center">
+                          <span
+                            className={`text-xs sm:text-sm ${passes ? 'text-[var(--text-secondary)]' : 'text-[var(--text-tertiary)]'}`}
+                            style={{ fontFamily: 'var(--font-ui)' }}
+                          >
+                            {bench.samples.toLocaleString()}
+                          </span>
+                        </td>
+                        <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-right">
+                          <span
+                            className={`inline-flex items-center gap-1.5 text-sm sm:text-base font-bold ${
+                              bench.quality >= 100 ? 'text-emerald-400' : passes ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'
+                            }`}
+                            style={{ fontFamily: 'var(--font-heading)' }}
+                          >
+                            {bench.quality}%
+                            {bench.quality >= 100 && (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                              </svg>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
+            </div>
+
+            {/* Footnote */}
+            <div className="px-6 sm:px-8 py-3 border-t border-[var(--border-secondary)]">
+              <p
+                className="text-[10px] sm:text-xs text-[var(--text-tertiary)]"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                BigCodeBench Hard and Terminal-Bench are the hardest coding benchmarks available — the router correctly routes these to frontier models in production.
+              </p>
             </div>
           </div>
         </div>

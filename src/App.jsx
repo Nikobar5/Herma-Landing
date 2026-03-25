@@ -8,7 +8,6 @@ import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import ComplianceSection from './components/ComplianceSection';
 import BenchmarkTrust from './components/BenchmarkTrust';
-import RoutePreview from './components/RoutePreview';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -46,6 +45,7 @@ const AgenticRouting = lazy(() => import('./pages/blog/AgenticRouting'));
 const SaveOnAICosts = lazy(() => import('./pages/blog/SaveOnAICosts'));
 const APIGatewayVsRouter = lazy(() => import('./pages/blog/APIGatewayVsRouter'));
 const HowRoutersWork = lazy(() => import('./pages/blog/HowRoutersWork'));
+const LLMPricingComparison = lazy(() => import('./pages/blog/LLMPricingComparison'));
 
 const NotFound = lazy(() => Promise.resolve({
   default: () => (
@@ -143,7 +143,7 @@ const Home = () => {
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
-      <RoutePreview />
+      {/* <RoutePreview /> */}
       <BenchmarkTrust />
       <ComplianceSection />
     </>
@@ -218,6 +218,7 @@ function App() {
             <Route path="/blog/save-on-ai-costs" element={<SaveOnAICosts />} />
             <Route path="/blog/llm-api-gateway-vs-router" element={<APIGatewayVsRouter />} />
             <Route path="/blog/how-llm-routers-work" element={<HowRoutersWork />} />
+            <Route path="/blog/llm-api-pricing-comparison" element={<LLMPricingComparison />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
