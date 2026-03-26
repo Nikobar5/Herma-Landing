@@ -5,6 +5,62 @@ import { setPageMeta, resetPageMeta } from '../../utils/seo';
 
 const blogPosts = [
   {
+    slug: 'deepseek-r1-vs-gpt-5',
+    title: 'DeepSeek R1 vs GPT-5: Developer\'s Comparison Guide (2026)',
+    description:
+      'An honest comparison of DeepSeek R1 and GPT-5.2 across 10 dimensions. Reasoning, code, price, speed, and when to use each — based on real production routing data.',
+    tag: 'Comparison',
+    date: 'March 2026',
+  },
+  {
+    slug: 'best-ai-for-coding',
+    title: 'Best AI for Coding in 2026: 6 Models Compared for Developers',
+    description:
+      'A developer\'s guide to the best AI models for coding. Claude, GPT-4o, DeepSeek, Gemini compared across 12 real development tasks — with honest tradeoffs, pricing, and when to use each.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
+    slug: 'gemini-2-5-pro-vs-gpt-5',
+    title: 'Gemini 2.5 Pro vs GPT-5: Head-to-Head Comparison (2026)',
+    description:
+      'An honest comparison of Google Gemini 2.5 Pro and GPT-5.2 across 10 dimensions. Context window, multimodal, pricing, code, reasoning, and when to use each — with real production data.',
+    tag: 'Comparison',
+    date: 'March 2026',
+  },
+  {
+    slug: 'gpt-5-vs-claude-opus',
+    title: 'GPT-5 vs Claude Opus 4: Which Frontier Model Wins in 2026?',
+    description:
+      'An honest comparison of GPT-5.2 and Claude Opus 4 across 10 dimensions. Reasoning, code, writing, speed, pricing, and use case verdicts — based on real production routing data.',
+    tag: 'Comparison',
+    date: 'March 2026',
+  },
+  {
+    slug: 'claude-vs-gpt-4o',
+    title: 'Claude vs GPT-4o: Head-to-Head Comparison (2026)',
+    description:
+      'An honest comparison of Claude 3.5 Sonnet and GPT-4o across 10 dimensions — coding, writing, reasoning, pricing, speed, and more. Use case verdicts and the real answer most articles miss.',
+    tag: 'Comparison',
+    date: 'March 2026',
+  },
+  {
+    slug: 'openai-alternatives',
+    title: '7 Best OpenAI Alternatives for Developers in 2026',
+    description:
+      'A developer\'s guide to the best OpenAI API alternatives. Compare Claude, Gemini, DeepSeek, Llama, Mistral, and more — with pricing, tradeoffs, and a migration checklist.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
+    slug: 'choose-right-llm',
+    title: 'How to Choose the Right LLM for Your Use Case (2026 Guide)',
+    description:
+      'A practical decision framework for picking the right LLM. Compare GPT-4o, Claude, Gemini, and DeepSeek by task type, quality needs, volume, and budget — with a quick decision tree.',
+    tag: 'Guide',
+    date: 'March 2026',
+  },
+  {
     slug: 'llm-api-pricing-comparison',
     title: 'LLM API Pricing Comparison 2026: What Every Model Actually Costs',
     description:

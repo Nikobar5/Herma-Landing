@@ -46,6 +46,13 @@ const SaveOnAICosts = lazy(() => import('./pages/blog/SaveOnAICosts'));
 const APIGatewayVsRouter = lazy(() => import('./pages/blog/APIGatewayVsRouter'));
 const HowRoutersWork = lazy(() => import('./pages/blog/HowRoutersWork'));
 const LLMPricingComparison = lazy(() => import('./pages/blog/LLMPricingComparison'));
+const ChooseRightLLM = lazy(() => import('./pages/blog/ChooseRightLLM'));
+const OpenAIAlternatives = lazy(() => import('./pages/blog/OpenAIAlternatives'));
+const ClaudeVsGPT4o = lazy(() => import('./pages/blog/ClaudeVsGPT4o'));
+const GPT5VsClaudeOpus = lazy(() => import('./pages/blog/GPT5VsClaudeOpus'));
+const Gemini25VsGPT5 = lazy(() => import('./pages/blog/Gemini25VsGPT5'));
+const BestAIForCoding = lazy(() => import('./pages/blog/BestAIForCoding'));
+const DeepSeekVsGPT5 = lazy(() => import('./pages/blog/DeepSeekVsGPT5'));
 
 const NotFound = lazy(() => Promise.resolve({
   default: () => (
@@ -219,6 +226,13 @@ function App() {
             <Route path="/blog/llm-api-gateway-vs-router" element={<APIGatewayVsRouter />} />
             <Route path="/blog/how-llm-routers-work" element={<HowRoutersWork />} />
             <Route path="/blog/llm-api-pricing-comparison" element={<LLMPricingComparison />} />
+            <Route path="/blog/choose-right-llm" element={<ChooseRightLLM />} />
+            <Route path="/blog/openai-alternatives" element={<OpenAIAlternatives />} />
+            <Route path="/blog/claude-vs-gpt-4o" element={<ClaudeVsGPT4o />} />
+            <Route path="/blog/gpt-5-vs-claude-opus" element={<GPT5VsClaudeOpus />} />
+            <Route path="/blog/gemini-2-5-pro-vs-gpt-5" element={<Gemini25VsGPT5 />} />
+            <Route path="/blog/best-ai-for-coding" element={<BestAIForCoding />} />
+            <Route path="/blog/deepseek-r1-vs-gpt-5" element={<DeepSeekVsGPT5 />} />
             <Route path="/upgrade" element={<PurchasePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
