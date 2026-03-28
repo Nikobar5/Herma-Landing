@@ -458,6 +458,47 @@ export function getCsuiteOverview() {
   return authFetch('/admin/analytics/csuite');
 }
 
+// --- Observability (Admin) ---
+
+export function getObservabilitySummary() {
+  return authFetch('/admin/analytics/observability/summary');
+}
+
+export function getObservabilityHealth() {
+  return authFetch('/admin/analytics/observability/health-ping');
+}
+
+export function postHealthPing(machineId = 'dashboard', meta = {}) {
+  return authFetch('/admin/analytics/observability/health-ping', {
+    method: 'POST',
+    body: JSON.stringify({ machine_id: machineId, meta }),
+  });
+}
+
+export function getObservabilitySessionLogs(limit = 100, level = null) {
+  const params = new URLSearchParams({ limit });
+  if (level) params.set('level', level);
+  return authFetch(`/admin/analytics/observability/session-logs?${params}`);
+}
+
+export function postSessionLog({ level = 'info', message, source = 'dashboard', metadata = {} }) {
+  return authFetch('/admin/analytics/observability/session-logs', {
+    method: 'POST',
+    body: JSON.stringify({ level, message, source, metadata }),
+  });
+}
+
+export function postObservabilityAlert({ alert_type, details }) {
+  return authFetch('/admin/analytics/observability/alert', {
+    method: 'POST',
+    body: JSON.stringify({ alert_type, details }),
+  });
+}
+
+export function getObservabilityAlerts(limit = 50) {
+  return authFetch(`/admin/analytics/observability/alerts?limit=${limit}`);
+}
+
 // --- Conversations (server-side storage) ---
 
 export function createConversation(title = 'New chat') {

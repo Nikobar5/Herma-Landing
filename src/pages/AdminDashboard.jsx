@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
 import FunnelTab from './dashboard/FunnelTab';
+import ObservabilityTab from './dashboard/ObservabilityTab';
 import {
   getAdminOverview,
   getAdminDaily,
@@ -134,6 +135,7 @@ export default function AdminDashboard() {
   const [notifDropdownData, setNotifDropdownData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [primaryTab, setPrimaryTab] = useState('observability');
   const [tab, setTab] = useState('overview');
 
   const loadData = useCallback(async () => {
@@ -222,7 +224,11 @@ export default function AdminDashboard() {
   }
 
   const pendingCount = pendingPerms?.length || 0;
-  const tabs = [
+  const primaryTabs = [
+    { id: 'observability', label: 'Observability' },
+    { id: 'business', label: 'Business' },
+  ];
+  const businessTabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'notifications', label: notifCount > 0 ? `Notifications (${notifCount})` : 'Notifications' },
     { id: 'hierarchy', label: 'Hierarchy' },
@@ -284,7 +290,7 @@ export default function AdminDashboard() {
                 <div className="absolute right-0 top-8 w-80 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl shadow-xl z-30 overflow-hidden">
                   <div className="px-4 py-2 border-b border-[var(--border-secondary)] flex items-center justify-between">
                     <span className="text-xs font-medium text-[var(--text-primary)]">Notifications</span>
-                    <button onClick={() => { setShowNotifDropdown(false); setTab('notifications'); }} className="text-[10px] text-[var(--accent-primary)] hover:underline">
+                    <button onClick={() => { setShowNotifDropdown(false); setPrimaryTab('business'); setTab('notifications'); }} className="text-[10px] text-[var(--accent-primary)] hover:underline">
                       View all
                     </button>
                   </div>
@@ -350,42 +356,72 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 mb-4 border-b border-[var(--border-secondary)]">
-          {tabs.map((t) => (
+        {/* Primary tabs: Observability / Business */}
+        <div className="flex gap-1 mb-0 border-b border-[var(--border-secondary)]">
+          {primaryTabs.map((t) => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`px-4 py-2 text-sm transition-colors border-b-2 -mb-px ${
-                tab === t.id
+              onClick={() => setPrimaryTab(t.id)}
+              className={`px-5 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                primaryTab === t.id
                   ? 'border-[var(--accent-primary)] text-[var(--text-primary)]'
                   : 'border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
               }`}
-              style={{ fontFamily: 'var(--font-ui)' }}
+              style={{ fontFamily: 'var(--font-heading)' }}
             >
               {t.label}
             </button>
           ))}
         </div>
 
-        {/* Tab content */}
-        {tab === 'overview' && <OverviewTab overview={overview} daily={daily} notifCount={notifCount} pendingCount={pendingCount} />}
-        {tab === 'notifications' && <NotificationsTab onRefresh={loadData} />}
-        {tab === 'hierarchy' && <HierarchyTab hierarchy={hierarchy} />}
-        {tab === 'approvals' && <ApprovalsTab pending={pendingPerms} onRefresh={loadData} />}
-        {tab === 'budgets' && <BudgetsTab budgets={budgets} onRefresh={loadData} />}
-        {tab === 'qa' && <QaTestingTab qaOverview={qaOverview} onRefresh={loadData} />}
-        {tab === 'latency' && <LatencyTab latency={latencyData} />}
-        {tab === 'models' && <ModelsTab models={models} />}
-        {tab === 'requests' && <RequestsTab recent={recent} />}
-        {tab === 'routing' && <RoutingTab routing={routing} />}
-        {tab === 'quality' && <QualityTab quality={quality} />}
-        {tab === 'agents' && <AgentsTab agents={agents} trustScores={trustScores} />}
-        {tab === 'memory' && <MemoryTab memory={memory} />}
-        {tab === 'reports' && <ReportsTab />}
-        {tab === 'retention' && <RetentionTab data={retention} />}
-        {tab === 'site-analytics' && <SiteAnalyticsTab data={siteAnalytics} />}
-        {tab === 'funnel' && <FunnelTab />}
+        {/* Observability tab content */}
+        {primaryTab === 'observability' && (
+          <div className="pt-4">
+            <ObservabilityTab />
+          </div>
+        )}
+
+        {/* Business tab content */}
+        {primaryTab === 'business' && (
+          <>
+            {/* Business sub-tabs */}
+            <div className="flex gap-1 mt-2 mb-4 border-b border-[var(--border-secondary)]/50 overflow-x-auto">
+              {businessTabs.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`px-4 py-2 text-sm transition-colors border-b-2 -mb-px whitespace-nowrap ${
+                    tab === t.id
+                      ? 'border-[var(--accent-primary)] text-[var(--text-primary)]'
+                      : 'border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                  }`}
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Business sub-tab content */}
+            {tab === 'overview' && <OverviewTab overview={overview} daily={daily} notifCount={notifCount} pendingCount={pendingCount} />}
+            {tab === 'notifications' && <NotificationsTab onRefresh={loadData} />}
+            {tab === 'hierarchy' && <HierarchyTab hierarchy={hierarchy} />}
+            {tab === 'approvals' && <ApprovalsTab pending={pendingPerms} onRefresh={loadData} />}
+            {tab === 'budgets' && <BudgetsTab budgets={budgets} onRefresh={loadData} />}
+            {tab === 'qa' && <QaTestingTab qaOverview={qaOverview} onRefresh={loadData} />}
+            {tab === 'latency' && <LatencyTab latency={latencyData} />}
+            {tab === 'models' && <ModelsTab models={models} />}
+            {tab === 'requests' && <RequestsTab recent={recent} />}
+            {tab === 'routing' && <RoutingTab routing={routing} />}
+            {tab === 'quality' && <QualityTab quality={quality} />}
+            {tab === 'agents' && <AgentsTab agents={agents} trustScores={trustScores} />}
+            {tab === 'memory' && <MemoryTab memory={memory} />}
+            {tab === 'reports' && <ReportsTab />}
+            {tab === 'retention' && <RetentionTab data={retention} />}
+            {tab === 'site-analytics' && <SiteAnalyticsTab data={siteAnalytics} />}
+            {tab === 'funnel' && <FunnelTab />}
+          </>
+        )}
       </div>
     </div>
   );

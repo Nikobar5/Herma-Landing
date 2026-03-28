@@ -53,24 +53,24 @@ const Hero = () => {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 animate-hero-delayed-more">
                 <button
-                  onClick={handleTryItOut}
+                  onClick={() => navigate('/login?signup=true')}
                   className="group relative overflow-hidden px-8 py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] min-w-[200px]"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   <span className="relative flex items-center justify-center gap-2">
-                    Try the demo
+                    Get started free
                     <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
                 </button>
                 <button
-                  onClick={() => navigate('/docs')}
+                  onClick={handleTryItOut}
                   className="px-8 py-4 border border-[var(--border-secondary)] text-[var(--text-secondary)] font-semibold rounded-lg hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all duration-200 min-w-[200px]"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
-                  View the docs
+                  Try the demo
                 </button>
               </div>
 

@@ -3,7 +3,8 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const initialSearchParams = new URLSearchParams(window.location.search);
+  const [isLogin, setIsLogin] = useState(initialSearchParams.get('signup') !== 'true');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
