@@ -6,7 +6,6 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
-import ComplianceSection from './components/ComplianceSection';
 import BenchmarkTrust from './components/BenchmarkTrust';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -23,7 +22,6 @@ const Overview = lazy(() => import('./pages/dashboard/Overview'));
 const Usage = lazy(() => import('./pages/dashboard/Usage'));
 const ApiKeys = lazy(() => import('./pages/dashboard/ApiKeys'));
 const Billing = lazy(() => import('./pages/dashboard/Billing'));
-const Quality = lazy(() => import('./pages/dashboard/Quality'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const DemoChat = lazy(() => import('./pages/DemoChat'));
@@ -72,6 +70,9 @@ const RouteTracker = () => {
   // Track page views on route change
   useEffect(() => {
     trackPageView();
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+    }
   }, [location]);
 
   // Track scroll depth
@@ -151,7 +152,6 @@ const Home = () => {
       <ValueProposition />
       <HowItWorksSection />
       <BenchmarkTrust />
-      <ComplianceSection />
     </>
   );
 };
@@ -171,78 +171,77 @@ function App() {
     <Router>
       <HermaAuthProvider>
         <ErrorBoundary>
-        <div className="app">
-          <RouteTracker />
-          <ConditionalHeader />
-          <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Overview />} />
-              <Route path="quality" element={<Quality />} />
-              <Route path="usage" element={<Usage />} />
-              <Route path="api-keys" element={<ApiKeys />} />
-              <Route path="billing" element={<Billing />} />
-            </Route>
-            <Route
-              path="/chat"
-              element={
-                <ProtectedRoute>
-                  <ChatPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/demo" element={<DemoChat />} />
-            <Route path="/docs" element={<Documentation />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/blog" element={<BlogIndex />} />
-            <Route path="/blog/cost-quality-matrix" element={<CostQualityMatrix />} />
-            <Route path="/blog/shadow-routing" element={<ShadowRouting />} />
-            <Route path="/blog/ev-routing" element={<EVRouting />} />
-            <Route path="/blog/how-we-benchmark" element={<HowWeBenchmark />} />
-            <Route path="/blog/best-llm-routers" element={<BestLLMRouters />} />
-            <Route path="/blog/agentic-routing" element={<AgenticRouting />} />
-            <Route path="/blog/save-on-ai-costs" element={<SaveOnAICosts />} />
-            <Route path="/blog/llm-api-gateway-vs-router" element={<APIGatewayVsRouter />} />
-            <Route path="/blog/how-llm-routers-work" element={<HowRoutersWork />} />
-            <Route path="/blog/llm-api-pricing-comparison" element={<LLMPricingComparison />} />
-            <Route path="/blog/choose-right-llm" element={<ChooseRightLLM />} />
-            <Route path="/blog/openai-alternatives" element={<OpenAIAlternatives />} />
-            <Route path="/blog/claude-vs-gpt-4o" element={<ClaudeVsGPT4o />} />
-            <Route path="/blog/gpt-5-vs-claude-opus" element={<GPT5VsClaudeOpus />} />
-            <Route path="/blog/gemini-2-5-pro-vs-gpt-5" element={<Gemini25VsGPT5 />} />
-            <Route path="/blog/best-ai-for-coding" element={<BestAIForCoding />} />
-            <Route path="/blog/deepseek-r1-vs-gpt-5" element={<DeepSeekVsGPT5 />} />
-            <Route path="/upgrade" element={<PurchasePage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/attributions" element={<Attributions />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/cancel" element={<Home />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </Suspense>
-          <ConditionalFooter />
-        </div>
+          <div className="app">
+            <RouteTracker />
+            <ConditionalHeader />
+            <Suspense fallback={<div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Overview />} />
+                  <Route path="usage" element={<Usage />} />
+                  <Route path="api-keys" element={<ApiKeys />} />
+                  <Route path="billing" element={<Billing />} />
+                </Route>
+                <Route
+                  path="/chat"
+                  element={
+                    <ProtectedRoute>
+                      <ChatPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/demo" element={<DemoChat />} />
+                <Route path="/docs" element={<Documentation />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/faq" element={<FAQPage />} />
+                <Route path="/blog" element={<BlogIndex />} />
+                <Route path="/blog/cost-quality-matrix" element={<CostQualityMatrix />} />
+                <Route path="/blog/shadow-routing" element={<ShadowRouting />} />
+                <Route path="/blog/ev-routing" element={<EVRouting />} />
+                <Route path="/blog/how-we-benchmark" element={<HowWeBenchmark />} />
+                <Route path="/blog/best-llm-routers" element={<BestLLMRouters />} />
+                <Route path="/blog/agentic-routing" element={<AgenticRouting />} />
+                <Route path="/blog/save-on-ai-costs" element={<SaveOnAICosts />} />
+                <Route path="/blog/llm-api-gateway-vs-router" element={<APIGatewayVsRouter />} />
+                <Route path="/blog/how-llm-routers-work" element={<HowRoutersWork />} />
+                <Route path="/blog/llm-api-pricing-comparison" element={<LLMPricingComparison />} />
+                <Route path="/blog/choose-right-llm" element={<ChooseRightLLM />} />
+                <Route path="/blog/openai-alternatives" element={<OpenAIAlternatives />} />
+                <Route path="/blog/claude-vs-gpt-4o" element={<ClaudeVsGPT4o />} />
+                <Route path="/blog/gpt-5-vs-claude-opus" element={<GPT5VsClaudeOpus />} />
+                <Route path="/blog/gemini-2-5-pro-vs-gpt-5" element={<Gemini25VsGPT5 />} />
+                <Route path="/blog/best-ai-for-coding" element={<BestAIForCoding />} />
+                <Route path="/blog/deepseek-r1-vs-gpt-5" element={<DeepSeekVsGPT5 />} />
+                <Route path="/upgrade" element={<PurchasePage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/attributions" element={<Attributions />} />
+                <Route path="/success" element={<SuccessPage />} />
+                <Route path="/cancel" element={<Home />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            <ConditionalFooter />
+          </div>
         </ErrorBoundary>
       </HermaAuthProvider>
     </Router>

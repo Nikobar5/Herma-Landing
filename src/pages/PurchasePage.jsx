@@ -12,7 +12,7 @@ const SUBSCRIPTION_PLANS = [
 ];
 
 const PurchasePage = () => {
-  const { isAuthenticated, loading: authLoading } = useHermaAuth();
+  const { isAuthenticated } = useHermaAuth();
   const [balance, setBalance] = useState(null);
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,20 +20,11 @@ const PurchasePage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Redirect unauthenticated users to login immediately, with return path preserved.
-  // This prevents users from interacting with the purchase form only to be interrupted
-  // mid-flow when they click a button.
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/login?next=/upgrade', { replace: true });
-    }
-  }, [isAuthenticated, authLoading, navigate]);
-
   useEffect(() => {
     if (isAuthenticated) {
       getBalance()
         .then((data) => setBalance(data.balance ?? data.balance_usd ?? 0))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [isAuthenticated]);
 
@@ -102,13 +93,13 @@ const PurchasePage = () => {
         </div>
 
         {!isAuthenticated && (
-          <div className="mb-6 p-4 bg-[var(--accent-muted)] border border-[var(--border-accent)] rounded-lg flex items-center justify-between gap-4">
+          <div className="mb-6 p-4 bg-[var(--accent-muted)] border border-[var(--border-accent)] rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
               Sign up free to get <span className="font-semibold text-[var(--text-primary)]">$1.00 in credits</span> and unlock purchasing.
             </p>
             <button
               onClick={() => navigate('/login')}
-              className="flex-shrink-0 px-4 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] text-sm font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-200"
+              className="w-full sm:w-auto flex-shrink-0 px-4 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] text-sm font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-200"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               Sign Up Free
@@ -139,24 +130,23 @@ const PurchasePage = () => {
                 key={plan.id}
                 onClick={() => handleSubscribe(plan.id)}
                 disabled={subLoading !== null}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  plan.popular
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${plan.popular
                     ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
                     : 'border-[var(--border-secondary)] hover:border-[var(--border-accent)]'
-                } ${subLoading === plan.id ? 'opacity-60' : ''}`}
+                  } ${subLoading === plan.id ? 'opacity-60' : ''}`}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
+                <div className="flex items-start sm:items-center justify-between gap-2">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                       <span className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
                         {plan.name}
                       </span>
                       {plan.popular && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium">
+                        <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium whitespace-nowrap">
                           Most Popular
                         </span>
                       )}
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">
+                      <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium whitespace-nowrap">
                         +{plan.bonus}% bonus
                       </span>
                     </div>
@@ -220,11 +210,10 @@ const PurchasePage = () => {
               <button
                 key={val}
                 onClick={() => setAmount(String(val))}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  amount === String(val)
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${amount === String(val)
                     ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] border-[var(--accent-primary)]'
                     : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'
-                }`}
+                  }`}
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 ${val}
@@ -245,9 +234,9 @@ const PurchasePage = () => {
 
         {/* Trust Indicators */}
         <div className="bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-primary)] p-6 mb-12">
-          <div className="grid md:grid-cols-3 gap-6 text-center">
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center">
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="flex items-center sm:flex-col sm:justify-center gap-4 sm:gap-3 text-left sm:text-center">
+              <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -257,8 +246,8 @@ const PurchasePage = () => {
                 <div className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>Your data stays yours</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-10 h-10 bg-indigo-500/10 rounded-full flex items-center justify-center">
+            <div className="flex items-center sm:flex-col sm:justify-center gap-4 sm:gap-3 text-left sm:text-center">
+              <div className="w-10 h-10 bg-indigo-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -268,8 +257,8 @@ const PurchasePage = () => {
                 <div className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>Protected by Stripe</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-10 h-10 bg-purple-500/10 rounded-full flex items-center justify-center">
+            <div className="flex items-center sm:flex-col sm:justify-center gap-4 sm:gap-3 text-left sm:text-center">
+              <div className="w-10 h-10 bg-purple-500/10 rounded-full flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -290,7 +279,7 @@ const PurchasePage = () => {
               <p className="text-[var(--text-secondary)] mb-6" style={{ fontFamily: 'var(--font-body)' }}>Create an account or sign in to get started with $1.00 in free credits</p>
               <button
                 onClick={() => navigate('/login')}
-                className="px-8 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-300"
+                className="w-full sm:w-auto px-8 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-300"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 Sign Up Free

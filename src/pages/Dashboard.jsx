@@ -4,7 +4,6 @@ import { useHermaAuth } from '../context/HermaAuthContext';
 
 const navItems = [
   { to: '/dashboard', label: 'Overview', end: true },
-  { to: '/dashboard/quality', label: 'Quality' },
   { to: '/dashboard/usage', label: 'Usage' },
   { to: '/dashboard/api-keys', label: 'API Keys' },
   { to: '/dashboard/billing', label: 'Billing' },
@@ -20,10 +19,9 @@ const Dashboard = () => {
   };
 
   const linkClass = ({ isActive }) =>
-    `block px-4 py-2.5 text-sm font-medium transition-colors ${
-      isActive
-        ? 'text-[var(--accent-primary)] bg-[var(--accent-muted)]'
-        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+    `block px-4 py-2.5 text-sm font-medium transition-colors ${isActive
+      ? 'text-[var(--accent-primary)] bg-[var(--accent-muted)]'
+      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
     }`;
 
   const linkStyle = { borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' };
@@ -73,18 +71,17 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      {/* Mobile tabs */}
-      <div className="md:hidden fixed top-[60px] left-0 right-0 z-30 bg-[var(--bg-secondary)]/95 backdrop-blur-sm border-b border-[var(--border-primary)] px-2 py-1 flex gap-1 overflow-x-auto">
+      {/* Mobile tabs (Bottom Nav) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--bg-secondary)]/95 backdrop-blur-sm border-t border-[var(--border-primary)] px-2 pt-2 pb-[max(8px,env(safe-area-inset-bottom))] flex gap-1 overflow-x-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.end}
             className={({ isActive }) =>
-              `px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-                isActive
-                  ? 'text-[var(--accent-primary)] bg-[var(--accent-muted)]'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              `flex-1 text-center px-1 py-2.5 text-xs font-semibold whitespace-nowrap transition-colors ${isActive
+                ? 'text-[var(--accent-primary)] bg-[var(--accent-muted)] shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
               }`
             }
             style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
@@ -95,7 +92,7 @@ const Dashboard = () => {
       </div>
 
       {/* Main content */}
-      <main className="md:ml-64 pt-24 md:pt-20 px-4 sm:px-6 lg:px-8 pb-8">
+      <main className="md:ml-64 pt-20 px-4 sm:px-6 lg:px-8 pb-24 md:pb-8">
         <div className="max-w-5xl mx-auto">
           <Outlet />
         </div>

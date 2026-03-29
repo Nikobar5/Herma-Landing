@@ -108,6 +108,13 @@ const Header = () => {
                 >
                   Blog
                 </Link>
+                <Link
+                  to="/upgrade"
+                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  Pricing
+                </Link>
                 {isAuthenticated ? (
                   <>
                     <Link

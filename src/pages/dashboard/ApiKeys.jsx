@@ -97,13 +97,13 @@ const ApiKeys = () => {
               <p className="text-sm text-[var(--text-secondary)] mb-4">
                 Please copy your secret key now. <span className="text-emerald-400 font-medium">You won't be able to see it again!</span>
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2">
                 <code className="flex-1 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg px-4 py-3 font-mono text-sm text-[var(--text-primary)] break-all">
                   {newKeyRaw}
                 </code>
                 <button
                   onClick={handleCopyKey}
-                  className="px-4 py-3 bg-[var(--accent-primary)] text-white font-medium rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+                  className="w-full sm:w-auto px-4 py-3 bg-[var(--accent-primary)] text-white font-medium rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
                 >
                   Copy
                 </button>
@@ -122,19 +122,19 @@ const ApiKeys = () => {
       {/* Create Key Card */}
       <div className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl p-6">
         <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Create a new key</h2>
-        <form onSubmit={handleCreate} className="flex gap-4">
+        <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-4">
           <input
             type="text"
             value={newKeyName}
             onChange={(e) => setNewKeyName(e.target.value)}
             placeholder="Key name (e.g. Production App)"
-            className="flex-1 bg-[var(--bg-input)] border border-[var(--border-secondary)] text-[var(--text-primary)] px-4 py-2.5 rounded-lg focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] placeholder-[var(--text-tertiary)] transition-all"
+            className="flex-1 w-full bg-[var(--bg-input)] border border-[var(--border-secondary)] text-[var(--text-primary)] px-4 py-2.5 rounded-lg focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] placeholder-[var(--text-tertiary)] transition-all"
             style={{ fontFamily: 'var(--font-ui)' }}
           />
           <button
             type="submit"
             disabled={creating || !newKeyName.trim()}
-            className="px-6 py-2.5 bg-[var(--text-primary)] text-[var(--bg-primary)] font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-all flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 bg-[var(--text-primary)] text-[var(--bg-primary)] font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
           >
             {creating && <div className="w-4 h-4 rounded-full border-2 border-[var(--bg-primary)] border-t-transparent animate-spin" />}
             Create Secret Key
