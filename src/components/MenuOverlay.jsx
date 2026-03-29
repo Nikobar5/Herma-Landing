@@ -87,6 +87,14 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             >
               Blog
             </Link>
+            <Link
+              to="/upgrade"
+              onClick={onClose}
+              className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Pricing
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link
