@@ -222,10 +222,6 @@ export function createSubscriptionCheckout(plan) {
   });
 }
 
-export function getSubscriptionStatus() {
-  return authFetch('/portal/subscription');
-}
-
 export function manageSubscription() {
   return authFetch('/portal/subscription/manage', {
     method: 'POST',
@@ -250,10 +246,6 @@ export function getAdminHourly(hours = 24) {
   return authFetch(`/admin/analytics/hourly?hours=${hours}`);
 }
 
-export function getAdminCustomers(limit = 50) {
-  return authFetch(`/admin/analytics/customers?limit=${limit}`);
-}
-
 export function getAdminModels() {
   return authFetch('/admin/analytics/models');
 }
@@ -262,171 +254,6 @@ export function getAdminRecent(limit = 50) {
   return authFetch(`/admin/analytics/recent?limit=${limit}`);
 }
 
-export function getAdminMemory() {
-  return authFetch('/admin/analytics/memory');
-}
-
-export function getAdminRouting() {
-  return authFetch('/admin/analytics/routing');
-}
-
-export function getAdminQuality() {
-  return authFetch('/admin/analytics/quality');
-}
-
-export function getAdminAgents() {
-  return authFetch('/admin/analytics/agents');
-}
-
-export function getAdminReports({ agent, severity, actionable_only, limit = 50, offset = 0 } = {}) {
-  const params = new URLSearchParams();
-  if (agent) params.set('agent', agent);
-  if (severity) params.set('severity', severity);
-  if (actionable_only) params.set('actionable_only', 'true');
-  params.set('limit', limit);
-  params.set('offset', offset);
-  return authFetch(`/admin/analytics/reports?${params}`);
-}
-
-export function generateReportsNow() {
-  return authFetch('/admin/analytics/reports/generate', { method: 'POST' });
-}
-
-export function getSchedulerStatus() {
-  return authFetch('/admin/analytics/scheduler');
-}
-
-// --- Hierarchy / Trust / Permissions (Admin) ---
-
-export function getAgentHierarchy() {
-  return authFetch('/admin/analytics/hierarchy');
-}
-
-export function getAgentTrustScores() {
-  return authFetch('/admin/analytics/trust');
-}
-
-export function getPendingPermissions() {
-  return authFetch('/admin/analytics/permissions/pending');
-}
-
-export function approvePermission(requestId, notes = '') {
-  return authFetch(`/admin/analytics/permissions/${requestId}/approve`, {
-    method: 'POST',
-    body: JSON.stringify({ notes }),
-  });
-}
-
-export function denyPermission(requestId, notes = '') {
-  return authFetch(`/admin/analytics/permissions/${requestId}/deny`, {
-    method: 'POST',
-    body: JSON.stringify({ notes }),
-  });
-}
-
-export function getDecisionLog({ type, actor, limit = 50, offset = 0 } = {}) {
-  const params = new URLSearchParams();
-  if (type) params.set('type', type);
-  if (actor) params.set('actor', actor);
-  params.set('limit', limit);
-  params.set('offset', offset);
-  return authFetch(`/admin/analytics/decisions?${params}`);
-}
-
-export function getTrustPromotions() {
-  return authFetch('/admin/analytics/trust/promotions');
-}
-
-// --- Notifications (Admin) ---
-
-export function getNotifications({ is_read, severity, limit = 50, offset = 0 } = {}) {
-  const params = new URLSearchParams();
-  if (is_read !== undefined && is_read !== null) params.set('is_read', is_read);
-  if (severity) params.set('severity', severity);
-  params.set('limit', limit);
-  params.set('offset', offset);
-  return authFetch(`/admin/analytics/notifications?${params}`);
-}
-
-export function getNotificationCount() {
-  return authFetch('/admin/analytics/notifications/count');
-}
-
-export function markNotificationRead(id) {
-  return authFetch(`/admin/analytics/notifications/${id}/read`, { method: 'POST' });
-}
-
-export function markAllNotificationsRead() {
-  return authFetch('/admin/analytics/notifications/read-all', { method: 'POST' });
-}
-
-export function actionNotification(id) {
-  return authFetch(`/admin/analytics/notifications/${id}/action`, { method: 'POST' });
-}
-
-// --- Budgets (Admin) ---
-
-export function getAgentBudgets() {
-  return authFetch('/admin/analytics/budgets');
-}
-
-export function allocateBudget(agent_name, amount_usd, period_type = 'monthly') {
-  return authFetch('/admin/analytics/budgets', {
-    method: 'POST',
-    body: JSON.stringify({ agent_name, amount_usd, period_type }),
-  });
-}
-
-export function updateBudget(agent_name, { amount_usd, is_paused } = {}) {
-  return authFetch(`/admin/analytics/budgets/${agent_name}`, {
-    method: 'PUT',
-    body: JSON.stringify({ amount_usd, is_paused }),
-  });
-}
-
-// --- QA Testing (Admin) ---
-
-export function getQaOverview() {
-  return authFetch('/admin/analytics/qa');
-}
-
-export function getQaRuns({ status, scenario, limit = 50, offset = 0 } = {}) {
-  const params = new URLSearchParams();
-  if (status) params.set('status', status);
-  if (scenario) params.set('scenario', scenario);
-  params.set('limit', limit);
-  params.set('offset', offset);
-  return authFetch(`/admin/analytics/qa/runs?${params}`);
-}
-
-export function triggerQaRun() {
-  return authFetch('/admin/analytics/qa/trigger', { method: 'POST' });
-}
-
-// --- QA Scenarios (Admin) ---
-
-export function getQaScenarios({ status, limit = 50, offset = 0 } = {}) {
-  const params = new URLSearchParams();
-  if (status) params.set('status', status);
-  params.set('limit', limit);
-  params.set('offset', offset);
-  return authFetch(`/admin/analytics/qa/scenarios?${params}`);
-}
-
-export function generateQaScenarios() {
-  return authFetch('/admin/analytics/qa/scenarios/generate', { method: 'POST' });
-}
-
-export function activateQaScenario(id) {
-  return authFetch(`/admin/analytics/qa/scenarios/${id}/activate`, { method: 'POST' });
-}
-
-export function retireQaScenario(id, reason = '') {
-  return authFetch(`/admin/analytics/qa/scenarios/${id}/retire`, {
-    method: 'POST',
-    body: JSON.stringify({ reason }),
-  });
-}
 
 // --- Site Analytics (Admin) ---
 
@@ -452,47 +279,16 @@ export function getAdminFunnel(days = 30) {
   return authFetch(`/admin/analytics/funnel?days=${days}`);
 }
 
-// --- C-Suite (Admin) ---
-
-export function getCsuiteOverview() {
-  return authFetch('/admin/analytics/csuite');
-}
-
 // --- Observability (Admin) ---
 
 export function getObservabilitySummary() {
   return authFetch('/admin/analytics/observability/summary');
 }
 
-export function getObservabilityHealth() {
-  return authFetch('/admin/analytics/observability/health-ping');
-}
-
-export function postHealthPing(machineId = 'dashboard', meta = {}) {
-  return authFetch('/admin/analytics/observability/health-ping', {
-    method: 'POST',
-    body: JSON.stringify({ machine_id: machineId, meta }),
-  });
-}
-
 export function getObservabilitySessionLogs(limit = 100, level = null) {
   const params = new URLSearchParams({ limit });
   if (level) params.set('level', level);
   return authFetch(`/admin/analytics/observability/session-logs?${params}`);
-}
-
-export function postSessionLog({ level = 'info', message, source = 'dashboard', metadata = {} }) {
-  return authFetch('/admin/analytics/observability/session-logs', {
-    method: 'POST',
-    body: JSON.stringify({ level, message, source, metadata }),
-  });
-}
-
-export function postObservabilityAlert({ alert_type, details }) {
-  return authFetch('/admin/analytics/observability/alert', {
-    method: 'POST',
-    body: JSON.stringify({ alert_type, details }),
-  });
 }
 
 export function getObservabilityAlerts(limit = 50) {

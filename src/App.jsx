@@ -150,7 +150,6 @@ const Home = () => {
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
-      {/* <RoutePreview /> */}
       <BenchmarkTrust />
       <ComplianceSection />
     </>
