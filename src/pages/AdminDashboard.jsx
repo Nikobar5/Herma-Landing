@@ -5,7 +5,7 @@ import { ToastProvider, useToast } from '../context/ToastContext';
 import AdminSidebar from '../components/AdminSidebar';
 import FunnelTab from './dashboard/FunnelTab';
 import {
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Area, AreaChart, Legend,
   PieChart, Pie, Cell,
 } from 'recharts';
