@@ -106,16 +106,7 @@ function SkeletonChart() {
   );
 }
 
-// Empty state component
-function EmptyState({ icon, title, description }) {
-  return (
-    <div className="rounded-xl p-8 text-center">
-      {icon && <div className="text-[var(--text-tertiary)] mb-3 flex justify-center">{icon}</div>}
-      <div className="text-sm text-[var(--text-secondary)] mb-1">{title}</div>
-      {description && <div className="text-xs text-[var(--text-tertiary)] max-w-md mx-auto">{description}</div>}
-    </div>
-  );
-}
+
 
 // Custom Recharts tooltip
 function ChartTooltip({ active, payload, label, formatter }) {

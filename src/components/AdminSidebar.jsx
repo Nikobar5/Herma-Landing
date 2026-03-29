@@ -52,7 +52,6 @@ function NavItem({ item, isActive, onClick, collapsed, isAgent }) {
 }
 
 export default function AdminSidebar({ activeTab, onTabChange, collapsed, onToggleCollapse, agentHealth }) {
-    const isAgent = activeTab?.startsWith('agent-');
     // Determine agent status indicator color
     const agentStatusColor = agentHealth === 'healthy' ? '#34D399' : agentHealth === 'unhealthy' ? '#F87171' : '#71717A';
 

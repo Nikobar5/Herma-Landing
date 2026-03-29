@@ -23,13 +23,6 @@ export function ToastProvider({ children }) {
         return id;
     }, [removeToast]);
 
-    const toast = useCallback({
-        success: (msg) => addToast(msg, 'success'),
-        error: (msg) => addToast(msg, 'error'),
-        warning: (msg) => addToast(msg, 'warning'),
-        info: (msg) => addToast(msg, 'info'),
-    }, [addToast]);
-
     // Fix: toast needs to be a plain object, not useCallback
     const value = { toast: { success: (msg) => addToast(msg, 'success'), error: (msg) => addToast(msg, 'error'), warning: (msg) => addToast(msg, 'warning'), info: (msg) => addToast(msg, 'info') } };
 
@@ -45,9 +38,9 @@ export function ToastProvider({ children }) {
                         style={{ animation: 'toastSlideIn 0.3s ease-out' }}
                     >
                         <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm text-sm ${t.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
-                                t.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                                    t.type === 'warning' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                                        'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/20 text-[var(--accent-primary)]'
+                            t.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+                                t.type === 'warning' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                    'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/20 text-[var(--accent-primary)]'
                             }`}>
                             <span className="mt-0.5">
                                 {t.type === 'success' && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
