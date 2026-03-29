@@ -4,7 +4,6 @@ import { useHermaAuth } from '../context/HermaAuthContext';
 
 const navItems = [
   { to: '/dashboard', label: 'Overview', end: true },
-  { to: '/dashboard/quality', label: 'Quality' },
   { to: '/dashboard/usage', label: 'Usage' },
   { to: '/dashboard/api-keys', label: 'API Keys' },
   { to: '/dashboard/billing', label: 'Billing' },

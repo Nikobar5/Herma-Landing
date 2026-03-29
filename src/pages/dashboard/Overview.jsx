@@ -380,8 +380,6 @@ const Overview = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      trend: '+12%', // Mock trend
-      trendUp: true
     },
     {
       label: 'Total Requests',
@@ -392,8 +390,6 @@ const Overview = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
-      trend: '+5.4%',
-      trendUp: true
     },
     {
       label: 'Total Spend',
@@ -404,8 +400,6 @@ const Overview = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 3.666A5.002 5.002 0 0112 21a5.002 5.002 0 01-5-9.666M9 19H5.002A2 2 0 013 17v-1a2 2 0 012-2h4M15 19h3.998A2 2 0 0021 17v-1a2 2 0 00-2-2h-4M9 10h6" />
         </svg>
       ),
-      trend: '+2.1%',
-      trendUp: true
     },
     {
       label: 'Total Tokens',
@@ -449,14 +443,6 @@ const Overview = () => {
               <div className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] group-hover:scale-110 transition-transform duration-300">
                 {card.icon}
               </div>
-              {card.trend && (
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${card.trendUp
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                  }`}>
-                  {card.trend}
-                </span>
-              )}
             </div>
 
             <div className="space-y-1">
@@ -475,7 +461,7 @@ const Overview = () => {
       </div>
 
       {/* Savings Visualization */}
-      <SavingsChart />
+      < SavingsChart />
 
       <OnboardingModal
         isOpen={showOnboarding}

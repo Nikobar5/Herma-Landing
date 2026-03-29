@@ -6,7 +6,6 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
-import ComplianceSection from './components/ComplianceSection';
 import BenchmarkTrust from './components/BenchmarkTrust';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -23,7 +22,6 @@ const Overview = lazy(() => import('./pages/dashboard/Overview'));
 const Usage = lazy(() => import('./pages/dashboard/Usage'));
 const ApiKeys = lazy(() => import('./pages/dashboard/ApiKeys'));
 const Billing = lazy(() => import('./pages/dashboard/Billing'));
-const Quality = lazy(() => import('./pages/dashboard/Quality'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const DemoChat = lazy(() => import('./pages/DemoChat'));
@@ -154,7 +152,6 @@ const Home = () => {
       <ValueProposition />
       <HowItWorksSection />
       <BenchmarkTrust />
-      <ComplianceSection />
     </>
   );
 };
@@ -192,7 +189,6 @@ function App() {
                   }
                 >
                   <Route index element={<Overview />} />
-                  <Route path="quality" element={<Quality />} />
                   <Route path="usage" element={<Usage />} />
                   <Route path="api-keys" element={<ApiKeys />} />
                   <Route path="billing" element={<Billing />} />
