@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { getBalance, getUsageSummary, getDailySavings, getChatBalance } from '../../services/hermaApi';
 import { useHermaAuth } from '../../context/HermaAuthContext';
 import OnboardingModal, { ONBOARDING_KEY } from '../../components/OnboardingModal';
@@ -413,8 +414,35 @@ const Overview = () => {
     },
   ];
 
+  const totalBalance = (() => {
+    const bal = balance ? parseFloat(balance.balance_usd) : 0;
+    const free = chatBalance?.chat_free_credit_usd ? parseFloat(chatBalance.chat_free_credit_usd) : 0;
+    return bal + free;
+  })();
+
   return (
     <div className="space-y-8 animate-fade-in">
+      {/* Low balance nudge */}
+      {totalBalance < 5 && totalBalance >= 0 && !loading && (
+        <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p className="text-sm text-amber-300" style={{ fontFamily: 'var(--font-ui)' }}>
+              Running low on credits — ${totalBalance.toFixed(2)} remaining
+            </p>
+          </div>
+          <Link
+            to="/upgrade"
+            className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-500 text-white hover:bg-amber-400 transition-colors"
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Add credits
+          </Link>
+        </div>
+      )}
+
       {/* Welcome Header */}
       <div>
         <h1

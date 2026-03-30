@@ -143,14 +143,14 @@ const Header = () => {
                 )}
               </nav>
 
-              {/* Try it out Button */}
+              {/* CTA Button */}
               <button
-                onClick={() => navigate('/chat')}
+                onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
                 className="hidden sm:flex px-5 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-full shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)] transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 <span className="text-sm">
-                  Try it out
+                  {isAuthenticated ? 'Try it out' : 'Sign up free'}
                 </span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

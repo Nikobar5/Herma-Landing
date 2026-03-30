@@ -6,9 +6,31 @@ import { createCheckout, createSubscriptionCheckout, getBalance } from '../servi
 const QUICK_AMOUNTS = [5, 10, 25, 50, 100];
 
 const SUBSCRIPTION_PLANS = [
-  { id: 'starter', name: 'Starter', price: 10, credits: 12, bonus: 20 },
-  { id: 'pro', name: 'Pro', price: 25, credits: 32, bonus: 28, popular: true },
-  { id: 'enterprise', name: 'Enterprise', price: 50, credits: 65, bonus: 30 },
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: 10,
+    credits: 12,
+    bonus: 20,
+    features: ['Smart model routing', 'Standard response speed', 'Email support'],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 25,
+    credits: 32,
+    bonus: 28,
+    popular: true,
+    features: ['Smart model routing', 'Priority response speed', 'Priority email support', 'Usage analytics dashboard'],
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 50,
+    credits: 65,
+    bonus: 30,
+    features: ['Smart model routing', 'Highest priority routing', 'Dedicated support', 'Usage analytics dashboard', 'Volume discounts'],
+  },
 ];
 
 const PurchasePage = () => {
@@ -124,43 +146,54 @@ const PurchasePage = () => {
             </span>
           </div>
 
-          <div className="grid gap-3">
+          <div className="grid sm:grid-cols-3 gap-4">
             {SUBSCRIPTION_PLANS.map((plan) => (
               <button
                 key={plan.id}
                 onClick={() => handleSubscribe(plan.id)}
                 disabled={subLoading !== null}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${plan.popular
+                className={`w-full text-left p-5 rounded-xl border-2 transition-all flex flex-col ${plan.popular
                     ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
                     : 'border-[var(--border-secondary)] hover:border-[var(--border-accent)]'
                   } ${subLoading === plan.id ? 'opacity-60' : ''}`}
               >
-                <div className="flex items-start sm:items-center justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                        {plan.name}
-                      </span>
-                      {plan.popular && (
-                        <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium whitespace-nowrap">
-                          Most Popular
-                        </span>
-                      )}
-                      <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium whitespace-nowrap">
-                        +{plan.bonus}% bonus
-                      </span>
-                    </div>
-                    <span className="text-xs text-[var(--text-tertiary)] mt-0.5 block" style={{ fontFamily: 'var(--font-ui)' }}>
-                      Pay ${plan.price}/mo &rarr; get ${plan.credits} in credits every month
+                {/* Name + badges */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+                    {plan.name}
+                  </span>
+                  {plan.popular && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium">
+                      Most Popular
                     </span>
-                  </div>
-                  <div className="text-right flex-shrink-0 ml-4">
-                    <span className="text-lg font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                      ${plan.price}
-                    </span>
-                    <span className="text-xs text-[var(--text-tertiary)] block">/month</span>
-                  </div>
+                  )}
                 </div>
+
+                {/* Price */}
+                <div className="mb-1">
+                  <span className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+                    ${plan.price}
+                  </span>
+                  <span className="text-sm text-[var(--text-tertiary)]">/mo</span>
+                </div>
+
+                {/* Credits + bonus */}
+                <p className="text-xs text-[var(--text-tertiary)] mb-4" style={{ fontFamily: 'var(--font-ui)' }}>
+                  ${plan.credits} in credits &middot;{' '}
+                  <span className="text-emerald-400 font-medium">+{plan.bonus}% bonus</span>
+                </p>
+
+                {/* Features */}
+                <ul className="space-y-1.5 mt-auto">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+                      <svg className="w-3 h-3 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
               </button>
             ))}
           </div>

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
+
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 const Login = () => {
   const initialSearchParams = new URLSearchParams(window.location.search);
@@ -12,19 +14,38 @@ const Login = () => {
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login, signup } = useHermaAuth();
+  const { login, signup, loginWithGoogle } = useHermaAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const googleButtonRef = useRef(null);
+  const isLoginRef = useRef(isLogin);
+  isLoginRef.current = isLogin;
 
   const from = location.state?.from?.pathname;
 
-  // Check for ?redirect=comparison in the URL
   const searchParams = new URLSearchParams(window.location.search);
   const redirectParam = searchParams.get('redirect');
-  // Generic ?next=/path param — used when redirecting unauthenticated users
-  // from protected pages so they return to their intended destination after login.
   const nextParam = searchParams.get('next');
+
+  const redirectParams = { redirectParam, nextParam, from };
+  const redirectParamsRef = useRef(redirectParams);
+  redirectParamsRef.current = redirectParams;
+
+  const handlePostAuthRedirect = (isNewUser) => {
+    const { redirectParam: rp, nextParam: np, from: f } = redirectParamsRef.current;
+    if (rp === 'comparison') {
+      navigate('/', { replace: true });
+      setTimeout(() => {
+        document.getElementById('see-the-difference')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else if (np) {
+      navigate(np, { replace: true });
+    } else {
+      navigate(isLoginRef.current && !isNewUser ? (f || '/dashboard') : '/chat', { replace: true });
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -50,29 +71,72 @@ const Login = () => {
           email: formData.email,
           password: formData.password,
         });
-        // If email not verified, redirect to verification page
         if (!signupData.email_verified) {
           navigate('/verify-email', { replace: true });
           return;
         }
       }
-      if (redirectParam === 'comparison') {
-        navigate('/', { replace: true });
-        setTimeout(() => {
-          document.getElementById('see-the-difference')?.scrollIntoView({ behavior: 'smooth' });
-        }, 300);
-      } else if (nextParam) {
-        // Return the user to their intended destination (e.g. /upgrade, /success)
-        navigate(nextParam, { replace: true });
-      } else {
-        navigate(isLogin ? (from || '/dashboard') : '/chat', { replace: true });
-      }
+      handlePostAuthRedirect(false);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  // Google OAuth setup
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+
+    const handleGoogleResponse = async (response) => {
+      setGoogleLoading(true);
+      setError('');
+      try {
+        const data = await loginWithGoogle(response.credential);
+        if (data.email_verified === false) {
+          navigate('/verify-email', { replace: true });
+          return;
+        }
+        handlePostAuthRedirect(data.is_new_user);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setGoogleLoading(false);
+      }
+    };
+
+    const initGoogle = () => {
+      if (!window.google?.accounts?.id) return;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse,
+      });
+      if (googleButtonRef.current) {
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          width: 400,
+          text: 'continue_with',
+        });
+      }
+    };
+
+    if (window.google?.accounts?.id) {
+      initGoogle();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGoogle;
+      document.head.appendChild(script);
+      return () => {
+        if (document.head.contains(script)) document.head.removeChild(script);
+      };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]">
@@ -112,6 +176,25 @@ const Login = () => {
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
               {error}
+            </div>
+          )}
+
+          {/* Google Sign In */}
+          {GOOGLE_CLIENT_ID && (
+            <div className="mb-5">
+              <div ref={googleButtonRef} className="w-full flex justify-center" />
+              {googleLoading && (
+                <div className="flex justify-center mt-2">
+                  <div className="w-5 h-5 rounded-full border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
+                </div>
+              )}
+              <div className="flex items-center gap-3 mt-5">
+                <div className="flex-1 h-px bg-[var(--border-secondary)]" />
+                <span className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+                  or continue with email
+                </span>
+                <div className="flex-1 h-px bg-[var(--border-secondary)]" />
+              </div>
             </div>
           )}
 

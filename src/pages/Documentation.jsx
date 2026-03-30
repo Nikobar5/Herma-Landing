@@ -229,7 +229,7 @@ const Documentation = () => {
               code: `# Herma AI
 
 Herma is an OpenAI-compatible intelligent model router that automatically routes each
-request to the optimal model, saving 60-90% on LLM costs while maintaining frontier quality.
+request to the optimal model, saving 65%+ on LLM costs while maintaining frontier quality.
 
 ## Configuration
 

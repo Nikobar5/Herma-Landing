@@ -50,7 +50,7 @@ const faqItems = [
   {
     id: 10,
     question: "How much can I save with intelligent routing?",
-    answer: "On average, Herma's router saves 60-90% compared to always using the most expensive model. For simple questions, factual lookups, and routine coding tasks, the router selects models that cost a fraction of frontier pricing while maintaining the same quality. For complex tasks like system design or multi-step reasoning, it automatically routes to the best available model. Your savings dashboard shows a real-time comparison of what you're paying versus what it would have cost with a frontier model."
+    answer: "On average, Herma's router saves 65% or more compared to always using the most expensive model. For simple questions, factual lookups, and routine coding tasks, the router selects models that cost a fraction of frontier pricing while maintaining the same quality. For complex tasks like system design or multi-step reasoning, it automatically routes to the best available model. Your savings dashboard shows a real-time comparison of what you're paying versus what it would have cost with a frontier model."
   }
 ];
 

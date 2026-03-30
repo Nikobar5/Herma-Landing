@@ -40,7 +40,7 @@ const Hero = () => {
               >
                 <span className="text-[var(--text-primary)]">Same AI Quality.</span>
                 <br />
-                <span className="text-[var(--accent-primary)]">60–90% Cheaper.</span>
+                <span className="text-[var(--accent-primary)]">Save 65%+ on AI Costs.</span>
               </h1>
 
               <p

@@ -91,6 +91,30 @@ export async function login({ email, password }) {
   return data;
 }
 
+export async function loginWithGoogle(credential) {
+  const res = await fetch(`${API_URL}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credential }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body.detail || `Google login failed (${res.status})`);
+  }
+
+  const data = await res.json();
+  localStorage.setItem('herma_token', data.token);
+  localStorage.setItem('herma_user', JSON.stringify({
+    customer_id: data.customer_id,
+    name: data.name,
+    email: data.email,
+    is_admin: data.is_admin || false,
+    email_verified: data.email_verified || false,
+  }));
+  return data;
+}
+
 // --- Email verification ---
 
 export async function verifyEmail(token) {
