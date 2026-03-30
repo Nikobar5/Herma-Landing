@@ -11,8 +11,8 @@ const HowItWorksSection = () => {
 
 // 1. Initialize with Herma Base URL
 const client = new OpenAI({
-  baseURL: 'https://api.herma.ai/v1',
-  apiKey: 'herma-sk-...' 
+  baseURL: 'https://api.hermaai.com/v1',
+  apiKey: 'herma-sk-...'
 });
 
 // 2. Use exactly like OpenAI

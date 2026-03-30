@@ -139,7 +139,7 @@ const Home = () => {
       '@type': 'Organization',
       name: 'Herma AI',
       url: 'https://hermaai.com',
-      description: 'Intelligent LLM router — same AI quality, 60-90% cheaper. OpenAI-compatible API.',
+      description: 'Intelligent LLM router — same AI quality, save 65%+ on costs. OpenAI-compatible API.',
       sameAs: ['https://github.com/Nikobar5/herma-eval'],
     });
     document.head.appendChild(script);

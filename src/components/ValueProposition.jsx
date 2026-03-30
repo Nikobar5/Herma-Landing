@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 // Herma pricing: $2/1M input, $8/1M output
@@ -34,6 +35,7 @@ function formatDollars(amount) {
 }
 
 const ValueProposition = () => {
+  const navigate = useNavigate();
   const [headerRef, headerVisible] = useScrollAnimation(0.1);
   const [calcRef, calcVisible] = useScrollAnimation(0.1);
   const [models] = useState(FALLBACK_MODELS);
@@ -262,6 +264,22 @@ const ValueProposition = () => {
                   </div>
                 </div>
               </div>
+
+              {/* CTA */}
+              {costs.savings > 0 && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    onClick={() => navigate('/login?signup=true')}
+                    className="px-8 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    Save {formatDollars(costs.savings)}/mo — Get started free
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </button>
+                </div>
+              )}
 
               {/* Footnote */}
               <p

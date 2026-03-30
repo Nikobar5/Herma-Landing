@@ -79,7 +79,7 @@ const ComparisonMarkdown = ({ content }) => (
 const HERMA_INPUT_PRICE = 2.0;   // per 1M tokens
 const HERMA_OUTPUT_PRICE = 8.0;  // per 1M tokens
 
-const MAX_DEMO_QUERIES = 2;
+const MAX_DEMO_QUERIES = 3;
 const DEMO_STORAGE_KEY = 'herma_demo_queries';
 
 // Supported models and their retail pricing (per 1M tokens)

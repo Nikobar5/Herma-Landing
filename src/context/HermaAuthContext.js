@@ -49,6 +49,15 @@ export function HermaAuthProvider({ children }) {
     return data;
   }
 
+  async function loginWithGoogle(credential) {
+    const data = await hermaApi.loginWithGoogle(credential);
+    const u = { customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false, email_verified: data.email_verified ?? true };
+    setUser(u);
+    localStorage.setItem('herma_user', JSON.stringify(u));
+    if (data.is_new_user) trackSignup();
+    return data;
+  }
+
   function setEmailVerified(verified) {
     setUser((prev) => {
       if (!prev) return prev;
@@ -71,6 +80,7 @@ export function HermaAuthProvider({ children }) {
     isAdmin: !!user?.is_admin,
     login,
     signup,
+    loginWithGoogle,
     logout,
     setEmailVerified,
   };
