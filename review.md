@@ -135,3 +135,88 @@ Removed AI-generated visual and copy patterns from the landing page to make it f
 - `src/components/BenchmarkTrust.jsx`: Heading "Proven Quality. Real Benchmarks." → "How Herma Performs"; subtext "The numbers speak for themselves." → "Full methodology linked below."
 - `src/components/HowItWorksSection.jsx`: "Compatible with LangChain, Vercel AI SDK, etc." → "...and any OpenAI-compatible library"; removed leading space bug on "Zero downtime migration"
 - `src/components/Footer.jsx`: Tagline "Intelligent model routing for every workload." → "Route every AI call to the best model for the price."
+
+---
+
+# Admin Dashboard — Activity Log & Alerts Improvements
+
+## Overview
+Fixed broken filter/search UI in the Activity Log tab, added a full log detail modal, enhanced the Alerts tab to surface warnings and errors from session logs, and bumped the log fetch limit.
+
+## Detailed Changes
+
+### 1. Fixed Activity Log Filter/Search UI (`src/pages/AdminDashboard.jsx`)
+- **What Changed**: Added missing `bg-[var(--bg-tertiary)]`, `border border-[var(--border-secondary)]`, and `placeholder-[var(--text-tertiary)]` classes to the search input and level filter `<select>`.
+- **Why**: Both controls were rendering with no background, making them invisible against the dark page background. The filter logic itself worked; the inputs were just visually hidden.
+
+### 2. Fixed Warning Level Filter (`src/pages/AdminDashboard.jsx`)
+- **What Changed**: Added level normalization in the filter function: `entry.level === 'warning' ? 'warn' : entry.level` before comparing against the dropdown value.
+- **Why**: The backend emits `"warning"` (full word) but the dropdown option value was `"warn"`. The exact-match check always failed for warning-level entries; info worked because the backend and dropdown agreed on `"info"`.
+
+### 3. Increased Log Fetch Limit (`src/pages/AdminDashboard.jsx`)
+- **What Changed**: `getObservabilitySessionLogs(200)` → `getObservabilitySessionLogs(1000)`.
+- **Why**: The 200-entry cap was arbitrary. 1000 covers real debugging needs without introducing frontend performance issues. The backend enforces its own hard cap server-side.
+
+### 4. Log Detail Modal — `LogDetailModal` component (`src/pages/AdminDashboard.jsx`)
+- **What Changed**: Added a new `LogDetailModal` component that opens when a user clicks any log row in the Activity Log tab.
+- **Features**:
+  - Full-screen backdrop with blur; closes on Escape key or backdrop click
+  - Displays: level badge, full message (selectable text), exact ISO timestamp + relative time, source (monospace), pretty-printed metadata JSON block
+  - Collapsible "Raw JSON" section showing the complete log entry
+  - "Acknowledge error" button for error-level entries; dimmed checkmark if already acknowledged
+- **Activity Log rows**: Each row is now `cursor-pointer` with a hover-reveal expand icon; "Dismiss" button still works inline via `stopPropagation`.
+
+### 5. Alerts Tab Overhaul (`src/pages/AdminDashboard.jsx`)
+- **What Changed**: Restructured `AgentAlertsTab` into two sections and added summary counts.
+- **Section A — Warnings & Errors**: Derived from `agentLogs` filtered to `error`/`warn`/`warning` level entries. Each row is clickable (opens `LogDetailModal`). Includes an "Errors only" toggle pill to narrow the list. Acknowledge/dismiss works from within the modal.
+- **Section B — Agent Alerts**: Existing alert history data, visually unchanged.
+- **Summary bar**: Color-coded pill badges at the top showing error count (red), warning count (amber), and agent alert count (gray) — instant status at a glance.
+- **Refresh button**: Now visible in the Alerts tab header (was wired up but never rendered).
+- **Parent change**: `agentLogs`, `acknowledgedErrors`, and `acknowledgeError` are now passed to `AgentAlertsTab` so dismiss state is consistent across tabs.
+
+### 6. Errors Pill Color Fix (`src/pages/AdminDashboard.jsx`)
+- **What Changed**: The "0 errors" pill on the Alerts tab was green (falsely implying a positive state). It is now always styled in red — full opacity when errors exist, dimmed red (`text-red-400/50`) when the count is zero.
+
+---
+
+# AI Discovery & Integration Files
+
+## Overview
+Added downloadable AI coding tool configuration files, improved `llms.txt` and `llms-full.txt`, updated `sitemap.xml`, and added a "Quick Start with Coding Tools" section to the docs page.
+
+## Detailed Changes
+
+### 1. New Integration Files (`public/integration/`)
+Created five static files served as downloads:
+
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` | Drop into project root — tells Claude Code to use Herma for all LLM calls |
+| `cursor-rules.txt` | Rename to `.cursorrules` — Cursor rules directing use of Herma |
+| `windsurf-rules.txt` | Rename to `.windsurfrules` — Windsurf rules directing use of Herma |
+| `AGENTS.md` | For Codex, Devin, and other agent frameworks; includes agent-specific notes on streaming, tool calling, rate limits, and error codes |
+| `.env.example` | Minimal env snippet with `HERMA_API_KEY` and commented `HERMA_BASE_URL` |
+
+All files use only real API details from the live docs: base URL `https://api.hermaai.com/v1`, model `herma-auto`, key prefix `hk-`.
+
+### 2. Updated `public/llms.txt`
+- Added Node.js, LangChain (Python), Vercel AI SDK, and LlamaIndex code snippets
+- Added `HERMA_API_KEY` / `HERMA_BASE_URL` environment variable conventions
+- Added "AI Coding Tool Integration" section with direct download links to all five integration files
+
+### 3. Updated `public/llms-full.txt`
+- Added LangChain, Vercel AI SDK, and LlamaIndex framework examples
+- Added environment variables section
+- Added full integration table mapping each tool to its config file and download URL
+- Added note about llms.txt auto-discovery standard
+
+### 4. Updated `public/sitemap.xml`
+- Added entries for `llms.txt`, `llms-full.txt`, and all four integration files (`CLAUDE.md`, `cursor-rules.txt`, `windsurf-rules.txt`, `AGENTS.md`)
+
+### 5. Docs Page — "Quick Start with Coding Tools" Section (`src/pages/Documentation.jsx`)
+- **What Changed**: Added a new `IntegrationTabGroup` component and a new section to the docs page.
+- **Position**: Directly after "Quick Start", before "Base URL" — visible early without blocking the rest of the docs.
+- **Behavior**: Collapsed by default — only the four tool buttons are visible. Clicking a button expands its file content; clicking it again collapses. Clicking a different tool switches content.
+- **Each tab shows**: The raw file content in a `CodeBlock` (with copy button) + filename instruction + Download link pointing to `/integration/`.
+- **Also includes**: An environment variables block with a `.env.example` download link, and a note explaining llms.txt auto-discovery.
+- **Title history**: Originally "Use with AI Coding Tools" → "Integrate with Coding Tools" → "Quick Start with Coding Tools".

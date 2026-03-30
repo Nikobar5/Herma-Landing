@@ -50,11 +50,10 @@ const Footer = () => {
 
             <button
               onClick={() => navigate('/chat')}
-              className="group relative overflow-hidden px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)] mb-6 sm:mb-8"
+              className="px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)] mb-6 sm:mb-8"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-              <span className="relative flex items-center justify-center gap-2 text-sm sm:text-base">
+              <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
                 Try it out
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -97,7 +96,7 @@ const Footer = () => {
                 </span>
               </Link>
               <p className="text-sm text-[var(--text-tertiary)] mb-4" style={{ fontFamily: 'var(--font-ui)' }}>
-                Intelligent model routing for every workload.
+                Route every AI call to the best model for the price.
               </p>
               {/* Social */}
               <a

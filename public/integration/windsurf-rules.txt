@@ -1,0 +1,49 @@
+# Herma AI — LLM Provider Rules
+
+This project uses Herma as the LLM provider. Herma is a fully OpenAI-compatible intelligent model router.
+
+## Rules
+
+- For ALL LLM API calls: use base URL `https://api.hermaai.com/v1` and model `herma-auto`
+- Never call `api.openai.com` endpoints directly
+- Never hardcode API keys — always read from the `HERMA_API_KEY` environment variable
+- All standard OpenAI SDK parameters (stream, temperature, max_tokens, tools) work unchanged
+
+## Client Setup — Python
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["HERMA_API_KEY"],
+    base_url="https://api.hermaai.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[{"role": "user", "content": "..."}]
+)
+```
+
+## Client Setup — Node.js
+
+```javascript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+
+const response = await client.chat.completions.create({
+  model: "herma-auto",
+  messages: [{ role: "user", content: "..." }]
+});
+```
+
+## Reference
+
+- Model: always `herma-auto`
+- Docs: https://hermaai.com/docs
+- Get API key: https://hermaai.com/dashboard/api-keys

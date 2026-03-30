@@ -74,13 +74,13 @@ const BenchmarkTrust = () => {
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] mb-4 tracking-tight px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Proven Quality. Real Benchmarks.
+            How Herma Performs
           </h2>
           <p
             className="text-base sm:text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto px-2 sm:px-0"
             style={{ fontFamily: 'var(--font-body)' }}
           >
-            Tested against frontier models on industry-standard benchmarks. The numbers speak for themselves.
+            Tested against frontier models on industry-standard benchmarks. Full methodology linked below.
           </p>
         </div>
 
@@ -91,9 +91,7 @@ const BenchmarkTrust = () => {
         >
           {/* Quality Retained */}
           <div className="relative group">
-            {/* Gradient border glow */}
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-[var(--accent-primary)] via-purple-500 to-emerald-500 opacity-30 group-hover:opacity-50 blur-[1px] transition-opacity duration-500" />
-            <div className="relative bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-transparent">
+            <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
               <p
                 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-purple-400 bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
@@ -111,8 +109,7 @@ const BenchmarkTrust = () => {
 
           {/* Cost Savings */}
           <div className="relative group delay-100">
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-emerald-500 via-[var(--accent-primary)] to-purple-500 opacity-30 group-hover:opacity-50 blur-[1px] transition-opacity duration-500" />
-            <div className="relative bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-transparent">
+            <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
               <p
                 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-emerald-400 to-[var(--accent-primary)] bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
@@ -130,8 +127,7 @@ const BenchmarkTrust = () => {
 
           {/* Tests Passing */}
           <div className="relative group delay-200">
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-purple-500 via-emerald-500 to-[var(--accent-primary)] opacity-30 group-hover:opacity-50 blur-[1px] transition-opacity duration-500" />
-            <div className="relative bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-transparent">
+            <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
               <p
                 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}

@@ -28,6 +28,62 @@ const CodeBlock = ({ children, language }) => {
   );
 };
 
+const IntegrationTabGroup = ({ tabs }) => {
+  const [active, setActive] = useState(null);
+  const current = active !== null ? tabs[active] : null;
+  return (
+    <div>
+      <div className="flex gap-0 border-b border-[var(--border-primary)]">
+        {tabs.map((tab, i) => (
+          <button
+            key={tab.label}
+            onClick={() => setActive(active === i ? null : i)}
+            className={`px-4 py-2.5 text-sm font-medium transition-colors relative ${
+              active === i
+                ? 'text-[var(--accent-primary)]'
+                : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+            }`}
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            {tab.label}
+            {active === i && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)]" />
+            )}
+          </button>
+        ))}
+      </div>
+      {current && (
+        <>
+          <CodeBlock>{current.code}</CodeBlock>
+          <div className="flex items-center justify-between mt-3 px-1">
+            <span className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
+              Save as{' '}
+              <code
+                className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-[var(--accent-primary)]"
+                style={{ fontFamily: 'var(--font-code)' }}
+              >
+                {current.filename}
+              </code>
+              {' '}in your project root
+            </span>
+            <a
+              href={current.download}
+              download
+              className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors flex items-center gap-1.5 font-medium"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download
+            </a>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const TabGroup = ({ tabs }) => {
   const [active, setActive] = useState(0);
 
@@ -146,6 +202,278 @@ const Documentation = () => {
                 Use the endpoint below with your API key. That's it.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Integrate with Coding Tools */}
+        <section className="mb-12" id="ai-coding-tools">
+          <h2
+            className="text-2xl font-bold text-[var(--text-primary)] mb-3"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Quick Start with Coding Tools
+          </h2>
+          <p
+            className="text-[var(--text-secondary)] mb-6"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Drop one of these files into your project root and your AI coding assistant will automatically
+            use Herma for all LLM API calls — no manual configuration needed each time.
+          </p>
+
+          <IntegrationTabGroup tabs={[
+            {
+              label: 'Claude Code',
+              filename: 'CLAUDE.md',
+              download: '/integration/CLAUDE.md',
+              code: `# Herma AI
+
+Herma is an OpenAI-compatible intelligent model router that automatically routes each
+request to the optimal model, saving 60-90% on LLM costs while maintaining frontier quality.
+
+## Configuration
+
+All LLM API calls in this project use Herma:
+
+| Setting  | Value                                |
+|----------|--------------------------------------|
+| Base URL | https://api.hermaai.com/v1           |
+| Model    | herma-auto                           |
+| API Key  | $HERMA_API_KEY (starts with hk-)     |
+
+## Python
+
+\`\`\`python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["HERMA_API_KEY"],
+    base_url="https://api.hermaai.com/v1"
+)
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[{"role": "user", "content": "..."}]
+)
+\`\`\`
+
+## Node.js
+
+\`\`\`javascript
+import OpenAI from "openai";
+const client = new OpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+const response = await client.chat.completions.create({
+  model: "herma-auto",
+  messages: [{ role: "user", content: "..." }]
+});
+\`\`\`
+
+## Rules
+
+- Always use \`herma-auto\` as the model.
+- Never call api.openai.com endpoints directly.
+- Never hardcode API keys — use HERMA_API_KEY env var.
+- Streaming and tool calling are fully supported.
+
+## Reference
+
+- Docs: https://hermaai.com/docs
+- Pricing: $2/M input tokens, $8/M output tokens`,
+            },
+            {
+              label: 'Cursor',
+              filename: '.cursorrules',
+              download: '/integration/cursor-rules.txt',
+              code: `# Herma AI — LLM Provider Rules
+
+This project uses Herma as the LLM provider. Herma is fully OpenAI-compatible.
+
+## Rules
+
+- For ALL LLM API calls: use base URL https://api.hermaai.com/v1 and model herma-auto
+- Never call api.openai.com endpoints directly
+- Never hardcode API keys — always read from HERMA_API_KEY environment variable
+- All standard OpenAI SDK parameters (stream, temperature, max_tokens, tools) work unchanged
+
+## Client Setup — Python
+
+\`\`\`python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["HERMA_API_KEY"],
+    base_url="https://api.hermaai.com/v1"
+)
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[{"role": "user", "content": "..."}]
+)
+\`\`\`
+
+## Client Setup — Node.js
+
+\`\`\`javascript
+import OpenAI from "openai";
+const client = new OpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+\`\`\`
+
+Model: always herma-auto
+Docs: https://hermaai.com/docs`,
+            },
+            {
+              label: 'Windsurf',
+              filename: '.windsurfrules',
+              download: '/integration/windsurf-rules.txt',
+              code: `# Herma AI — LLM Provider Rules
+
+This project uses Herma as the LLM provider. Herma is fully OpenAI-compatible.
+
+## Rules
+
+- For ALL LLM API calls: use base URL https://api.hermaai.com/v1 and model herma-auto
+- Never call api.openai.com endpoints directly
+- Never hardcode API keys — always read from HERMA_API_KEY environment variable
+- All standard OpenAI SDK parameters (stream, temperature, max_tokens, tools) work unchanged
+
+## Client Setup — Python
+
+\`\`\`python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["HERMA_API_KEY"],
+    base_url="https://api.hermaai.com/v1"
+)
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[{"role": "user", "content": "..."}]
+)
+\`\`\`
+
+## Client Setup — Node.js
+
+\`\`\`javascript
+import OpenAI from "openai";
+const client = new OpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+\`\`\`
+
+Model: always herma-auto
+Docs: https://hermaai.com/docs`,
+            },
+            {
+              label: 'Codex / Devin / Other',
+              filename: 'AGENTS.md',
+              download: '/integration/AGENTS.md',
+              code: `# Herma AI — Agent Integration
+
+Herma is an OpenAI-compatible intelligent model router.
+Use it as the LLM provider for all AI calls in this project.
+
+## Configuration
+
+| Setting  | Value                                |
+|----------|--------------------------------------|
+| Base URL | https://api.hermaai.com/v1           |
+| Model    | herma-auto                           |
+| API Key  | $HERMA_API_KEY                       |
+
+## Python
+
+\`\`\`python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["HERMA_API_KEY"],
+    base_url="https://api.hermaai.com/v1"
+)
+\`\`\`
+
+## Node.js
+
+\`\`\`javascript
+import OpenAI from "openai";
+const client = new OpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+\`\`\`
+
+## Agent Notes
+
+- Streaming: fully supported (stream: true)
+- Tool/function calling: fully supported
+- Complex tasks auto-route to frontier models (Claude Opus, GPT-4o)
+- Rate limits: 500 req/min, 50 concurrent per account
+- Error 402 = insufficient credits (https://hermaai.com/upgrade)
+
+## Rules
+
+- Always use herma-auto as the model.
+- Never call api.openai.com directly.
+- Never hardcode API keys.
+
+Docs: https://hermaai.com/docs`,
+            },
+          ]} />
+
+          {/* .env.example */}
+          <div className="mt-8">
+            <h3
+              className="text-lg font-semibold text-[var(--text-primary)] mb-3"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Environment Variables
+            </h3>
+            <p className="text-[var(--text-secondary)] mb-3 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+              Add this to your <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-[var(--accent-primary)] text-xs" style={{ fontFamily: 'var(--font-code)' }}>.env</code> file.
+              Your API key is in{' '}
+              <a href="/dashboard/api-keys" className="text-[var(--accent-primary)] underline">Dashboard → API Keys</a>.
+            </p>
+            <div className="relative">
+              <CodeBlock>{`# Herma AI
+# Get your key at https://hermaai.com/dashboard/api-keys
+HERMA_API_KEY=hk-your-api-key-here`}</CodeBlock>
+              <div className="flex justify-end mt-2">
+                <a
+                  href="/integration/.env.example"
+                  download=".env.example"
+                  className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors flex items-center gap-1.5 font-medium"
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download .env.example
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* llms.txt note */}
+          <div
+            className="mt-8 bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-5"
+            style={{ borderRadius: 'var(--radius-md)' }}
+          >
+            <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+              <strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>Auto-discovery via llms.txt —</strong>{' '}
+              Herma publishes a{' '}
+              <a href="/llms.txt" className="text-[var(--accent-primary)] underline" target="_blank" rel="noopener noreferrer">llms.txt</a>{' '}
+              file following the open standard for AI tool discovery. AI assistants that support llms.txt
+              can automatically find Herma's API details, base URL, and integration examples without
+              needing a configuration file in your project.
+            </p>
           </div>
         </section>
 
@@ -652,6 +980,7 @@ while (true) {
             </ul>
           </div>
         </section>
+
 
         {/* CTA */}
         <section className="text-center">

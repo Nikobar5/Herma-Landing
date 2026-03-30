@@ -47,9 +47,9 @@ const response = await client.chat.completions.create({
             <ul className="space-y-4">
               {[
                 "No new libraries to install",
-                "Compatible with LangChain, Vercel AI SDK, etc.",
+                "Compatible with LangChain, Vercel AI SDK, and any OpenAI-compatible library",
                 "Instant API key provisioning",
-                " Zero downtime migration"
+                "Zero downtime migration"
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded-full bg-[var(--accent-primary)]/10 flex items-center justify-center flex-shrink-0">
@@ -68,9 +68,6 @@ const response = await client.chat.completions.create({
             ref={codeRef}
             className={`relative animate-on-scroll animate-fade-left ${codeVisible ? 'is-visible' : ''}`}
           >
-            {/* Background Decoration */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-[var(--accent-primary)] to-purple-600 rounded-3xl opacity-20 blur-xl"></div>
-
             <div className="relative bg-[#1e1e1e] rounded-2xl shadow-2xl overflow-hidden border border-[var(--border-secondary)]">
               {/* Window Controls */}
               <div className="flex items-center px-4 py-3 bg-[#2d2d2d] border-b border-[#3d3d3d]">
