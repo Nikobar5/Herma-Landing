@@ -35,17 +35,61 @@
 - Streaming support
 - Tool/function calling support
 
+## Environment Variables
+- HERMA_API_KEY — your API key (starts with hk-)
+- HERMA_BASE_URL — base URL (default: https://api.hermaai.com/v1)
+
 ## Quick Start
+
+Python:
 ```python
+import os
 from openai import OpenAI
 client = OpenAI(
     base_url="https://api.hermaai.com/v1",
-    api_key="your-herma-key"
+    api_key=os.environ["HERMA_API_KEY"]
 )
 response = client.chat.completions.create(
     model="herma-auto",
     messages=[{"role": "user", "content": "Hello!"}]
 )
+```
+
+Node.js:
+```javascript
+import OpenAI from "openai";
+const client = new OpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+const response = await client.chat.completions.create({
+  model: "herma-auto",
+  messages: [{ role: "user", content: "Hello!" }]
+});
+```
+
+LangChain (Python):
+```python
+from langchain_openai import ChatOpenAI
+llm = ChatOpenAI(
+    model="herma-auto",
+    openai_api_key=os.environ["HERMA_API_KEY"],
+    openai_api_base="https://api.hermaai.com/v1"
+)
+```
+
+Vercel AI SDK:
+```javascript
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText } from "ai";
+const herma = createOpenAI({ apiKey: process.env.HERMA_API_KEY, baseURL: "https://api.hermaai.com/v1" });
+const { text } = await generateText({ model: herma("herma-auto"), prompt: "Hello!" });
+```
+
+LlamaIndex (Python):
+```python
+from llama_index.llms.openai import OpenAI as LlamaOpenAI
+llm = LlamaOpenAI(model="herma-auto", api_key=os.environ["HERMA_API_KEY"], api_base="https://api.hermaai.com/v1")
 ```
 
 ## API Endpoints
@@ -57,6 +101,14 @@ response = client.chat.completions.create(
 - herma-eval: Benchmark toolkit for LLM routers (pip install herma-eval)
   - 7 benchmarks: GSM8K, HumanEval+, MMLU, MBPP+, ARC-Challenge, LiveCodeBench, Aider Polyglot
   - https://github.com/Nikobar5/herma-eval
+
+## AI Coding Tool Integration
+Drop a configuration file into your project root so your AI coding assistant automatically uses Herma for all LLM calls:
+- Claude Code (CLAUDE.md): https://hermaai.com/integration/CLAUDE.md
+- Cursor (.cursorrules): https://hermaai.com/integration/cursor-rules.txt
+- Windsurf (.windsurfrules): https://hermaai.com/integration/windsurf-rules.txt
+- Codex / Devin / other agents (AGENTS.md): https://hermaai.com/integration/AGENTS.md
+- Environment variables (.env.example): https://hermaai.com/integration/.env.example
 
 ## Links
 - Website: https://hermaai.com

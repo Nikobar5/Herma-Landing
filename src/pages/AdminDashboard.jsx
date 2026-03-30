@@ -356,7 +356,7 @@ function AdminDashboardInner() {
         getSiteAnalytics(30).catch(() => null),
         getRetentionOverview().catch(() => null),
         getObservabilitySummary().catch(() => null),
-        getObservabilitySessionLogs(200).catch(() => []),
+        getObservabilitySessionLogs(1000).catch(() => []),
         getObservabilityAlerts(50).catch(() => []),
       ]);
       setOverview(ov);
@@ -504,7 +504,7 @@ function AdminDashboardInner() {
               acknowledgeError={acknowledgeError}
             />
           )}
-          {tab === 'agent-alerts' && <AgentAlertsTab alerts={agentAlerts} onRefresh={loadData} />}
+          {tab === 'agent-alerts' && <AgentAlertsTab alerts={agentAlerts} logs={agentLogs} onRefresh={loadData} acknowledgedErrors={acknowledgedErrors} acknowledgeError={acknowledgeError} />}
         </div>
       </div>
 
@@ -1531,12 +1531,145 @@ function AgentStatusTab({ health, logs = [], acknowledgedErrors, acknowledgeErro
   );
 }
 
+/* --------------------------------------------------------------------------
+   Log Detail Modal — opens when a user clicks any log entry
+   -------------------------------------------------------------------------- */
+function LogDetailModal({ entry, onClose, onAcknowledge, isAcked }) {
+  const lvl = LEVEL_STYLES[entry.level] || LEVEL_STYLES.info;
+  const isError = entry.level === 'error';
+  const hasMetadata = entry.metadata && Object.keys(entry.metadata).length > 0;
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] shadow-2xl flex flex-col max-h-[85vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border-primary)] shrink-0">
+          <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${lvl} shrink-0`}>
+            {entry.level}
+          </span>
+          <span className="text-sm font-medium text-[var(--text-primary)] flex-1" style={{ fontFamily: 'var(--font-heading)' }}>
+            Log Detail
+          </span>
+          <button
+            onClick={onClose}
+            className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors p-1 rounded-md hover:bg-[var(--bg-tertiary)]"
+            aria-label="Close"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+          {/* Message */}
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Message</div>
+            <p className="text-sm text-[var(--text-primary)] break-words leading-relaxed select-text">
+              {entry.message || <span className="italic text-[var(--text-tertiary)]">No message</span>}
+            </p>
+          </div>
+
+          {/* Timestamp + Source row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Timestamp</div>
+              <div className="text-xs text-[var(--text-primary)] font-mono">
+                {entry.timestamp ? new Date(entry.timestamp).toISOString() : '—'}
+              </div>
+              <div className="text-[10px] text-[var(--text-tertiary)] mt-0.5">{timeAgo(entry.timestamp)}</div>
+            </div>
+            {entry.source && (
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Source</div>
+                <div className="text-xs text-[var(--text-primary)] font-mono break-all select-text">{entry.source}</div>
+              </div>
+            )}
+          </div>
+
+          {/* Metadata */}
+          {hasMetadata && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Metadata</div>
+              <pre className="text-[11px] font-mono text-[var(--text-secondary)] bg-[var(--bg-primary)] rounded-lg p-3 overflow-x-auto border border-[var(--border-primary)] select-text whitespace-pre-wrap break-words">
+                {JSON.stringify(entry.metadata, null, 2)}
+              </pre>
+            </div>
+          )}
+
+          {/* Raw JSON (collapsible) */}
+          <details className="group">
+            <summary className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] cursor-pointer hover:text-[var(--text-secondary)] transition-colors select-none list-none flex items-center gap-1.5">
+              <svg className="w-3 h-3 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+              Raw JSON
+            </summary>
+            <pre className="mt-2 text-[11px] font-mono text-[var(--text-tertiary)] bg-[var(--bg-primary)] rounded-lg p-3 overflow-x-auto border border-[var(--border-primary)] select-text whitespace-pre-wrap break-words">
+              {JSON.stringify(entry, null, 2)}
+            </pre>
+          </details>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-5 py-3 border-t border-[var(--border-primary)] shrink-0">
+          {isError && (
+            isAcked ? (
+              <span className="text-xs text-green-500/70 flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                Acknowledged
+              </span>
+            ) : (
+              <button
+                onClick={() => { onAcknowledge(); onClose(); }}
+                className="text-xs px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors"
+              >
+                Acknowledge error
+              </button>
+            )
+          )}
+          <button
+            onClick={onClose}
+            className="text-xs px-3 py-1.5 rounded-lg bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-secondary)] hover:bg-[var(--bg-hover)] transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Activity Log Tab
+   -------------------------------------------------------------------------- */
 function AgentActivityTab({ logs = [], onRefresh, acknowledgedErrors, acknowledgeError }) {
   const [levelFilter, setLevelFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLog, setSelectedLog] = useState(null);
 
   const filtered = logs.filter((entry) => {
-    if (levelFilter && entry.level !== levelFilter) return false;
+    if (levelFilter) {
+      // Normalize 'warning' → 'warn' so the dropdown matches both spellings
+      const normalizedLevel = entry.level === 'warning' ? 'warn' : entry.level;
+      if (normalizedLevel !== levelFilter) return false;
+    }
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
       return (entry.message || '').toLowerCase().includes(q)
@@ -1547,27 +1680,46 @@ function AgentActivityTab({ logs = [], onRefresh, acknowledgedErrors, acknowledg
 
   return (
     <div className="space-y-4">
+      {/* Log Detail Modal */}
+      {selectedLog && (
+        <LogDetailModal
+          entry={selectedLog}
+          onClose={() => setSelectedLog(null)}
+          onAcknowledge={() => acknowledgeError(errFp(selectedLog))}
+          isAcked={selectedLog.level === 'error' && acknowledgedErrors.has(errFp(selectedLog))}
+        />
+      )}
+
       {/* Filter controls */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-          <svg className="w-4 h-4 text-[var(--text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="relative flex-1 min-w-[200px]">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-tertiary)] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search logs..."
-            className="flex-1 text-sm text-[var(--text-primary)] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search messages, sources…"
+            className="w-full text-xs bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] rounded-lg pl-9 pr-3 py-1.5 text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)]/50 transition-colors"
+          />
         </div>
-        <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}
-          className="text-xs text-[var(--text-secondary)] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]">
+        <select
+          value={levelFilter}
+          onChange={(e) => setLevelFilter(e.target.value)}
+          className="text-xs bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] text-[var(--text-secondary)] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]/50 cursor-pointer transition-colors"
+        >
           <option value="">All levels</option>
           <option value="error">Errors</option>
           <option value="warn">Warnings</option>
           <option value="info">Info</option>
           <option value="debug">Debug</option>
         </select>
-        <button onClick={onRefresh}
+        <button
+          onClick={onRefresh}
           className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-md hover:bg-[var(--bg-tertiary)]"
-          title="Refresh logs">
+          title="Refresh logs"
+        >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
@@ -1576,7 +1728,7 @@ function AgentActivityTab({ logs = [], onRefresh, acknowledgedErrors, acknowledg
       </div>
 
       {/* Log stream */}
-      <div className="rounded-xl overflow-hidden">
+      <div className="rounded-xl overflow-hidden border border-[var(--border-primary)]">
         <div className="max-h-[calc(100vh-250px)] overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="px-5 py-12 text-center text-sm text-[var(--text-tertiary)]">
@@ -1589,7 +1741,12 @@ function AgentActivityTab({ logs = [], onRefresh, acknowledgedErrors, acknowledg
                 const isError = entry.level === 'error';
                 const isAcked = isError && acknowledgedErrors.has(errFp(entry));
                 return (
-                  <div key={i} className={`px-5 py-3 hover:bg-[var(--bg-tertiary)]/20 transition-colors ${isAcked ? 'opacity-50' : ''}`}>
+                  <div
+                    key={i}
+                    className={`px-5 py-3 hover:bg-[var(--bg-tertiary)]/30 transition-colors cursor-pointer group ${isAcked ? 'opacity-50' : ''}`}
+                    onClick={() => setSelectedLog(entry)}
+                    title="Click to view full log detail"
+                  >
                     <div className="flex items-start gap-3">
                       <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${lvl} shrink-0 mt-0.5`}>
                         {entry.level}
@@ -1600,21 +1757,26 @@ function AgentActivityTab({ logs = [], onRefresh, acknowledgedErrors, acknowledg
                           <span className="text-[10px] text-[var(--text-tertiary)]">{timeAgo(entry.timestamp)}</span>
                           {entry.source && <span className="text-[10px] text-[var(--text-tertiary)] font-mono">{entry.source}</span>}
                           {entry.metadata && Object.keys(entry.metadata).length > 0 && (
-                            <span className="text-[10px] text-[var(--text-tertiary)] font-mono truncate max-w-xs"
-                              title={JSON.stringify(entry.metadata)}>
+                            <span className="text-[10px] text-[var(--text-tertiary)] font-mono truncate max-w-xs">
                               {Object.entries(entry.metadata).map(([k, v]) => `${k}=${v}`).join(' ')}
                             </span>
                           )}
                         </div>
                       </div>
-                      {isError && (
-                        isAcked
-                          ? <span className="text-[10px] text-green-500/60 shrink-0">✓ acked</span>
-                          : <button
-                            onClick={() => acknowledgeError(errFp(entry))}
-                            className="text-[10px] text-[var(--text-tertiary)] hover:text-green-400 border border-[var(--border-secondary)] rounded px-1.5 py-0.5 shrink-0 transition-colors"
-                          >Dismiss</button>
-                      )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Expand hint */}
+                        <svg className="w-3.5 h-3.5 text-[var(--text-tertiary)] opacity-0 group-hover:opacity-60 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                        </svg>
+                        {isError && (
+                          isAcked
+                            ? <span className="text-[10px] text-green-500/60">✓ acked</span>
+                            : <button
+                              onClick={(e) => { e.stopPropagation(); acknowledgeError(errFp(entry)); }}
+                              className="text-[10px] text-[var(--text-tertiary)] hover:text-green-400 border border-[var(--border-secondary)] rounded px-1.5 py-0.5 transition-colors"
+                            >Dismiss</button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -1627,42 +1789,186 @@ function AgentActivityTab({ logs = [], onRefresh, acknowledgedErrors, acknowledg
   );
 }
 
-function AgentAlertsTab({ alerts = [] }) {
-  return (
-    <div className="space-y-4">
-      <p className="text-xs text-[var(--text-tertiary)]">{alerts.length} alerts in history</p>
+/* --------------------------------------------------------------------------
+   Alerts Tab — shows warnings/errors from logs + formal agent alerts
+   -------------------------------------------------------------------------- */
+function AgentAlertsTab({ alerts = [], logs = [], onRefresh, acknowledgedErrors, acknowledgeError }) {
+  const [errorsOnly, setErrorsOnly] = useState(false);
+  const [selectedLog, setSelectedLog] = useState(null);
 
-      {/* Alert history */}
-      <div className="rounded-xl overflow-hidden">
-        <div className="max-h-[calc(100vh-280px)] overflow-y-auto">
-          {alerts.length === 0 ? (
-            <div className="px-5 py-12 text-center text-sm text-[var(--text-tertiary)]">
-              No alerts recorded yet. The agent sends alerts automatically when issues are detected.
-            </div>
-          ) : (
-            <div className="divide-y divide-[var(--border-secondary)]/40">
-              {alerts.map((alert, i) => (
-                <div key={i} className="px-5 py-4 hover:bg-[var(--bg-tertiary)]/20 transition-colors">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-[var(--text-primary)]">{alert.alert_type}</span>
-                    <span className="text-[10px] text-[var(--text-tertiary)]">{timeAgo(alert.timestamp)}</span>
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)] mb-2">{alert.details}</p>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-[var(--text-tertiary)]">
-                      Sent to: {alert.sent?.length || 0} | Failed: {alert.failed?.length || 0}
-                    </span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${alert.health_status?.status === 'healthy' ? 'bg-green-400/10 text-green-400'
-                      : alert.health_status?.status === 'unhealthy' ? 'bg-red-400/10 text-red-400'
+  // Derive warnings+errors from the session log
+  const issuesFromLogs = (logs || []).filter((e) =>
+    e.level === 'error' || e.level === 'warn' || e.level === 'warning'
+  );
+  const displayedIssues = errorsOnly
+    ? issuesFromLogs.filter((e) => e.level === 'error')
+    : issuesFromLogs;
+
+  const errorCount = issuesFromLogs.filter((e) => e.level === 'error').length;
+  const warnCount = issuesFromLogs.filter((e) => e.level === 'warn' || e.level === 'warning').length;
+
+  return (
+    <div className="space-y-5">
+      {/* Log Detail Modal */}
+      {selectedLog && (
+        <LogDetailModal
+          entry={selectedLog}
+          onClose={() => setSelectedLog(null)}
+          onAcknowledge={() => acknowledgeError && acknowledgeError(errFp(selectedLog))}
+          isAcked={selectedLog.level === 'error' && acknowledgedErrors && acknowledgedErrors.has(errFp(selectedLog))}
+        />
+      )}
+
+      {/* Summary bar */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-0.5 rounded-full border ${errorCount > 0 ? 'bg-red-500/10 text-red-400 border-red-500/20 font-medium' : 'bg-red-500/5 text-red-400/50 border-red-500/10'}`}>
+            {errorCount} {errorCount === 1 ? 'error' : 'errors'}
+          </span>
+          {warnCount > 0 && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+              {warnCount} {warnCount === 1 ? 'warning' : 'warnings'}
+            </span>
+          )}
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] border border-[var(--border-secondary)]">
+            {alerts.length} agent {alerts.length === 1 ? 'alert' : 'alerts'}
+          </span>
+        </div>
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            onClick={onRefresh}
+            className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-md hover:bg-[var(--bg-tertiary)]"
+            title="Refresh"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Section A: Warnings & Errors from session log */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+              Warnings &amp; Errors
+            </h3>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] border border-[var(--border-secondary)]">
+              {issuesFromLogs.length}
+            </span>
+          </div>
+          {/* Errors only toggle */}
+          <button
+            onClick={() => setErrorsOnly((v) => !v)}
+            className={`text-[10px] px-2.5 py-1 rounded-full border transition-colors ${
+              errorsOnly
+                ? 'bg-red-500/15 text-red-400 border-red-500/30'
+                : 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] border-[var(--border-secondary)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            Errors only
+          </button>
+        </div>
+
+        <div className="rounded-xl overflow-hidden border border-[var(--border-primary)]">
+          <div className="max-h-80 overflow-y-auto">
+            {displayedIssues.length === 0 ? (
+              <div className="px-5 py-10 text-center text-sm text-[var(--text-tertiary)]">
+                {errorsOnly
+                  ? 'No errors in the current session log.'
+                  : 'No warnings or errors in the current session log.'}
+              </div>
+            ) : (
+              <div className="divide-y divide-[var(--border-secondary)]/40">
+                {displayedIssues.map((entry, i) => {
+                  const lvl = LEVEL_STYLES[entry.level] || LEVEL_STYLES.info;
+                  const isError = entry.level === 'error';
+                  const isAcked = isError && acknowledgedErrors && acknowledgedErrors.has(errFp(entry));
+                  return (
+                    <div
+                      key={i}
+                      className={`px-5 py-3 hover:bg-[var(--bg-tertiary)]/30 transition-colors cursor-pointer group ${isAcked ? 'opacity-50' : ''}`}
+                      onClick={() => setSelectedLog(entry)}
+                      title="Click to view full log detail"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border ${lvl} shrink-0 mt-0.5`}>
+                          {entry.level}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-[var(--text-primary)] break-words">{entry.message}</div>
+                          <div className="flex items-center gap-3 mt-1 flex-wrap">
+                            <span className="text-[10px] text-[var(--text-tertiary)]">{timeAgo(entry.timestamp)}</span>
+                            {entry.source && <span className="text-[10px] text-[var(--text-tertiary)] font-mono">{entry.source}</span>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <svg className="w-3.5 h-3.5 text-[var(--text-tertiary)] opacity-0 group-hover:opacity-60 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                          </svg>
+                          {isError && (
+                            isAcked
+                              ? <span className="text-[10px] text-green-500/60">✓ acked</span>
+                              : <button
+                                onClick={(e) => { e.stopPropagation(); acknowledgeError && acknowledgeError(errFp(entry)); }}
+                                className="text-[10px] text-[var(--text-tertiary)] hover:text-green-400 border border-[var(--border-secondary)] rounded px-1.5 py-0.5 transition-colors"
+                              >Dismiss</button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Section B: Agent Alerts */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+            Agent Alerts
+          </h3>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] border border-[var(--border-secondary)]">
+            {alerts.length}
+          </span>
+        </div>
+
+        <div className="rounded-xl overflow-hidden border border-[var(--border-primary)]">
+          <div className="max-h-[calc(100vh-580px)] min-h-[120px] overflow-y-auto">
+            {alerts.length === 0 ? (
+              <div className="px-5 py-10 text-center text-sm text-[var(--text-tertiary)]">
+                No alerts recorded yet. The agent sends alerts automatically when issues are detected.
+              </div>
+            ) : (
+              <div className="divide-y divide-[var(--border-secondary)]/40">
+                {alerts.map((alert, i) => (
+                  <div key={i} className="px-5 py-4 hover:bg-[var(--bg-tertiary)]/20 transition-colors">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-medium text-[var(--text-primary)]">{alert.alert_type}</span>
+                      <span className="text-[10px] text-[var(--text-tertiary)]">{timeAgo(alert.timestamp)}</span>
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)] mb-2">{alert.details}</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] text-[var(--text-tertiary)]">
+                        Sent to: {alert.sent?.length || 0} | Failed: {alert.failed?.length || 0}
+                      </span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                        alert.health_status?.status === 'healthy' ? 'bg-green-400/10 text-green-400'
+                        : alert.health_status?.status === 'unhealthy' ? 'bg-red-400/10 text-red-400'
                         : 'bg-gray-400/10 text-gray-400'
                       }`}>
-                      {alert.health_status?.status || 'unknown'}
-                    </span>
+                        {alert.health_status?.status || 'unknown'}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
