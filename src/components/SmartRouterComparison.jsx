@@ -6,7 +6,7 @@ import { streamChat, streamDemoChat } from '../services/hermaApi';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
 const ComparisonMarkdown = ({ content }) => (
-  <div className="prose prose-sm prose-invert max-w-none text-[var(--text-primary)]">
+  <div className="prose prose-sm max-w-none text-[var(--text-primary)]">
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
@@ -242,7 +242,7 @@ const SmartRouterComparison = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto mt-12 mb-20 animate-fade-up relative">
-      <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-xl border border-[var(--border-secondary)] overflow-hidden">
+      <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-2xl border border-[var(--border-accent)] overflow-hidden" style={{ boxShadow: '0 8px 40px rgba(79,76,232,0.10), 0 2px 8px rgba(0,0,0,0.08)' }}>
         {/* Header / Input Area */}
         <div className="p-6 sm:p-8 border-b border-[var(--border-secondary)] bg-[var(--bg-tertiary)]/50">
           <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] text-center mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
@@ -424,7 +424,7 @@ const SmartRouterComparison = () => {
                 <div className="flex justify-between items-end mb-1">
                   <span className="text-xs sm:text-sm text-[var(--text-primary)] font-medium">Herma Cost</span>
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="text-[10px] sm:text-xs font-bold text-green-500 bg-green-100 px-1 sm:px-1.5 py-0.5 rounded uppercase tracking-wider">SAVINGS</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-[#5BAF8A] bg-[#5BAF8A]/15 px-1 sm:px-1.5 py-0.5 rounded uppercase tracking-wider">SAVINGS</span>
                     <span className="text-lg sm:text-2xl font-bold text-[var(--accent-primary)]">{hermaResult.cost}</span>
                   </div>
                 </div>

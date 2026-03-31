@@ -139,7 +139,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]">
+    <div className="min-h-screen flex flex-col pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-6">
           <span

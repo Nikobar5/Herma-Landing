@@ -23,14 +23,14 @@ const HowWeBenchmark = () => {
   useEffect(() => {
     setPageMeta(
       'How We Benchmark AI Routers: Methodology, Pitfalls, and What We Learned',
-      'The real challenges of benchmarking a model routing system — broken datasets, answer extraction bugs, and what we learned about classifier design.',
+      'The real challenges of benchmarking a model routing system | broken datasets, answer extraction bugs, and what we learned about classifier design.',
       { type: 'article' }
     );
     setStructuredData('ld-article-how-we-benchmark', {
       '@context': 'https://schema.org',
       '@type': 'Article',
       headline: 'How We Benchmark AI Routers: Methodology, Pitfalls, and What We Learned',
-      description: 'The real challenges of benchmarking a model routing system — broken datasets, answer extraction bugs, and what we learned about classifier design.',
+      description: 'The real challenges of benchmarking a model routing system | broken datasets, answer extraction bugs, and what we learned about classifier design.',
       author: { '@type': 'Organization', name: 'Herma AI' },
       publisher: { '@type': 'Organization', name: 'Herma AI' },
       datePublished: '2026-03-22',

@@ -23,7 +23,7 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
       {subscription && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#5BAF8A] inline-block shadow-[0_0_8px_rgba(91,175,138,0.4)]" />
             <span className="text-xs font-medium text-[var(--text-primary)] capitalize" style={{ fontFamily: 'var(--font-ui)' }}>
               {subscription.plan} Plan
             </span>

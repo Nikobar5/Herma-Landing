@@ -220,3 +220,166 @@ All files use only real API details from the live docs: base URL `https://api.he
 - **Each tab shows**: The raw file content in a `CodeBlock` (with copy button) + filename instruction + Download link pointing to `/integration/`.
 - **Also includes**: An environment variables block with a `.env.example` download link, and a note explaining llms.txt auto-discovery.
 - **Title history**: Originally "Use with AI Coding Tools" → "Integrate with Coding Tools" → "Quick Start with Coding Tools".
+
+---
+
+# SEO, CRO, and Design Overhaul
+
+## Overview
+Comprehensive audit and improvement pass covering SEO meta tags, conversion rate optimization, auth-aware CTAs, design theme migration, and visual polish.
+
+---
+
+## SEO — Tab Titles & Meta Tags
+
+### Title Format (`src/utils/seo.js`, `public/index.html`)
+- Changed format from `Page Title | Herma` to `Herma | Page Title` — brand name always appears first in browser tabs and search results
+- Replaced all em dashes (`—`) with pipes (`|`) in every page title and meta description string — ensures clean display in Google search snippets
+- Updated `public/index.html` static title to `Herma | AI Model Router | Save 60-90% on AI Costs`
+- Updated og:title and twitter:title in `index.html` to match
+
+### Per-Page Meta Tags Added
+Previously all non-blog pages showed as bare "Herma" in Google results. Added `setPageMeta()` + `resetPageMeta()` useEffect to:
+- `src/App.jsx` — Home: `Herma | AI Model Router | Save 60-90% on AI Costs`
+- `src/pages/Documentation.jsx` — `Herma | API Documentation`
+- `src/pages/FAQPage.jsx` — `Herma | Frequently Asked Questions`
+- `src/pages/PurchasePage.jsx` — `Herma | Pricing | AI Model Router`
+- `src/pages/About.jsx` — `Herma | About`
+- `src/pages/DemoChat.jsx` — `Herma | Try the Demo`
+- `src/pages/blog/BlogIndex.jsx` — `Herma | LLM Router Blog | AI Cost Optimization Guides`
+
+### seo.js Fixes
+- `DEFAULT_IMAGE`: was `og-default.png` (nonexistent file) → corrected to `og-image.png`
+- `DEFAULT_DESCRIPTION`: aligned with `index.html` meta description
+- Added canonical link tag injection into `setPageMeta()` — every page that calls it now automatically gets `<link rel="canonical">`
+
+### Em Dash Fixes in Meta Strings
+Files where `—` was replaced with `|` in title or description strings passed to `setPageMeta` or used in structured data:
+- `BlogIndex.jsx`, `EVRouting.jsx`, `PurchasePage.jsx`, `FAQPage.jsx`
+- `HowWeBenchmark.jsx`, `OpenAIAlternatives.jsx`, `SaveOnAICosts.jsx`
+- `App.jsx` (Organization schema description)
+- `public/index.html` (og:title, twitter:title, page title, noscript blog link)
+
+### Schema / Noscript Fixes (`public/index.html`)
+- WebApplication schema `offers` description: removed "no subscriptions" language → neutral billing copy
+- FAQPage schema answer for "How much does Herma cost?": removed "There are no subscriptions, no minimums" → neutral language
+- Noscript pricing text: same fix
+
+---
+
+## Conversion Rate Optimization
+
+### Hero Section (`src/components/Hero.jsx`)
+- Primary CTA is now auth-aware: logged-in → "Go to chat" → `/chat`; logged-out → "Start saving" → `/login?signup=true`
+- CTA text simplified from "Start saving — free to try" to "Start saving"
+- Added micro-copy below CTAs: "Free $1 credit to start · No credit card required"
+- Added trust bar: three checkmark items — "89% avg. cost savings", "OpenAI-compatible API", "8/8 subset of Terminal-Bench"
+
+### Footer (`src/components/Footer.jsx`)
+- CTA heading: "Ready to try it out?" → "Ready to start saving?"
+- Button is now auth-aware: logged-in → `/chat`; logged-out → `/login?signup=true`
+- Added GitHub social link alongside LinkedIn
+
+### ValueProposition (`src/components/ValueProposition.jsx`)
+- Savings calculator CTA is now auth-aware: logged-in → `/chat`; logged-out → `/login?signup=true`
+
+### DemoChat (`src/pages/DemoChat.jsx`)
+- "Sign up free" button in top bar: hidden for logged-in users, replaced with "Go to chat" → `/chat`
+- Demo banner ("sign up to unlock all models"): hidden for logged-in users
+- Limit-reached button: auth-aware — logged-in → "Go to chat"; logged-out → "Sign up free — $1.00 credit included"
+
+### Documentation (`src/pages/Documentation.jsx`)
+- Removed duplicate "Ready to get started?" CTA section at the bottom of the page — Footer CTA is the only one now
+- Fixed inline pricing badge: "no subscriptions, no minimums" → "no minimums"
+
+### FAQ Subscription Contradiction (`src/pages/FAQPage.jsx`)
+- Items #6 and #9: removed "There are no subscriptions" — updated to neutral language describing both pay-as-you-go and subscription options
+
+---
+
+## Auth-Aware Navigation
+
+All public CTAs now check auth state before navigating. Logged-in users are never sent to `/login`:
+
+| Component | Logged In | Logged Out |
+|---|---|---|
+| Hero primary CTA | `/chat` | `/login?signup=true` |
+| Footer CTA | `/chat` | `/login?signup=true` |
+| ValueProposition savings CTA | `/chat` | `/login?signup=true` |
+| DemoChat top bar button | `/chat` (Go to chat) | `/login?signup=true` |
+| DemoChat demo banner | hidden | visible |
+| DemoChat limit-reached button | `/chat` | `/login?signup=true` |
+
+---
+
+## Login Page Fix (`src/pages/Login.jsx`)
+- Fixed title/heading being clipped behind the fixed header
+- Changed outer container from `min-h-screen flex flex-col justify-center py-12` to `min-h-screen flex flex-col pt-24 pb-12`
+- Form now starts below the header rather than being vertically centered in the full viewport
+
+---
+
+## Design — Warm Light Theme (`src/App.css`)
+
+Full migration from dark (#09090B) to warm cream/off-white light theme:
+
+| Variable | Before | After |
+|---|---|---|
+| `--bg-primary` | `#09090B` | `#FAFAF8` |
+| `--bg-secondary` | `#111114` | `#F3F2EF` |
+| `--bg-tertiary` | `#1A1A1F` | `#ECEAE5` |
+| `--bg-hover` | `#222228` | `#E5E3DE` |
+| `--bg-active` | `#2A2A32` | `#DDD9D3` |
+| `--text-primary` | `#F4F4F5` | `#1A1916` |
+| `--text-secondary` | `#A1A1AA` | `#6B6762` |
+| `--text-tertiary` | `#71717A` | `#9A9691` |
+| `--accent-primary` | `#818CF8` | `#4F4CE8` |
+| `--accent-hover` | `#6366F1` | `#3D3BB8` |
+| `--border-primary` | `rgba(255,255,255,0.08)` | `rgba(0,0,0,0.08)` |
+| `--font-body` | `'PT Serif', Georgia, serif` | `'Outfit', -apple-system, sans-serif` |
+
+Removed `prose-invert` Tailwind class from components where it made markdown invisible on the light background:
+- `src/components/SmartRouterComparison.jsx`
+- `src/components/chat/ChatMessage.jsx`
+- `src/pages/DemoChat.jsx`
+
+---
+
+## Green Color Replacement
+
+Replaced all neon emerald/green (`emerald-400`, `#34D399`) with pastel sage green (`#5BAF8A`) across every user-facing file. Covers text color, backgrounds, borders, gradients, glow shadows, and chart colors.
+
+**Files updated:**
+- `src/components/BenchmarkTrust.jsx`
+- `src/components/Hero.jsx`
+- `src/components/ValueProposition.jsx`
+- `src/components/ComplianceSection.jsx`
+- `src/components/IntegrationWizard.jsx`
+- `src/components/SmartRouterComparison.jsx`
+- `src/components/SuccessPage.jsx`
+- `src/components/OnboardingModal.jsx`
+- `src/components/chat/PaywallModal.jsx`
+- `src/components/chat/BalanceBadge.jsx`
+- `src/pages/Documentation.jsx`
+- `src/pages/PurchasePage.jsx`
+- `src/pages/ResetPassword.jsx`
+- `src/pages/VerifyEmail.jsx`
+- `src/pages/dashboard/Overview.jsx`
+- `src/pages/dashboard/Usage.jsx`
+- `src/pages/dashboard/Billing.jsx`
+- `src/pages/dashboard/ApiKeys.jsx`
+- `src/pages/dashboard/Quality.jsx`
+- `src/pages/dashboard/FunnelTab.jsx`
+
+Blog comparison tables intentionally left with green — those use it semantically to highlight "winner" in head-to-head model comparisons, not as a brand color.
+
+---
+
+## Benchmark Stats
+
+### BenchmarkTrust (`src/components/BenchmarkTrust.jsx`)
+- Animated stat card: `6/8` → `8/8`
+- Label: "benchmarks at 100%+ quality" → "subset of Terminal-Bench"
+
+### Hero trust bar (`src/components/Hero.jsx`)
+- "6/8 benchmarks at 100%+ quality" → "8/8 subset of Terminal-Bench"

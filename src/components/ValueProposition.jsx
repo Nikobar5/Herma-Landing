@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useHermaAuth } from '../context/HermaAuthContext';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 // Herma pricing: $2/1M input, $8/1M output
@@ -36,6 +37,7 @@ function formatDollars(amount) {
 
 const ValueProposition = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useHermaAuth();
   const [headerRef, headerVisible] = useScrollAnimation(0.1);
   const [calcRef, calcVisible] = useScrollAnimation(0.1);
   const [models] = useState(FALLBACK_MODELS);
@@ -232,7 +234,7 @@ const ValueProposition = () => {
               </div>
 
               {/* Savings Summary */}
-              <div className="bg-[var(--bg-tertiary)] rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-emerald-500/20">
+              <div className="bg-[var(--bg-tertiary)] rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-[#5BAF8A]/20">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-center sm:text-left">
                     <p
@@ -242,7 +244,7 @@ const ValueProposition = () => {
                       Your Monthly Savings
                     </p>
                     <p
-                      className="text-3xl sm:text-4xl font-bold text-emerald-400"
+                      className="text-3xl sm:text-4xl font-bold text-[#5BAF8A]"
                       style={{ fontFamily: 'var(--font-heading)' }}
                     >
                       {formatDollars(costs.savings)}/mo
@@ -250,7 +252,7 @@ const ValueProposition = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <div
-                      className="text-4xl sm:text-5xl font-bold text-emerald-400"
+                      className="text-4xl sm:text-5xl font-bold text-[#5BAF8A]"
                       style={{ fontFamily: 'var(--font-heading)' }}
                     >
                       {costs.savingsPercent.toFixed(0)}%
@@ -269,7 +271,7 @@ const ValueProposition = () => {
               {costs.savings > 0 && (
                 <div className="flex justify-center mt-6">
                   <button
-                    onClick={() => navigate('/login?signup=true')}
+                    onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
                     className="px-8 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >

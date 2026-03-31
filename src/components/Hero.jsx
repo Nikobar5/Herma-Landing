@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useHermaAuth } from '../context/HermaAuthContext';
 import SmartRouterComparison from './SmartRouterComparison';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useHermaAuth();
 
   const handleTryItOut = () => {
     navigate('/demo');
@@ -51,14 +53,14 @@ const Hero = () => {
               </p>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 animate-hero-delayed-more">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 animate-hero-delayed-more">
                 <button
-                  onClick={() => navigate('/login?signup=true')}
+                  onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
                   className="px-8 py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] min-w-[200px]"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   <span className="flex items-center justify-center gap-2">
-                    Get started free
+                    {isAuthenticated ? 'Go to chat' : 'Start saving'}
                     <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -66,11 +68,39 @@ const Hero = () => {
                 </button>
                 <button
                   onClick={handleTryItOut}
-                  className="px-8 py-4 border border-[var(--border-secondary)] text-[var(--text-secondary)] font-semibold rounded-lg hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all duration-200 min-w-[200px]"
+                  className="px-8 py-4 border border-[var(--accent-primary)]/50 text-[var(--accent-primary)] bg-[var(--accent-primary)]/5 font-semibold rounded-lg hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)] transition-all duration-200 min-w-[200px]"
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Try the demo
                 </button>
+              </div>
+
+              {/* CRO: friction-reducing micro-copy below CTAs */}
+              <p
+                className="text-sm text-[var(--text-tertiary)] mb-6 animate-hero-delayed-more"
+                style={{ fontFamily: 'var(--font-ui)' }}
+              >
+                Free $1 credit to start &middot; No credit card required
+              </p>
+
+              {/* CRO: trust bar — surface benchmark social proof near CTA, not just below the fold */}
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 animate-hero-delayed-more">
+                {[
+                  '89% avg. cost savings',
+                  'OpenAI-compatible API',
+                  '8/8 subset of Terminal-Bench',
+                ].map((item) => (
+                  <span
+                    key={item}
+                    className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    <svg className="w-3.5 h-3.5 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </span>
+                ))}
               </div>
 
 

@@ -6,14 +6,14 @@ import { setPageMeta, resetPageMeta, setStructuredData, removeStructuredData } f
 const EVRouting = () => {
   useEffect(() => {
     setPageMeta(
-      'Why AI Routers Fail — And How Expected Value Fixes Them',
+      'Why AI Routers Fail | How Expected Value Fixes Them',
       'Most AI routers treat quality as a linear tradeoff. It isn\'t. Here\'s the expected value framework that makes routing safe enough to actually use.',
       { type: 'article' }
     );
     setStructuredData('ld-article-ev-routing', {
       '@context': 'https://schema.org',
       '@type': 'Article',
-      headline: 'Why AI Routers Fail — And How Expected Value Fixes Them',
+      headline: 'Why AI Routers Fail | How Expected Value Fixes Them',
       description: 'Most AI routers treat quality as a linear tradeoff. It isn\'t. Here\'s the expected value framework that makes routing safe enough to actually use.',
       author: { '@type': 'Organization', name: 'Herma AI' },
       publisher: { '@type': 'Organization', name: 'Herma AI' },

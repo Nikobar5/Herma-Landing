@@ -1,6 +1,7 @@
-const DEFAULT_TITLE = 'Herma';
-const DEFAULT_DESCRIPTION = 'One API for every AI model. Herma routes your queries to the best model for the job — unified access, smart routing, and full cost visibility.';
-const DEFAULT_IMAGE = 'https://hermaai.com/og-default.png';
+const DEFAULT_TITLE = 'Herma | AI Model Router | Save 60-90% on AI Costs';
+// SEO: align with index.html meta description (og-default.png was a bug — og-image.png is the correct file)
+const DEFAULT_DESCRIPTION = 'Herma AI is an intelligent LLM router that routes API calls to the optimal model for each task. OpenAI-compatible API with 60-90% cost savings versus frontier models. Free $1 to start.';
+const DEFAULT_IMAGE = 'https://hermaai.com/og-image.png';
 
 /**
  * Sets page title, meta description, OpenGraph, and Twitter Card tags.
@@ -10,7 +11,7 @@ const DEFAULT_IMAGE = 'https://hermaai.com/og-default.png';
  * @param {object} options - Optional: { url, image, type }
  */
 export function setPageMeta(title, description, options = {}) {
-  const fullTitle = title ? `${title} | Herma` : DEFAULT_TITLE;
+  const fullTitle = title ? `Herma | ${title}` : DEFAULT_TITLE;
   document.title = fullTitle;
 
   const url = options.url || window.location.href;
@@ -40,6 +41,15 @@ export function setPageMeta(title, description, options = {}) {
     }
     meta.setAttribute('content', content);
   });
+
+  // SEO: inject canonical link tag to prevent duplicate content penalties
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonical);
+  }
+  canonical.setAttribute('href', url);
 }
 
 /**

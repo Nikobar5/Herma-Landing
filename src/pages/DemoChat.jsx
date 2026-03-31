@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useHermaAuth } from '../context/HermaAuthContext';
 import { streamDemoChat } from '../services/hermaApi';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
 import ReactMarkdown from 'react-markdown';
@@ -180,7 +181,7 @@ const DemoMessage = React.memo(({ message, isLast, isStreaming }) => {
         )}
 
         <div
-          className={`prose prose-base prose-invert max-w-none ${message.error ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'}`}
+          className={`prose prose-base max-w-none ${message.error ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'}`}
           style={{ fontFamily: 'var(--font-ui)' }}
         >
           {renderedMarkdown}
@@ -238,6 +239,7 @@ const DemoMessage = React.memo(({ message, isLast, isStreaming }) => {
 
 const DemoChat = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useHermaAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -250,7 +252,7 @@ const DemoChat = () => {
   const limitReached = userMessageCount >= MAX_DEMO_MESSAGES;
 
   useEffect(() => {
-    setPageMeta('Try Herma', "Try Herma's intelligent model router for free. Same quality, fraction of the price.");
+    setPageMeta('Try the Demo', "Try Herma's intelligent model router for free. Same quality, fraction of the price.");
     return () => resetPageMeta();
   }, []);
 
@@ -396,16 +398,28 @@ const DemoChat = () => {
           {userMessageCount}/{MAX_DEMO_MESSAGES} messages
         </span>
 
-        <button
-          onClick={() => navigate('/login')}
-          className="px-4 py-1.5 bg-[var(--accent-primary)] text-[var(--text-inverse)] text-sm font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
-          style={{ fontFamily: 'var(--font-ui)' }}
-        >
-          Sign up free
-        </button>
+        {!isAuthenticated && (
+          <button
+            onClick={() => navigate('/login?signup=true')}
+            className="px-4 py-1.5 bg-[var(--accent-primary)] text-[var(--text-inverse)] text-sm font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Sign up free
+          </button>
+        )}
+        {isAuthenticated && (
+          <button
+            onClick={() => navigate('/chat')}
+            className="px-4 py-1.5 bg-[var(--accent-primary)] text-[var(--text-inverse)] text-sm font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Go to chat
+          </button>
+        )}
       </div>
 
-      {/* Demo banner */}
+      {/* Demo banner — only shown to non-authenticated users */}
+      {!isAuthenticated && (
       <div className="flex items-center justify-center gap-3 px-4 py-2 bg-[var(--accent-primary)]/10 border-b border-[var(--accent-primary)]/20 flex-shrink-0">
         <span
           className="text-sm text-[var(--accent-primary)] font-medium"
@@ -414,13 +428,14 @@ const DemoChat = () => {
           Free demo — sign up to unlock all models, memory, and web search.
         </span>
         <button
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/login?signup=true')}
           className="px-3 py-1 bg-[var(--accent-primary)] text-[var(--text-inverse)] text-xs font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors"
           style={{ fontFamily: 'var(--font-ui)' }}
         >
           Sign up
         </button>
       </div>
+      )}
 
       {/* Main content */}
       <div className="flex-1 overflow-hidden relative flex flex-col">
@@ -535,11 +550,11 @@ const DemoChat = () => {
                         You've used all {MAX_DEMO_MESSAGES} demo messages.
                       </p>
                       <button
-                        onClick={() => navigate('/login')}
+                        onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
                         className="px-6 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors shadow-lg"
                         style={{ fontFamily: 'var(--font-ui)' }}
                       >
-                        Sign up free — $1.00 credit included
+                        {isAuthenticated ? 'Go to chat' : 'Sign up free — $1.00 credit included'}
                       </button>
                       <p
                         className="text-xs text-[var(--text-tertiary)]"

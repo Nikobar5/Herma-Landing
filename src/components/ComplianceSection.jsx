@@ -76,9 +76,9 @@ const ComplianceSection = () => {
           </div>
 
           {/* Privacy by Design */}
-          <div className="bg-[var(--bg-secondary)] p-4 sm:p-6 rounded-xl border border-[var(--border-primary)] hover:border-emerald-500/30 hover:shadow-lg transition-all duration-300">
+          <div className="bg-[var(--bg-secondary)] p-4 sm:p-6 rounded-xl border border-[var(--border-primary)] hover:border-[#5BAF8A]/30 hover:shadow-lg transition-all duration-300">
             <div className="mb-3 sm:mb-4">
-              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-[#5BAF8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
               </svg>
             </div>

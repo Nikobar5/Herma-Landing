@@ -57,7 +57,7 @@ const SaveOnAICosts = () => {
   useEffect(() => {
     setPageMeta(
       'How to Save 65% on AI API Costs Without Losing Quality',
-      'Three approaches to cutting AI API costs — prompt optimization, manual model switching, and intelligent routing. Real numbers, real tradeoffs, and what actually works in production.',
+      'Three approaches to cutting AI API costs | prompt optimization, manual model switching, and intelligent routing. Real numbers, real tradeoffs, and what actually works in production.',
       { type: 'article' }
     );
     setStructuredData('ld-article-save-ai-costs', {
@@ -65,7 +65,7 @@ const SaveOnAICosts = () => {
       '@type': 'Article',
       headline: 'How to Save 65% on AI API Costs Without Losing Quality',
       description:
-        'Three approaches to cutting AI API costs — prompt optimization, manual model switching, and intelligent routing. Real numbers, real tradeoffs, and what actually works in production.',
+        'Three approaches to cutting AI API costs | prompt optimization, manual model switching, and intelligent routing. Real numbers, real tradeoffs, and what actually works in production.',
       author: { '@type': 'Organization', name: 'Herma AI' },
       publisher: { '@type': 'Organization', name: 'Herma AI' },
       datePublished: '2026-03-24',

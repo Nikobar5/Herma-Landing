@@ -12,6 +12,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HermaAuthProvider } from './context/HermaAuthContext';
 import { initAnalytics, trackPageView, trackScrollDepth, trackTimeOnPage, trackPerformance } from './services/analyticsTracker';
+import { setPageMeta, resetPageMeta } from './utils/seo';
 
 // Lazy-loaded pages — each becomes a separate chunk
 const Login = lazy(() => import('./pages/Login'));
@@ -130,6 +131,16 @@ const ConditionalFooter = () => {
 // Home component to wrap main page content
 const Home = () => {
   useEffect(() => {
+    // SEO: keyword-rich title and meta for homepage
+    setPageMeta(
+      'AI Model Router | Save 60-90% on AI Costs',
+      'Herma routes every API call to the cheapest model that maintains frontier quality. OpenAI-compatible — swap your API key and keep your code. Free $1 to start.',
+      { url: 'https://hermaai.com', type: 'website' }
+    );
+    return () => resetPageMeta();
+  }, []);
+
+  useEffect(() => {
     // Organization structured data for rich search results
     const script = document.createElement('script');
     script.id = 'ld-organization';
@@ -139,7 +150,7 @@ const Home = () => {
       '@type': 'Organization',
       name: 'Herma AI',
       url: 'https://hermaai.com',
-      description: 'Intelligent LLM router — same AI quality, save 65%+ on costs. OpenAI-compatible API.',
+      description: 'Intelligent LLM router | same AI quality, save 65%+ on costs. OpenAI-compatible API.',
       sameAs: ['https://github.com/Nikobar5/herma-eval'],
     });
     document.head.appendChild(script);

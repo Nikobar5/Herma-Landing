@@ -218,7 +218,7 @@ const Billing = () => {
       </div>
 
       {successMsg && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-sm font-medium">
+        <div className="p-4 bg-[#5BAF8A]/10 border border-[#5BAF8A]/20 rounded-lg text-[#5BAF8A] text-sm font-medium">
           {successMsg}
         </div>
       )}
@@ -358,7 +358,7 @@ const Billing = () => {
 
             {/* Feedback messages */}
             {autoRechargeMsg && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-sm font-medium">
+              <div className="p-3 bg-[#5BAF8A]/10 border border-[#5BAF8A]/20 rounded-lg text-[#5BAF8A] text-sm font-medium">
                 {autoRechargeMsg}
               </div>
             )}
@@ -420,7 +420,7 @@ const Billing = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-[var(--text-secondary)]">
                           {new Date(payment.created_at || payment.date).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right font-mono font-medium text-emerald-400">
+                        <td className="px-6 py-4 whitespace-nowrap text-right font-mono font-medium text-[#5BAF8A]">
                           ${parseFloat(payment.amount_usd || payment.amount || 0).toFixed(2)}
                         </td>
                         <td className="px-6 py-4 text-[var(--text-tertiary)] max-w-xs truncate">
@@ -483,14 +483,14 @@ const Billing = () => {
                           {new Date(entry.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${entry.type === 'topup' ? 'bg-emerald-500/10 text-emerald-400' :
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${entry.type === 'topup' ? 'bg-[#5BAF8A]/10 text-[#5BAF8A]' :
                               entry.type === 'usage' ? 'bg-blue-500/10 text-blue-400' :
                                 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
                             }`}>
                             {TYPE_LABELS[entry.type] || entry.type}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap text-right font-mono font-medium ${isPositive ? 'text-emerald-400' : 'text-[var(--text-primary)]'}`}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-right font-mono font-medium ${isPositive ? 'text-[#5BAF8A]' : 'text-[var(--text-primary)]'}`}>
                           {isPositive ? '+' : ''}${Math.abs(amount).toFixed(4)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right font-mono text-[var(--text-tertiary)]">
