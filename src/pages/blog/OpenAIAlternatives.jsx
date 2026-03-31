@@ -103,14 +103,14 @@ const OpenAIAlternatives = () => {
   useEffect(() => {
     setPageMeta(
       '7 Best OpenAI Alternatives for Developers in 2026',
-      'A developer\'s guide to the best OpenAI API alternatives. Compare Claude, Gemini, DeepSeek, Llama, Mistral, and more — with pricing, tradeoffs, and migration advice.',
+      'A developer\'s guide to the best OpenAI API alternatives. Compare Claude, Gemini, DeepSeek, Llama, Mistral, and more | pricing, tradeoffs, and migration advice.',
       { type: 'article' }
     );
     setStructuredData('ld-article-openai-alternatives', {
       '@context': 'https://schema.org',
       '@type': 'Article',
       headline: '7 Best OpenAI Alternatives for Developers in 2026',
-      description: 'A developer\'s guide to the best OpenAI API alternatives. Compare Claude, Gemini, DeepSeek, Llama, Mistral, and more — with pricing, tradeoffs, and migration advice.',
+      description: 'A developer\'s guide to the best OpenAI API alternatives. Compare Claude, Gemini, DeepSeek, Llama, Mistral, and more | pricing, tradeoffs, and migration advice.',
       author: { '@type': 'Organization', name: 'Herma AI' },
       publisher: { '@type': 'Organization', name: 'Herma AI' },
       datePublished: '2026-03-25',

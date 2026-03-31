@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { setPageMeta, resetPageMeta } from '../utils/seo';
 
 const CodeBlock = ({ children, language }) => {
   const [copied, setCopied] = useState(false);
@@ -116,6 +117,16 @@ const TabGroup = ({ tabs }) => {
 const Documentation = () => {
   const API_URL = 'https://api.hermaai.com';
 
+  useEffect(() => {
+    // SEO: per-page title for docs — currently shows as bare "Herma" in search results
+    setPageMeta(
+      'API Documentation',
+      'Herma is OpenAI-compatible — change two lines of code to start routing AI calls intelligently. Python, Node.js, and curl examples. Free $1 to start.',
+      { url: 'https://hermaai.com/docs' }
+    );
+    return () => resetPageMeta();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] pt-24 pb-16">
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -135,10 +146,10 @@ const Documentation = () => {
             Herma provides an OpenAI-compatible API. Change two lines of code and you're up and running.
           </p>
           <div
-            className="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg"
+            className="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-[#5BAF8A]/10 border border-[#5BAF8A]/20 rounded-lg"
           >
-            <span className="text-emerald-400 text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
-              Pricing: $2/M input tokens, $8/M output tokens — no subscriptions, no minimums
+            <span className="text-[#5BAF8A] text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
+              Pricing: $2/M input tokens, $8/M output tokens | no minimums
             </span>
           </div>
         </div>
@@ -520,7 +531,7 @@ HERMA_API_KEY=hk-your-api-key-here`}</CodeBlock>
           >
             <div className="flex items-center gap-3 mb-3">
               <span
-                className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded"
+                className="px-2.5 py-1 bg-[#5BAF8A]/10 text-[#5BAF8A] text-xs font-bold rounded"
                 style={{ fontFamily: 'var(--font-code)' }}
               >
                 POST
@@ -771,7 +782,7 @@ while (true) {
                 <tr>
                   <td className="px-4 py-3">
                     <code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code>
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">Recommended</span>
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#5BAF8A]/15 text-[#5BAF8A] font-medium">Recommended</span>
                   </td>
                   <td className="px-4 py-3 text-[var(--text-secondary)]">Automatic routing — Herma picks the best model for each request</td>
                 </tr>
@@ -978,35 +989,6 @@ while (true) {
                 <span><strong className="text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>50 concurrent requests</strong> per account</span>
               </li>
             </ul>
-          </div>
-        </section>
-
-
-        {/* CTA */}
-        <section className="text-center">
-          <div
-            className="bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-hover)] p-8 sm:p-10"
-            style={{ borderRadius: 'var(--radius-md)' }}
-          >
-            <h2
-              className="text-2xl font-bold text-white mb-3"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Ready to get started?
-            </h2>
-            <p
-              className="text-indigo-100 mb-6"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
-              Create an account, add credits, and start making API calls in minutes.
-            </p>
-            <a
-              href="/login"
-              className="inline-block px-8 py-3 bg-white text-[var(--accent-primary)] font-semibold rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-              style={{ fontFamily: 'var(--font-ui)' }}
-            >
-              Get Started
-            </a>
           </div>
         </section>
 

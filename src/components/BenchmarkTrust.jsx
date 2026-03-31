@@ -96,13 +96,13 @@ const BenchmarkTrust = () => {
                 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-purple-400 bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                <AnimatedNumber target={6} suffix="/8" duration={1200} />
+                <AnimatedNumber target={8} suffix="/8" duration={1200} />
               </p>
               <p
                 className="text-sm sm:text-base text-[var(--text-secondary)]"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                benchmarks at 100%+ quality
+                subset of Terminal-Bench
               </p>
             </div>
           </div>
@@ -111,7 +111,7 @@ const BenchmarkTrust = () => {
           <div className="relative group delay-100">
             <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
               <p
-                className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-emerald-400 to-[var(--accent-primary)] bg-clip-text text-transparent mb-2"
+                className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#5BAF8A] to-[var(--accent-primary)] bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
                 <AnimatedNumber target={89} suffix="%" duration={1300} />
@@ -129,7 +129,7 @@ const BenchmarkTrust = () => {
           <div className="relative group delay-200">
             <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
               <p
-                className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent mb-2"
+                className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-[#5BAF8A] bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
                 <AnimatedNumber target={540} suffix="+" duration={1500} />
@@ -221,7 +221,7 @@ const BenchmarkTrust = () => {
                         <td className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-right">
                           <span
                             className={`inline-flex items-center gap-1.5 text-sm sm:text-base font-bold ${
-                              bench.quality >= 100 ? 'text-emerald-400' : passes ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'
+                              bench.quality >= 100 ? 'text-[#5BAF8A]' : passes ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'
                             }`}
                             style={{ fontFamily: 'var(--font-heading)' }}
                           >

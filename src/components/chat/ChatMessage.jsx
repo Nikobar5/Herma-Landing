@@ -330,7 +330,7 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
         )}
 
         <div
-          className={`prose prose-base prose-invert max-w-none ${message.error ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'}`}
+          className={`prose prose-base max-w-none ${message.error ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'}`}
           style={{ fontFamily: 'var(--font-ui)' }}
         >
           {renderedMarkdown}

@@ -144,7 +144,12 @@ const blogPosts = [
 
 const BlogIndex = () => {
   useEffect(() => {
-    setPageMeta('Blog', 'Technical deep-dives on intelligent model routing from the Herma engineering team.');
+    // SEO: keyword-targeted title for blog index (was too generic "Blog")
+    setPageMeta(
+      'LLM Router Blog | AI Cost Optimization Guides',
+      'Technical guides on LLM routing, AI cost optimization, and model benchmarking. Real data, production insights, and comparisons from the Herma engineering team.',
+      { url: 'https://hermaai.com/blog' }
+    );
     return () => resetPageMeta();
   }, []);
 

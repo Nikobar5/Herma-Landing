@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { setPageMeta, resetPageMeta } from '../utils/seo';
 
 const About = () => {
   const [philRef, philVisible] = useScrollAnimation(0.1);
   const [teamRef, teamVisible] = useScrollAnimation(0.1);
+
+  useEffect(() => {
+    // SEO: per-page title for about page
+    setPageMeta(
+      'About',
+      'Herma is built by Georgia Tech engineers to give developers and teams unified, intelligent access to every major AI model through a single OpenAI-compatible API.',
+      { url: 'https://hermaai.com/about' }
+    );
+    return () => resetPageMeta();
+  }, []);
 
   const founders = [
     {

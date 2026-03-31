@@ -108,7 +108,7 @@ export default function FunnelTab() {
               {prevData?.overall_conversion_pct != null && (() => {
                 const delta = Number(data.overall_conversion_pct) - prevData.overall_conversion_pct;
                 return (
-                  <span className={`text-xs font-semibold ${delta >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className={`text-xs font-semibold ${delta >= 0 ? 'text-[#5BAF8A]' : 'text-red-400'}`}>
                     {delta >= 0 ? '▲' : '▼'} {Math.abs(delta).toFixed(2)}pp vs prior {days}d
                   </span>
                 );
@@ -150,7 +150,7 @@ export default function FunnelTab() {
 
                       <div className="flex items-center gap-3 text-sm" style={{ fontFamily: 'var(--font-code)' }}>
                         {stageDeltaPct != null && (
-                          <span className={`text-[10px] font-semibold ${stageDeltaPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          <span className={`text-[10px] font-semibold ${stageDeltaPct >= 0 ? 'text-[#5BAF8A]' : 'text-red-400'}`}>
                             {stageDeltaPct >= 0 ? '▲' : '▼'} {Math.abs(stageDeltaPct).toFixed(0)}%
                           </span>
                         )}
@@ -161,7 +161,7 @@ export default function FunnelTab() {
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                               stage.conversion_pct >= 50
-                                ? 'bg-green-400/10 text-green-400'
+                                ? 'bg-[#5BAF8A]/10 text-[#5BAF8A]'
                                 : stage.conversion_pct >= 10
                                 ? 'bg-yellow-400/10 text-yellow-400'
                                 : 'bg-red-400/10 text-red-400'
@@ -243,7 +243,7 @@ export default function FunnelTab() {
                           <span className="text-[var(--text-tertiary)]">
                             {prevPeriodCount.toLocaleString()}
                             {prevDeltaPct != null && (
-                              <span className={`ml-1.5 text-[10px] font-semibold ${prevDeltaPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              <span className={`ml-1.5 text-[10px] font-semibold ${prevDeltaPct >= 0 ? 'text-[#5BAF8A]' : 'text-red-400'}`}>
                                 {prevDeltaPct >= 0 ? '▲' : '▼'}{Math.abs(prevDeltaPct).toFixed(0)}%
                               </span>
                             )}
@@ -255,7 +255,7 @@ export default function FunnelTab() {
                           <span className="text-[var(--text-tertiary)]">—</span>
                         ) : (
                           <span className={
-                            stage.conversion_pct >= 50 ? 'text-green-400'
+                            stage.conversion_pct >= 50 ? 'text-[#5BAF8A]'
                             : stage.conversion_pct >= 10 ? 'text-yellow-400'
                             : 'text-red-400'
                           }>

@@ -18,7 +18,7 @@ const PERIOD_OPTIONS = [
 ];
 
 const MODEL_COLORS = [
-  '#34d399', // emerald
+  '#5BAF8A', // emerald
   '#60a5fa', // blue
   '#a78bfa', // purple
   '#fbbf24', // amber
@@ -49,7 +49,7 @@ function ModelTooltip({ active, payload }) {
 
 function QualityScoreBar({ label, value, max = 5 }) {
   const pct = (value / max) * 100;
-  const color = value >= 4.0 ? '#34d399' : value >= 3.0 ? '#fbbf24' : '#f87171';
+  const color = value >= 4.0 ? '#5BAF8A' : value >= 3.0 ? '#fbbf24' : '#f87171';
 
   return (
     <div className="space-y-1">
@@ -234,7 +234,7 @@ const Quality = () => {
             <div className="group bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-6 rounded-2xl hover:border-[var(--accent-primary)]/30 transition-all duration-300">
               <div className="flex items-start justify-between mb-4">
                 <div className="p-2 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)]">
-                  <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6 text-[#5BAF8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -282,7 +282,7 @@ const Quality = () => {
 
           {/* Savings Banner */}
           {savings.savings_pct > 0 && (
-            <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-6">
+            <div className="bg-gradient-to-r from-[#5BAF8A]/10 to-blue-500/10 border border-[#5BAF8A]/20 rounded-2xl p-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-center sm:text-left">
                   <h2
@@ -296,7 +296,7 @@ const Quality = () => {
                   </p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-400" style={{ fontFamily: 'var(--font-heading)' }}>
+                  <div className="text-3xl font-bold text-[#5BAF8A]" style={{ fontFamily: 'var(--font-heading)' }}>
                     ${savings.savings_usd?.toFixed(4)}
                   </div>
                   <div className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>saved</div>

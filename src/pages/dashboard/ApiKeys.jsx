@@ -85,9 +85,9 @@ const ApiKeys = () => {
       </div>
 
       {newKeyRaw && (
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 shadow-sm">
+        <div className="bg-[#5BAF8A]/10 border border-[#5BAF8A]/30 rounded-xl p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
+            <div className="p-2 bg-[#5BAF8A]/20 rounded-lg text-[#5BAF8A]">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
@@ -95,7 +95,7 @@ const ApiKeys = () => {
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">Key Created Successfully</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-4">
-                Please copy your secret key now. <span className="text-emerald-400 font-medium">You won't be able to see it again!</span>
+                Please copy your secret key now. <span className="text-[#5BAF8A] font-medium">You won't be able to see it again!</span>
               </p>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2">
                 <code className="flex-1 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded-lg px-4 py-3 font-mono text-sm text-[var(--text-primary)] break-all">
@@ -172,8 +172,8 @@ const ApiKeys = () => {
                     </td>
                     <td className="px-6 py-4">
                       {key.is_active !== false ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Active
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#5BAF8A]/10 text-[#5BAF8A] border border-[#5BAF8A]/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#5BAF8A]" /> Active
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--text-tertiary)]/10 text-[var(--text-tertiary)] border border-[var(--text-tertiary)]/20">

@@ -102,7 +102,7 @@ const StepIndicator = ({ currentStep }) => {
                 step.num === currentStep
                   ? 'bg-[var(--accent-primary)] text-white'
                   : step.num < currentStep
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  ? 'bg-[#5BAF8A]/20 text-[#5BAF8A] border border-[#5BAF8A]/30'
                   : 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] border border-[var(--border-primary)]'
               }`}
             >
@@ -126,7 +126,7 @@ const StepIndicator = ({ currentStep }) => {
             <div
               className={`w-12 h-px ${
                 step.num < currentStep
-                  ? 'bg-emerald-500/40'
+                  ? 'bg-[#5BAF8A]/40'
                   : 'bg-[var(--border-primary)]'
               }`}
             />
@@ -295,8 +295,8 @@ const IntegrationWizard = ({ apiKey, onClose }) => {
           {/* Step 3: Done */}
           {step === 3 && (
             <div className="text-center space-y-6 py-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30">
-                <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#5BAF8A]/15 border border-[#5BAF8A]/30">
+                <svg className="w-8 h-8 text-[#5BAF8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>

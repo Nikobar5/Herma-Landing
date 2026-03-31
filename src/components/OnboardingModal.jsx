@@ -97,7 +97,7 @@ const OnboardingModal = ({ isOpen, onClose, userName }) => {
           {/* Step 0: show welcome + free credit callout */}
           {step === 0 && (
             <div className="mt-2 mb-4 p-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-center">
-              <p className="text-sm font-medium text-emerald-400" style={{ fontFamily: 'var(--font-ui)' }}>
+              <p className="text-sm font-medium text-[#5BAF8A]" style={{ fontFamily: 'var(--font-ui)' }}>
                 Welcome, {firstName}! You have <span className="text-lg font-bold">$1.00</span> in free credits.
               </p>
             </div>

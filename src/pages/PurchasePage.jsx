@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
 import { createCheckout, createSubscriptionCheckout, getBalance } from '../services/hermaApi';
+import { setPageMeta, resetPageMeta } from '../utils/seo';
 
 const QUICK_AMOUNTS = [5, 10, 25, 50, 100];
 
@@ -41,6 +42,16 @@ const PurchasePage = () => {
   const [subLoading, setSubLoading] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // SEO: per-page title for pricing page
+    setPageMeta(
+      'Pricing | AI Model Router',
+      'Herma pricing: $2/M input tokens, $8/M output tokens. No minimums, no hidden fees. Subscribe for bonus credits or pay as you go. Free $1 to start.',
+      { url: 'https://hermaai.com/upgrade' }
+    );
+    return () => resetPageMeta();
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -141,7 +152,7 @@ const PurchasePage = () => {
             <h2 className="text-lg font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
               Monthly Plans
             </h2>
-            <span className="text-xs text-emerald-400 font-medium px-3 py-1 bg-emerald-500/10 rounded-full" style={{ fontFamily: 'var(--font-ui)' }}>
+            <span className="text-xs text-[#5BAF8A] font-medium px-3 py-1 bg-[#5BAF8A]/10 rounded-full" style={{ fontFamily: 'var(--font-ui)' }}>
               Up to 30% bonus credits
             </span>
           </div>
@@ -180,14 +191,14 @@ const PurchasePage = () => {
                 {/* Credits + bonus */}
                 <p className="text-xs text-[var(--text-tertiary)] mb-4" style={{ fontFamily: 'var(--font-ui)' }}>
                   ${plan.credits} in credits &middot;{' '}
-                  <span className="text-emerald-400 font-medium">+{plan.bonus}% bonus</span>
+                  <span className="text-[#5BAF8A] font-medium">+{plan.bonus}% bonus</span>
                 </p>
 
                 {/* Features */}
                 <ul className="space-y-1.5 mt-auto">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                      <svg className="w-3 h-3 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                       {f}
@@ -269,8 +280,8 @@ const PurchasePage = () => {
         <div className="bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-primary)] p-6 mb-12">
           <div className="grid sm:grid-cols-3 gap-6">
             <div className="flex items-center sm:flex-col sm:justify-center gap-4 sm:gap-3 text-left sm:text-center">
-              <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-[#5BAF8A]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-[#5BAF8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>

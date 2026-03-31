@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { setStructuredData, removeStructuredData } from '../utils/seo';
+import { setPageMeta, resetPageMeta, setStructuredData, removeStructuredData } from '../utils/seo';
 
 const faqItems = [
   {
@@ -30,7 +30,7 @@ const faqItems = [
   {
     id: 6,
     question: "How does billing work?",
-    answer: "Herma uses a simple credit-based system. You purchase credits and they're deducted based on actual token usage at transparent per-model rates. There are no monthly subscriptions or hidden fees — you only pay for what you use. Your dashboard shows real-time cost tracking broken down by model, so you always know exactly where your credits are going."
+    answer: "Herma uses a credit-based system. You can purchase credits on a pay-as-you-go basis or subscribe to a monthly plan that includes bonus credits. Credits are deducted based on actual token usage at transparent per-model rates, with no hidden fees. Your dashboard shows real-time cost tracking broken down by model, so you always know exactly where your credits are going."
   },
   {
     id: 7,
@@ -45,7 +45,7 @@ const faqItems = [
   {
     id: 9,
     question: "How much does Herma cost?",
-    answer: "Herma charges $2 per million input tokens and $8 per million output tokens. There are no subscriptions, no minimums, and no hidden fees. You buy credits and they're deducted based on actual usage. New accounts start with $1.00 in free credits so you can try it before adding funds. Your dashboard shows exactly how much each request costs and how much you're saving compared to using frontier models directly."
+    answer: "Herma charges $2 per million input tokens and $8 per million output tokens. There are no minimums and no hidden fees. You can pay as you go — buy credits and they're deducted based on actual usage — or subscribe to a monthly plan for bonus credits. New accounts start with $1.00 in free credits so you can try it before adding funds. Your dashboard shows exactly how much each request costs and how much you're saving compared to using frontier models directly."
   },
   {
     id: 10,
@@ -56,6 +56,16 @@ const faqItems = [
 
 const FAQPage = () => {
   const [expandedId, setExpandedId] = useState(null);
+
+  useEffect(() => {
+    // SEO: per-page title and description for the FAQ page
+    setPageMeta(
+      'Frequently Asked Questions',
+      'Answers to common questions about Herma | AI model routing, pricing, API compatibility, memory, and getting started.',
+      { url: 'https://hermaai.com/faq' }
+    );
+    return () => resetPageMeta();
+  }, []);
 
   useEffect(() => {
     const faqSchema = {

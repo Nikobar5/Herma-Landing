@@ -92,7 +92,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
                         Popular
                       </span>
                     )}
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#5BAF8A]/15 text-[#5BAF8A] font-medium">
                       +{plan.bonus} bonus
                     </span>
                   </div>
