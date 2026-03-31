@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
+import OnboardingModal, { ONBOARDING_KEY } from '../components/OnboardingModal';
 
 const navItems = [
   { to: '/dashboard', label: 'Overview', end: true },
@@ -12,6 +13,14 @@ const navItems = [
 const Dashboard = () => {
   const { user, logout } = useHermaAuth();
   const navigate = useNavigate();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Auto-show for new users who land on dashboard before visiting chat
+  useEffect(() => {
+    if (user && !localStorage.getItem(ONBOARDING_KEY)) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -45,6 +54,20 @@ const Dashboard = () => {
         </div>
 
         <div className="px-4 py-4 border-t border-[var(--border-primary)]">
+          <button
+            onClick={() => {
+              localStorage.removeItem(ONBOARDING_KEY);
+              setShowOnboarding(true);
+            }}
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors text-left mb-1"
+            style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
+            title="Re-open the getting started guide"
+          >
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Getting started
+          </button>
           {user && (
             <div className="mb-3 px-4">
               <p
@@ -97,6 +120,12 @@ const Dashboard = () => {
           <Outlet />
         </div>
       </main>
+
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        userName={user?.name}
+      />
     </div>
   );
 };

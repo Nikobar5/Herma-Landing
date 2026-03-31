@@ -56,6 +56,13 @@ const ChatPage = () => {
     () => !!user && !localStorage.getItem(ONBOARDING_KEY)
   );
 
+  // Edge case: user hydrates after ChatPage mounts (e.g. Google login → dashboard → /chat)
+  useEffect(() => {
+    if (user && !localStorage.getItem(ONBOARDING_KEY)) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
+
   const fetchBalance = useCallback(async () => {
     try {
       const data = await getChatBalance();
@@ -130,6 +137,10 @@ const ChatPage = () => {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         collapsed={sidebarCollapsed}
+        onShowGuide={() => {
+          localStorage.removeItem(ONBOARDING_KEY);
+          setShowOnboarding(true);
+        }}
       />
 
       <div className="flex-1 flex flex-col min-w-0 relative h-full">
@@ -157,8 +168,10 @@ const ChatPage = () => {
             </span>
           </button>
 
+          <div className="flex-1" />
+
           {/* Navigation links */}
-          <div className="hidden sm:flex items-center gap-1 ml-2">
+          <div className="hidden sm:flex items-center gap-1">
             <button
               onClick={() => navigate('/dashboard')}
               className="px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
@@ -175,8 +188,6 @@ const ChatPage = () => {
             </button>
           </div>
 
-          <div className="flex-1" />
-
           {/* New Chat button */}
           <button
             onClick={createConversation}
@@ -191,7 +202,7 @@ const ChatPage = () => {
         </div>
 
         {/* Low balance warning */}
-        <LowBalanceBanner balance={balance} />
+        <LowBalanceBanner balance={balance} chatFreeCredit={chatFreeCredit} />
 
         {/* Main content area */}
         <div className="flex-1 overflow-hidden relative flex flex-col">

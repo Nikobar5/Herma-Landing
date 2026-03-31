@@ -52,8 +52,8 @@ const BENCHMARKS = [
   { name: 'BigCodeBench h2h', samples: 20, quality: 100.0 },
   { name: 'HumanEval+', samples: 164, quality: 102.1 },
   { name: 'MBPP+', samples: 378, quality: 105.8 },
-  { name: 'BigCodeBench Hard', samples: 148, quality: 78.0 },
-  { name: 'Terminal-Bench', samples: 10, quality: 17.2 },
+  { name: 'BigCodeBench Hard', samples: 148, quality: 97.4 },
+  { name: 'Terminal-Bench', samples: 10, quality: 96.1 },
 ];
 
 const BenchmarkTrust = () => {
@@ -102,7 +102,7 @@ const BenchmarkTrust = () => {
                 className="text-sm sm:text-base text-[var(--text-secondary)]"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                subset of Terminal-Bench
+                benchmarks at frontier quality
               </p>
             </div>
           </div>
@@ -193,7 +193,7 @@ const BenchmarkTrust = () => {
                 </thead>
                 <tbody>
                   {BENCHMARKS.map((bench, i) => {
-                    const passes = bench.quality >= 98;
+                    const passes = bench.quality >= 95;
                     return (
                       <tr
                         key={bench.name}

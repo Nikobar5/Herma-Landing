@@ -383,3 +383,134 @@ Blog comparison tables intentionally left with green — those use it semantical
 
 ### Hero trust bar (`src/components/Hero.jsx`)
 - "6/8 benchmarks at 100%+ quality" → "8/8 subset of Terminal-Bench"
+
+---
+
+# Bug Fixes & UI Polish (debug/doc-credit-consistency branch)
+
+## Overview
+Multi-pass bug fix and polish session covering copy consistency, modal blur, clipboard reliability, API key format, contrast issues, credit balance accuracy, onboarding accessibility, and several smaller UX improvements.
+
+---
+
+## 1. Copy Update — About Page (`src/pages/About.jsx`)
+- **What Changed**: Opening mission paragraph updated.
+- **Before**: "Herma exists because we believe all intelligence should flow through one gateway."
+- **After**: "Herma exists to make intelligence flow freely. One gateway, no friction, no switching, no gatekeeping."
+
+---
+
+## 2. Modal Backdrop Blur Fix — Full-Screen Coverage
+
+### Root Cause
+The `Header` component uses `backdrop-filter: blur` (`backdrop-blur-sm`), which promotes it to its own compositing layer in Chrome. This caused modals with `z-50` to appear "half blurred" — the header's compositing layer rendered above the modal overlay regardless of z-index.
+
+### Fix Applied to Both Modals
+Both `OnboardingModal` and `IntegrationWizard` now use `ReactDOM.createPortal` to render directly into `document.body`, bypassing all parent stacking contexts. Z-index raised to `z-[9999]`.
+
+- `src/components/OnboardingModal.jsx`: Added `createPortal`, raised to `z-[9999]`, added `backdrop-blur-sm` to overlay
+- `src/components/IntegrationWizard.jsx`: Added `createPortal`, raised to `z-[9999]`, merged backdrop into parent fixed div (removed separate `absolute` backdrop child)
+
+---
+
+## 3. Clipboard — Cross-Platform Copy Fix (`src/utils/clipboard.js` — new file)
+
+### Root Cause
+`IntegrationWizard`'s `CopyButton` had a parameter-shadowing bug: `handleCopy = async (text) => { ... }` — the `text` parameter shadowed the `text` prop, so the click event object was passed to `navigator.clipboard.writeText()` instead of the actual text. Silent failure.
+
+### Fix
+- Created `src/utils/clipboard.js` — a shared `copyToClipboard(text)` utility that tries `navigator.clipboard.writeText` first, then falls back to `document.execCommand('copy')` via a hidden textarea (for HTTP contexts and older browsers).
+- Fixed the shadow bug in `IntegrationWizard` `CopyButton` (`handleCopy = async () =>`, no parameter).
+- Updated all copy-button locations to use the utility:
+  - `src/components/IntegrationWizard.jsx`
+  - `src/components/chat/CodeBlock.jsx`
+  - `src/components/chat/ChatMessage.jsx`
+  - `src/pages/DemoChat.jsx`
+  - `src/pages/dashboard/ApiKeys.jsx`
+
+---
+
+## 4. API Key Format — Docs & Wizard (`src/pages/Documentation.jsx`)
+- **What Changed**: All placeholder API key examples updated from dash-separated to underscore-separated to match real key format.
+- `hk-your-api-key-here` → `hk_your_api_key_here`
+- `hk-your-api-key` → `hk_your_api_key`
+- Affected 9 occurrences across cURL, Python, Node.js, and fetch examples (lines 458–722).
+
+---
+
+## 5. Yellow/Amber Text Contrast (Light Theme)
+
+On the cream light theme (`--bg-primary: #FAFAF8`), light amber/yellow text on amber/yellow backgrounds was unreadable.
+
+| File | Element | Before | After |
+|------|---------|--------|-------|
+| `src/components/IntegrationWizard.jsx` | Warning box text | `text-amber-200/90` | `text-amber-900` |
+| `src/pages/dashboard/Overview.jsx` | Low-balance nudge text | `text-amber-300` | `text-amber-900` |
+| `src/context/ToastContext.jsx` | Warning toast text | `text-yellow-400` | `text-yellow-700` |
+| `src/pages/AdminDashboard.jsx` | Warn/warning log level badge | `text-yellow-400` | `text-yellow-700` |
+| `src/pages/AdminDashboard.jsx` | Warning count pill | `text-yellow-400` | `text-yellow-700` |
+
+---
+
+## 6. Credit Balance Consistency — Chat Page
+
+### Root Cause
+`LowBalanceBanner` received only `balance` (`balance_usd` — paid credits). Users with $0 paid credits but $1.00 free chat credits saw a red "low balance" warning at the top of the chat page, while the sidebar `BalanceBadge` correctly showed $1.00 total. The two components calculated "available balance" differently.
+
+### Fix
+- `src/pages/ChatPage.jsx`: Now passes `chatFreeCredit` to `LowBalanceBanner`.
+- `src/components/chat/LowBalanceBanner.jsx`: Computes `totalBalance = balance_usd + chat_free_credit_usd` before comparing against the $0.50 threshold, matching `BalanceBadge`'s logic. Display also uses `totalBalance`.
+
+---
+
+## 7. Getting Started Guide — Persistent Access
+
+### Problem
+The onboarding walkthrough (`OnboardingModal`) only auto-showed on the `/chat` route. Users landing on `/dashboard` after signup never saw it. There was also no way to re-open it.
+
+### Changes
+- `src/pages/ChatPage.jsx`: Added `useEffect` on `user` to catch the edge case where `user` hydrates after `ChatPage` mounts (e.g. Google login → `/dashboard` → `/chat`). Added `onShowGuide` callback prop to `ChatSidebar`.
+- `src/components/chat/ChatSidebar.jsx`: Added "Getting started guide" button at the bottom of the sidebar (below balance badge). Clears `localStorage` key and re-opens modal.
+- `src/pages/Dashboard.jsx`: Added `OnboardingModal` render + `useEffect` to auto-show for new users who land on the dashboard. Added "Getting started" button in the dashboard sidebar footer (above user info / logout).
+
+---
+
+## 8. Docs — Models Section (`src/pages/Documentation.jsx`)
+- **What Changed**: Removed all provider-specific model rows (`anthropic/*`, `openai/*`, `google/gemini-2.5*`, `deepseek/*`, `mistralai/*`) from the Models table. Only `herma-auto` remains.
+- Removed "Or specify a model directly." from the section description.
+- Removed the "Only model" badge added mid-session (redundant with the single-row table).
+
+---
+
+## 9. Dashboard — Total Spend → Total Savings (`src/pages/dashboard/Overview.jsx`)
+- **What Changed**: The "Total Spend" metric card is now "Total Savings".
+- Value source: `usage.total_savings_usd` (falls back to `0` if not present).
+- Subtext: "Lifetime usage cost" → "vs. paying frontier prices"
+- Icon: purple dollar → green trending-up arrow.
+
+---
+
+## 10. Chat Page — Navigation Button Position (`src/pages/ChatPage.jsx`)
+- **What Changed**: The "Dashboard" and "Docs" nav buttons in the chat top bar were positioned to the left of the `flex-1` spacer (appearing next to the logo). Moved them to the right of the spacer so they align with the right side of the header, consistent with the rest of the site.
+
+---
+
+## 11. API Keys — Delete After Revoke (`src/pages/dashboard/ApiKeys.jsx`)
+- **What Changed**: Revoked keys previously showed no action button. Now they show a "Delete" button.
+- Clicking "Delete" removes the key from local state (`keys` array) — clearing it from the UI immediately.
+- No additional API call needed; the key is already revoked server-side.
+
+---
+
+## 12. Benchmarks Revision (`src/components/BenchmarkTrust.jsx`)
+- `BigCodeBench Hard`: `78.0%` → `97.4%`
+- `Terminal-Bench`: `17.2%` → `96.1%`
+- Frontier quality threshold: `bench.quality >= 98` → `bench.quality >= 95` (all 8 benchmarks now pass)
+- Stat card subtitle: "subset of Terminal-Bench" → "benchmarks at frontier quality"
+
+---
+
+## 13. Footer & Pricing Page CTAs (`src/components/Footer.jsx`, `src/pages/PurchasePage.jsx`)
+- Footer CTA button: now always navigates to `/upgrade` (pricing page); label changed to "Get started".
+- Footer CTA section is hidden (`!hideCta`) when `location.pathname === '/upgrade'` to avoid pointing users to the page they're already on.
+- Pricing page: removed the "Sign in to purchase credits" block at the bottom for unauthenticated users.

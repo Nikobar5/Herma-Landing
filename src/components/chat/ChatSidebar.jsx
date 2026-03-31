@@ -14,6 +14,7 @@ const ChatSidebar = ({
   isOpen,
   onClose,
   collapsed,
+  onShowGuide,
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -135,9 +136,24 @@ const ChatSidebar = ({
         )}
       </div>
 
-      {/* Balance */}
-      <div className="border-t border-[var(--border-primary)] p-4">
+      {/* Balance + guide button */}
+      <div className="border-t border-[var(--border-primary)]">
         <BalanceBadge balance={balance} chatFreeCredit={chatFreeCredit} subscription={subscription} />
+        {onShowGuide && (
+          <div className="px-4 pb-3">
+            <button
+              onClick={onShowGuide}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors"
+              style={{ fontFamily: 'var(--font-ui)' }}
+              title="Re-open the getting started guide"
+            >
+              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Getting started guide
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

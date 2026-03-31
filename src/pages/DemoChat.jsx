@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
 import { streamDemoChat } from '../services/hermaApi';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
+import { copyToClipboard } from '../utils/clipboard';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from '../components/chat/CodeBlock';
@@ -151,11 +152,11 @@ const DemoMessage = React.memo(({ message, isLast, isStreaming }) => {
   ), [message.content]);
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(message.content);
+    const ok = await copyToClipboard(message.content);
+    if (ok) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch { }
+    }
   };
 
   if (isUser) {

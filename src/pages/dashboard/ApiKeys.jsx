@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../services/hermaApi';
 import IntegrationWizard from '../../components/IntegrationWizard';
+import { copyToClipboard } from '../../utils/clipboard';
 
 const ApiKeys = () => {
   const [keys, setKeys] = useState([]);
@@ -59,7 +60,11 @@ const ApiKeys = () => {
   };
 
   const handleCopyKey = () => {
-    navigator.clipboard.writeText(newKeyRaw);
+    copyToClipboard(newKeyRaw);
+  };
+
+  const handleDelete = (keyId) => {
+    setKeys((prev) => prev.filter((k) => k.id !== keyId));
   };
 
   if (loading) {
@@ -188,12 +193,19 @@ const ApiKeys = () => {
                       {key.last_used_at ? new Date(key.last_used_at).toLocaleDateString() : 'Never'}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {(key.is_active !== false) && (
+                      {key.is_active !== false ? (
                         <button
                           onClick={() => handleRevoke(key.id)}
                           className="text-xs font-medium text-[var(--error)] hover:text-red-400 hover:underline transition-colors"
                         >
                           Revoke
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleDelete(key.id)}
+                          className="text-xs font-medium text-[var(--text-tertiary)] hover:text-[var(--error)] hover:underline transition-colors"
+                        >
+                          Delete
                         </button>
                       )}
                     </td>
