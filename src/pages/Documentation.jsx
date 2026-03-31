@@ -455,7 +455,7 @@ Docs: https://hermaai.com/docs`,
             <div className="relative">
               <CodeBlock>{`# Herma AI
 # Get your key at https://hermaai.com/dashboard/api-keys
-HERMA_API_KEY=hk-your-api-key-here`}</CodeBlock>
+HERMA_API_KEY=hk_your_api_key_here`}</CodeBlock>
               <div className="flex justify-end mt-2">
                 <a
                   href="/integration/.env.example"
@@ -513,7 +513,7 @@ HERMA_API_KEY=hk-your-api-key-here`}</CodeBlock>
           >
             Include your API key as a Bearer token in the <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>Authorization</code> header:
           </p>
-          <CodeBlock>Authorization: Bearer hk-your-api-key</CodeBlock>
+          <CodeBlock>Authorization: Bearer hk_your_api_key</CodeBlock>
         </section>
 
         {/* Endpoint */}
@@ -614,7 +614,7 @@ HERMA_API_KEY=hk-your-api-key-here`}</CodeBlock>
           <div className="mb-8">
             <TabGroup tabs={[
               { label: 'cURL', code: `curl ${API_URL}/v1/chat/completions \\
-  -H "Authorization: Bearer hk-your-api-key" \\
+  -H "Authorization: Bearer hk_your_api_key" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "herma-auto",
@@ -625,7 +625,7 @@ HERMA_API_KEY=hk-your-api-key-here`}</CodeBlock>
               { label: 'Python', code: `from openai import OpenAI
 
 client = OpenAI(
-    api_key="hk-your-api-key",
+    api_key="hk_your_api_key",
     base_url="${API_URL}/v1"
 )
 
@@ -640,7 +640,7 @@ print(response.choices[0].message.content)` },
               { label: 'Node.js', code: `import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "hk-your-api-key",
+  apiKey: "hk_your_api_key",
   baseURL: "${API_URL}/v1"
 });
 
@@ -655,7 +655,7 @@ console.log(response.choices[0].message.content);` },
               { label: 'fetch', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
   method: "POST",
   headers: {
-    "Authorization": "Bearer hk-your-api-key",
+    "Authorization": "Bearer hk_your_api_key",
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
@@ -682,7 +682,7 @@ console.log(data.choices[0].message.content);` },
               { label: 'Python', code: `from openai import OpenAI
 
 client = OpenAI(
-    api_key="hk-your-api-key",
+    api_key="hk_your_api_key",
     base_url="${API_URL}/v1"
 )
 
@@ -700,7 +700,7 @@ for chunk in stream:
               { label: 'Node.js', code: `import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "hk-your-api-key",
+  apiKey: "hk_your_api_key",
   baseURL: "${API_URL}/v1"
 });
 
@@ -719,7 +719,7 @@ for await (const chunk of stream) {
               { label: 'fetch (SSE)', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
   method: "POST",
   headers: {
-    "Authorization": "Bearer hk-your-api-key",
+    "Authorization": "Bearer hk_your_api_key",
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
@@ -764,7 +764,7 @@ while (true) {
             style={{ fontFamily: 'var(--font-body)' }}
           >
             Use <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code> and
-            Herma will route each request to the best model for the task — same quality, lower cost. Or specify a model directly.
+            Herma will route each request to the best model for the task — same quality, lower cost.
           </p>
 
           <div
@@ -782,29 +782,8 @@ while (true) {
                 <tr>
                   <td className="px-4 py-3">
                     <code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma-auto</code>
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#5BAF8A]/15 text-[#5BAF8A] font-medium">Recommended</span>
                   </td>
                   <td className="px-4 py-3 text-[var(--text-secondary)]">Automatic routing — Herma picks the best model for each request</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>anthropic/*</code></td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">Claude models (Opus, Sonnet, Haiku)</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>openai/*</code></td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">GPT models (GPT-4o, GPT-4, GPT-3.5)</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>google/gemini-2.5*</code></td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">Gemini 2.5 models</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>deepseek/*</code></td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">DeepSeek models</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3"><code className="text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>mistralai/*</code></td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">Mistral models</td>
                 </tr>
               </tbody>
             </table>

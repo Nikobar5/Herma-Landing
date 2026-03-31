@@ -39,7 +39,7 @@ export function ToastProvider({ children }) {
                     >
                         <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm text-sm ${t.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
                             t.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                                t.type === 'warning' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                                t.type === 'warning' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-700' :
                                     'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/20 text-[var(--accent-primary)]'
                             }`}>
                             <span className="mt-0.5">

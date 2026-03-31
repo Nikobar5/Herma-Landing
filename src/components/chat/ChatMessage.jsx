@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
+import { copyToClipboard } from '../../utils/clipboard';
 
 const WaitingIndicator = () => {
   const [elapsed, setElapsed] = useState(0);
@@ -243,16 +244,16 @@ const ChatMessage = ({ message, isLast, isStreaming, onRegenerate }) => {
   ), [message.content]);
 
   const handleCopy = async () => {
-    try {
-      const text = typeof message.content === 'string'
-        ? message.content
-        : Array.isArray(message.content)
-          ? message.content.filter(b => b.type === 'text').map(b => b.text).join('\n')
-          : '';
-      await navigator.clipboard.writeText(text);
+    const text = typeof message.content === 'string'
+      ? message.content
+      : Array.isArray(message.content)
+        ? message.content.filter(b => b.type === 'text').map(b => b.text).join('\n')
+        : '';
+    const ok = await copyToClipboard(text);
+    if (ok) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch { }
+    }
   };
 
   if (isUser) {

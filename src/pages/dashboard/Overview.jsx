@@ -393,12 +393,12 @@ const Overview = () => {
       ),
     },
     {
-      label: 'Total Spend',
-      value: usage ? `$${parseFloat(usage.total_cost_usd).toFixed(4)}` : '$0.0000',
-      subtext: 'Lifetime usage cost',
+      label: 'Total Savings',
+      value: usage ? `$${parseFloat(usage.total_savings_usd ?? 0).toFixed(4)}` : '$0.0000',
+      subtext: 'vs. paying frontier prices',
       icon: (
-        <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 3.666A5.002 5.002 0 0112 21a5.002 5.002 0 01-5-9.666M9 19H5.002A2 2 0 013 17v-1a2 2 0 012-2h4M15 19h3.998A2 2 0 0021 17v-1a2 2 0 00-2-2h-4M9 10h6" />
+        <svg className="w-6 h-6 text-[#5BAF8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
       ),
     },
@@ -429,7 +429,7 @@ const Overview = () => {
             <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <p className="text-sm text-amber-300" style={{ fontFamily: 'var(--font-ui)' }}>
+            <p className="text-sm text-amber-900" style={{ fontFamily: 'var(--font-ui)' }}>
               Running low on credits — ${totalBalance.toFixed(2)} remaining
             </p>
           </div>

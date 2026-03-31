@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import FocusTrap from 'focus-trap-react';
 
@@ -64,9 +65,9 @@ const OnboardingModal = ({ isOpen, onClose, userName }) => {
   const firstName = userName?.split(' ')[0] || 'there';
   const currentStep = STEPS[step];
 
-  return (
+  return createPortal(
     <FocusTrap focusTrapOptions={{ allowOutsideClick: false }}>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div
           role="dialog"
           aria-modal="true"
@@ -150,7 +151,8 @@ const OnboardingModal = ({ isOpen, onClose, userName }) => {
           </div>
         </div>
       </div>
-    </FocusTrap>
+    </FocusTrap>,
+    document.body
   );
 };
 

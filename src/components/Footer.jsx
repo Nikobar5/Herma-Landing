@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
@@ -7,7 +7,9 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [ctaRef, ctaVisible] = useScrollAnimation(0.1);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated } = useHermaAuth();
+  const hideCta = location.pathname === '/upgrade';
 
   const columns = [
     {
@@ -37,7 +39,7 @@ const Footer = () => {
   return (
     <>
       {/* CTA Section */}
-      <section className="py-10 sm:py-12 md:py-16 bg-[var(--bg-primary)]">
+      {!hideCta && <section className="py-10 sm:py-12 md:py-16 bg-[var(--bg-primary)]">
         <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div
             ref={ctaRef}
@@ -52,12 +54,12 @@ const Footer = () => {
 
             {/* CRO: auth-aware CTA — unauthenticated users go to signup, not /chat which requires login */}
             <button
-              onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
+              onClick={() => navigate('/upgrade')}
               className="px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-secondary)] mb-6 sm:mb-8"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
-                {isAuthenticated ? 'Try it out' : 'Start free'}
+                Get started
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -80,7 +82,7 @@ const Footer = () => {
             </p>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* Footer */}
       <footer className="bg-[var(--bg-secondary)] border-t border-[var(--border-primary)] py-10 sm:py-12">

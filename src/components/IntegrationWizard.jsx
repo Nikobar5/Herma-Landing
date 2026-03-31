@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { copyToClipboard } from '../utils/clipboard';
 import FocusTrap from 'focus-trap-react';
 
 const LANGUAGES = [
@@ -61,13 +63,11 @@ const CheckIcon = () => (
 const CopyButton = ({ text, label = 'Copy' }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
+  const handleCopy = async () => {
+    const ok = await copyToClipboard(text);
+    if (ok) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback or silent fail
     }
   };
 
@@ -156,16 +156,14 @@ const IntegrationWizard = ({ apiKey, onClose }) => {
 
   if (!apiKey) return null;
 
-  return (
+  return createPortal(
     <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
@@ -232,7 +230,7 @@ const IntegrationWizard = ({ apiKey, onClose }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
-                <p className="text-sm text-amber-200/90" style={{ fontFamily: 'var(--font-body)' }}>
+                <p className="text-sm text-amber-900" style={{ fontFamily: 'var(--font-body)' }}>
                   Save this key — you won't be able to see it again.
                 </p>
               </div>
@@ -364,7 +362,8 @@ const IntegrationWizard = ({ apiKey, onClose }) => {
         </div>
       </div>
     </div>
-    </FocusTrap>
+    </FocusTrap>,
+    document.body
   );
 };
 

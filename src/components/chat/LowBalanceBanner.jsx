@@ -3,15 +3,20 @@ import React, { useState } from 'react';
 const LOW_BALANCE_THRESHOLD = 0.50;
 const CRITICAL_THRESHOLD = 0.10;
 
-const LowBalanceBanner = ({ balance }) => {
+const LowBalanceBanner = ({ balance, chatFreeCredit }) => {
   const [dismissed, setDismissed] = useState(false);
 
-  // Don't show if balance isn't loaded yet, is above threshold, or was dismissed
-  if (balance == null || balance >= LOW_BALANCE_THRESHOLD || dismissed) {
+  const hasAnyBalance = balance != null || chatFreeCredit != null;
+  const totalBalance =
+    (balance != null ? parseFloat(balance) : 0) +
+    (chatFreeCredit != null ? parseFloat(chatFreeCredit) : 0);
+
+  // Don't show if no balance loaded yet, total is above threshold, or was dismissed
+  if (!hasAnyBalance || totalBalance >= LOW_BALANCE_THRESHOLD || dismissed) {
     return null;
   }
 
-  const isCritical = balance < CRITICAL_THRESHOLD;
+  const isCritical = totalBalance < CRITICAL_THRESHOLD;
   const accentColor = isCritical ? '#EF4444' : '#FBBF24';
   const bgColor = isCritical ? 'rgba(239, 68, 68, 0.08)' : 'rgba(251, 191, 36, 0.08)';
   const borderColor = isCritical ? 'rgba(239, 68, 68, 0.15)' : 'rgba(251, 191, 36, 0.15)';
@@ -44,9 +49,9 @@ const LowBalanceBanner = ({ balance }) => {
         </svg>
         <span style={{ color: 'var(--text-secondary)' }}>
           {isCritical ? (
-            <>Balance: ${Number(balance).toFixed(2)} — you're almost out</>
+            <>Balance: ${totalBalance.toFixed(2)} — you're almost out</>
           ) : (
-            <>Balance: ${Number(balance).toFixed(2)}<span className="hidden sm:inline"> — running low on credits</span></>
+            <>Balance: ${totalBalance.toFixed(2)}<span className="hidden sm:inline"> — running low on credits</span></>
           )}
         </span>
         <a

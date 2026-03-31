@@ -315,22 +315,6 @@ const PurchasePage = () => {
           </div>
         </div>
 
-        {/* Sign-in prompt for unauthenticated users */}
-        {!isAuthenticated && (
-          <div className="text-center">
-            <div className="bg-[var(--bg-secondary)] p-8 rounded-xl border border-[var(--border-primary)] max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>Sign in to purchase credits</h2>
-              <p className="text-[var(--text-secondary)] mb-6" style={{ fontFamily: 'var(--font-body)' }}>Create an account or sign in to get started with $1.00 in free credits</p>
-              <button
-                onClick={() => navigate('/login')}
-                className="w-full sm:w-auto px-8 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-300"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                Sign Up Free
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
