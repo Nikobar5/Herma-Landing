@@ -150,7 +150,7 @@ export function trackTimeOnPage(seconds) {
   send({
     event_type: 'time_on_page',
     page_path: window.location.pathname || '/',
-    event_data: seconds,
+    event_data: { seconds },
   });
 }
 
