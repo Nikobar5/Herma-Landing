@@ -132,7 +132,7 @@ const BenchmarkTrust = () => {
                 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-[#5BAF8A] bg-clip-text text-transparent mb-2"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                <AnimatedNumber target={540} suffix="+" duration={1500} />
+                <AnimatedNumber target={868} suffix="+" duration={1500} />
               </p>
               <p
                 className="text-sm sm:text-base text-[var(--text-secondary)]"
