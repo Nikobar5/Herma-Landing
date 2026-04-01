@@ -313,7 +313,7 @@ client = OpenAI(
 
 # After — intelligent routing, same API shape
 client = OpenAI(
-    base_url="https://hermaai.com/v1",
+    base_url="https://api.hermaai.com/v1",
     api_key="herma-..."
 )
 
