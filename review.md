@@ -514,3 +514,53 @@ The onboarding walkthrough (`OnboardingModal`) only auto-showed on the `/chat` r
 - Footer CTA button: now always navigates to `/upgrade` (pricing page); label changed to "Get started".
 - Footer CTA section is hidden (`!hideCta`) when `location.pathname === '/upgrade'` to avoid pointing users to the page they're already on.
 - Pricing page: removed the "Sign in to purchase credits" block at the bottom for unauthenticated users.
+
+---
+
+# Analytics & Conversion Tracking Improvements
+
+## Overview
+Fixed two critical analytics bugs (conversion tracking and UTM attribution loss), added PostHog as an industry-standard analytics layer for session replay and behavioral analytics, and wired up previously-unused click tracking across the purchase funnel.
+
+---
+
+## 1. PostHog Integration (`public/index.html`)
+- **What Changed**: Added the PostHog async snippet to `<head>` using CRA's `%REACT_APP_POSTHOG_KEY%` env var substitution.
+- **Config**: `person_profiles: 'identified_only'`, `session_recording: { maskAllInputs: true }` (passwords/sensitive fields masked), `capture_pageview: true`, `capture_pageleave: true`.
+- **Why**: The existing custom analytics tracks page views and a few events but has no behavioral visibility. PostHog adds session replay (watch real user navigation paths), automatic UTM attribution stored in first-party cookies (survives page reloads), heatmaps, and funnel analysis — all free up to 1M events/month. GA4 was evaluated but PostHog is preferred for product analytics without the Google data dependency.
+- **Env var required**: `REACT_APP_POSTHOG_KEY=phc_...` in `.env` and on Railway.
+
+---
+
+## 2. User Identification in PostHog (`src/context/HermaAuthContext.js`)
+- **What Changed**: `posthog.identify(customer_id, { email })` is now called after every successful authentication: email/password login, signup, and Google login.
+- **Why**: Without `identify()`, PostHog session recordings and funnel events are anonymous. With it, you can trace a specific user's full journey — from landing page visit through payment — by their `customer_id`.
+
+---
+
+## 3. Conversion Tracking Bug Fix — Payment Event (`src/services/analyticsTracker.js`, `src/components/SuccessPage.jsx`)
+
+### Root Cause
+The admin dashboard's conversion funnel expected a `payment` event but none was ever fired. The `/success` page only triggered a generic `page_view`. As a result, the funnel showed zero conversions even when payments were successfully processed.
+
+### Fix
+- `analyticsTracker.js`: Added `trackPayment(amount)` export (`event_type: 'payment'`).
+- `SuccessPage.jsx`: Imports `trackPayment` and calls it — alongside `posthog.capture('payment_completed')` — as soon as an authenticated user mounts the page. A `useRef` guard prevents double-firing in React StrictMode.
+
+---
+
+## 4. UTM Attribution Persistence Bug Fix (`src/services/analyticsTracker.js`)
+
+### Root Cause
+`getUtmParams()` stored captured UTM parameters in a module-level JavaScript variable (`let _utmParams`). This variable is reset to `null` on every full page reload. When a user clicks Buy and is redirected to Stripe, then returned to `/success`, the React app reinitializes — `_utmParams` is null, `window.location.search` has no UTMs (Stripe's redirect URL doesn't include them), and all attribution is silently lost.
+
+### Fix
+UTMs are now saved to `sessionStorage` (`herma_utm`) on first capture and read back from there on subsequent loads. On a reload (e.g., returning from Stripe), the module checks sessionStorage before parsing the URL — recovering the original UTMs from the user's landing page.
+
+The same fix is applied to referrer: `document.referrer` is saved to `sessionStorage` (`herma_referrer`) on first load and used as a fallback when `document.referrer` is empty (as it is on a redirect-back from Stripe).
+
+---
+
+## 5. Checkout Initiation Tracking (`src/pages/PurchasePage.jsx`)
+- **What Changed**: `trackClick('checkout_initiated', { type, amount/plan })` and `posthog.capture('checkout_initiated', ...)` are now called in both `handlePurchase()` (one-time credits) and `handleSubscribe()` (subscription plans) immediately before the Stripe redirect.
+- **Why**: Previously there was no visibility between "user viewed pricing page" and "payment completed". These events expose the Stripe abandonment rate — how many users start checkout but don't complete it.

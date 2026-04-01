@@ -23,10 +23,20 @@ function getCustomerId() {
   return null;
 }
 
-// UTM params — captured once per session
+// UTM params — captured once per session, persisted to sessionStorage so they
+// survive full-page reloads (e.g. Stripe checkout redirect back to /success).
 let _utmParams = null;
 function getUtmParams() {
   if (_utmParams) return _utmParams;
+  // Recover UTMs captured earlier in this browser session (survives page reloads)
+  try {
+    const stored = sessionStorage.getItem('herma_utm');
+    if (stored) {
+      _utmParams = JSON.parse(stored);
+      return _utmParams;
+    }
+  } catch {}
+  // Parse from the current URL
   try {
     const params = new URLSearchParams(window.location.search);
     const source = params.get('utm_source');
@@ -36,6 +46,7 @@ function getUtmParams() {
         utm_medium: params.get('utm_medium') || null,
         utm_campaign: params.get('utm_campaign') || null,
       };
+      sessionStorage.setItem('herma_utm', JSON.stringify(_utmParams));
     } else {
       _utmParams = {};
     }
@@ -45,6 +56,20 @@ function getUtmParams() {
   return _utmParams;
 }
 
+// Referrer — captured on first page load and persisted so it survives Stripe redirect
+function getReferrer() {
+  if (document.referrer) {
+    // We're on a fresh page load with a real referrer — save it
+    try { sessionStorage.setItem('herma_referrer', document.referrer); } catch {}
+    return document.referrer;
+  }
+  // No referrer on this load (likely a redirect) — use the saved value if present
+  try {
+    return sessionStorage.getItem('herma_referrer') || null;
+  } catch {}
+  return null;
+}
+
 function send(payload) {
   const body = JSON.stringify({
     ...payload,
@@ -52,7 +77,7 @@ function send(payload) {
     customer_id: getCustomerId(),
     screen_width: window.screen?.width || null,
     screen_height: window.screen?.height || null,
-    referrer: document.referrer || null,
+    referrer: getReferrer(),
     ...getUtmParams(),
   });
 
@@ -152,6 +177,14 @@ export function trackPerformance(ms) {
     event_type: 'performance',
     page_path: window.location.pathname || '/',
     event_data: { load_time_ms: ms },
+  });
+}
+
+export function trackPayment(amount) {
+  send({
+    event_type: 'payment',
+    page_path: '/success',
+    event_data: { amount },
   });
 }
 

@@ -37,6 +37,7 @@ export function HermaAuthProvider({ children }) {
     const u = { customer_id: data.customer_id, name: data.name, email: data.email, is_admin: data.is_admin || false, email_verified: data.email_verified ?? true };
     setUser(u);
     localStorage.setItem('herma_user', JSON.stringify(u));
+    if (window.posthog) window.posthog.identify(data.customer_id, { email: data.email });
     return data;
   }
 
@@ -46,6 +47,7 @@ export function HermaAuthProvider({ children }) {
     setUser(u);
     localStorage.setItem('herma_user', JSON.stringify(u));
     trackSignup();
+    if (window.posthog) window.posthog.identify(data.customer_id, { email: data.email });
     return data;
   }
 
@@ -55,6 +57,7 @@ export function HermaAuthProvider({ children }) {
     setUser(u);
     localStorage.setItem('herma_user', JSON.stringify(u));
     if (data.is_new_user) trackSignup();
+    if (window.posthog) window.posthog.identify(data.customer_id, { email: data.email });
     return data;
   }
 

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHermaAuth } from '../context/HermaAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { getBalance } from '../services/hermaApi';
+import { trackPayment } from '../services/analyticsTracker';
 
 const SuccessPage = () => {
   const { isAuthenticated, loading: authLoading } = useHermaAuth();
@@ -9,6 +10,17 @@ const SuccessPage = () => {
   const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState(10);
+  const conversionFired = useRef(false);
+
+  // Fire conversion event once when the authenticated user lands on this page.
+  // useRef guards against double-fire in React StrictMode.
+  useEffect(() => {
+    if (!isAuthenticated || authLoading) return;
+    if (conversionFired.current) return;
+    conversionFired.current = true;
+    trackPayment();
+    if (window.posthog) window.posthog.capture('payment_completed');
+  }, [isAuthenticated, authLoading]);
 
   useEffect(() => {
     if (authLoading) return;
