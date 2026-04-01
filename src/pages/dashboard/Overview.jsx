@@ -82,18 +82,19 @@ function SavingsChart() {
   const selectedModelLabel =
     FRONTIER_MODELS.find((m) => m.value === frontierModel)?.label || frontierModel;
 
-  // Compute summary stats
+  // Compute summary stats — API returns flat array with actual_cost field
+  const dailyItems = Array.isArray(savingsData) ? savingsData : (savingsData?.daily_savings || []);
   const totalYourCost =
-    savingsData?.daily_savings?.reduce((sum, d) => sum + (d.your_cost || 0), 0) ?? 0;
+    dailyItems.reduce((sum, d) => sum + (d.actual_cost || d.your_cost || 0), 0);
   const totalFrontierCost =
-    savingsData?.daily_savings?.reduce((sum, d) => sum + (d.frontier_cost || 0), 0) ?? 0;
+    dailyItems.reduce((sum, d) => sum + (d.frontier_cost || 0), 0);
   const totalSaved = totalFrontierCost - totalYourCost;
   const totalSavingsPct =
     totalFrontierCost > 0 ? ((totalSaved / totalFrontierCost) * 100).toFixed(1) : 0;
 
-  const chartData = (savingsData?.daily_savings || []).map((d) => ({
+  const chartData = dailyItems.map((d) => ({
     date: d.date,
-    your_cost: d.your_cost,
+    your_cost: d.actual_cost || d.your_cost || 0,
     frontier_cost: d.frontier_cost,
   }));
 
