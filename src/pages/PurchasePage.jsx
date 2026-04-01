@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
 import { createCheckout, createSubscriptionCheckout, getBalance } from '../services/hermaApi';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
+import { trackClick } from '../services/analyticsTracker';
 
 const QUICK_AMOUNTS = [5, 10, 25, 50, 100];
 
@@ -73,6 +74,8 @@ const PurchasePage = () => {
 
     setLoading(true);
     setError(null);
+    trackClick('checkout_initiated', { type: 'one_time', amount: parsedAmount });
+    if (window.posthog) window.posthog.capture('checkout_initiated', { type: 'one_time', amount: parsedAmount });
 
     try {
       const data = await createCheckout(parsedAmount);
@@ -91,6 +94,8 @@ const PurchasePage = () => {
     }
     setSubLoading(planId);
     setError(null);
+    trackClick('checkout_initiated', { type: 'subscription', plan: planId });
+    if (window.posthog) window.posthog.capture('checkout_initiated', { type: 'subscription', plan: planId });
     try {
       const data = await createSubscriptionCheckout(planId);
       window.location.href = data.checkout_url;
