@@ -36,7 +36,7 @@
 - Tool/function calling support
 
 ## Environment Variables
-- HERMA_API_KEY — your API key (starts with hk-)
+- HERMA_API_KEY — your API key (starts with herma_sk)
 - HERMA_BASE_URL — base URL (default: https://api.hermaai.com/v1)
 
 ## Quick Start
