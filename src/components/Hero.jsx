@@ -49,7 +49,7 @@ const Hero = () => {
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-[var(--text-secondary)] mb-8 font-normal max-w-3xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                Swap your API key to Herma. We route each query to the cheapest model that matches frontier quality, automatically. No code changes, no quality loss.
+                Swap your LLM API calls to Herma. We route each query to the cheapest model that matches frontier quality, automatically. No code changes, no quality loss.
               </p>
 
               {/* CTA Buttons */}
