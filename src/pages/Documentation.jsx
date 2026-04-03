@@ -194,7 +194,7 @@ const Documentation = () => {
               <p className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
                 Go to{' '}
                 <a href="/dashboard/api-keys" className="text-[var(--accent-primary)] underline font-medium">Dashboard &rarr; API Keys</a>{' '}
-                and create a key. It starts with <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>hk-</code>.
+                and create a key. It starts with <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma_sk</code>.
                 Copy it immediately — you won't see it again.
               </p>
             </div>
@@ -237,20 +237,29 @@ const Documentation = () => {
               label: 'Claude Code',
               filename: 'CLAUDE.md',
               download: '/integration/CLAUDE.md',
-              code: `# Herma AI
+              code: `# Herma AI — API Setup Guide
 
-Herma is an OpenAI-compatible intelligent model router that automatically routes each
-request to the optimal model, saving 65%+ on LLM costs while maintaining frontier quality.
+Herma is an OpenAI-compatible intelligent model router. Drop this file in your project
+root and Claude Code will know how to set up and use the Herma API.
+
+## How to Get an API Key
+
+When the user asks to set up Herma or use the Herma API, print these steps for them:
+
+1. Sign up at https://hermaai.com (free — includes $1 in credits to start)
+2. Go to Dashboard → API Keys and click "Create Key"
+3. Copy the key immediately — it starts with herma_sk and won't be shown again
+4. Add it to your project's .env file:
+   HERMA_API_KEY=herma_sk_your_key_here
+5. Install the OpenAI SDK: pip install openai (Python) or npm install openai (Node.js)
 
 ## Configuration
 
-All LLM API calls in this project use Herma:
-
-| Setting  | Value                                |
-|----------|--------------------------------------|
-| Base URL | https://api.hermaai.com/v1           |
-| Model    | herma-auto                           |
-| API Key  | $HERMA_API_KEY (starts with hk-)     |
+| Setting  | Value                                  |
+|----------|----------------------------------------|
+| Base URL | https://api.hermaai.com/v1             |
+| Model    | herma-auto                             |
+| API Key  | $HERMA_API_KEY (starts with herma_sk)  |
 
 ## Python
 
@@ -266,12 +275,14 @@ response = client.chat.completions.create(
     model="herma-auto",
     messages=[{"role": "user", "content": "..."}]
 )
+print(response.choices[0].message.content)
 \`\`\`
 
 ## Node.js
 
 \`\`\`javascript
 import OpenAI from "openai";
+
 const client = new OpenAI({
   apiKey: process.env.HERMA_API_KEY,
   baseURL: "https://api.hermaai.com/v1"
@@ -280,14 +291,15 @@ const response = await client.chat.completions.create({
   model: "herma-auto",
   messages: [{ role: "user", content: "..." }]
 });
+console.log(response.choices[0].message.content);
 \`\`\`
 
 ## Rules
 
-- Always use \`herma-auto\` as the model.
+- Always use \`herma-auto\` as the model — Herma picks the best model automatically.
 - Never call api.openai.com endpoints directly.
-- Never hardcode API keys — use HERMA_API_KEY env var.
-- Streaming and tool calling are fully supported.
+- Never hardcode API keys — always read from the HERMA_API_KEY environment variable.
+- Streaming and tool/function calling are fully supported.
 
 ## Reference
 
@@ -455,7 +467,7 @@ Docs: https://hermaai.com/docs`,
             <div className="relative">
               <CodeBlock>{`# Herma AI
 # Get your key at https://hermaai.com/dashboard/api-keys
-HERMA_API_KEY=hk_your_api_key_here`}</CodeBlock>
+HERMA_API_KEY=herma_sk_your_api_key_here`}</CodeBlock>
               <div className="flex justify-end mt-2">
                 <a
                   href="/integration/.env.example"
@@ -513,7 +525,7 @@ HERMA_API_KEY=hk_your_api_key_here`}</CodeBlock>
           >
             Include your API key as a Bearer token in the <code className="bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-sm text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>Authorization</code> header:
           </p>
-          <CodeBlock>Authorization: Bearer hk_your_api_key</CodeBlock>
+          <CodeBlock>Authorization: Bearer herma_sk_your_api_key</CodeBlock>
         </section>
 
         {/* Endpoint */}
@@ -593,161 +605,6 @@ HERMA_API_KEY=hk_your_api_key_here`}</CodeBlock>
                 </tr>
               </tbody>
             </table>
-          </div>
-        </section>
-
-        {/* Examples */}
-        <section className="mb-12">
-          <h2
-            className="text-2xl font-bold text-[var(--text-primary)] mb-6"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            Examples
-          </h2>
-
-          <h3
-            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
-            style={{ fontFamily: 'var(--font-ui)' }}
-          >
-            Basic Request
-          </h3>
-          <div className="mb-8">
-            <TabGroup tabs={[
-              { label: 'cURL', code: `curl ${API_URL}/v1/chat/completions \\
-  -H "Authorization: Bearer hk_your_api_key" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "model": "herma-auto",
-    "messages": [
-      {"role": "user", "content": "What is machine learning?"}
-    ]
-  }'` },
-              { label: 'Python', code: `from openai import OpenAI
-
-client = OpenAI(
-    api_key="hk_your_api_key",
-    base_url="${API_URL}/v1"
-)
-
-response = client.chat.completions.create(
-    model="herma-auto",
-    messages=[
-        {"role": "user", "content": "What is machine learning?"}
-    ]
-)
-
-print(response.choices[0].message.content)` },
-              { label: 'Node.js', code: `import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: "hk_your_api_key",
-  baseURL: "${API_URL}/v1"
-});
-
-const response = await client.chat.completions.create({
-  model: "herma-auto",
-  messages: [
-    { role: "user", content: "What is machine learning?" }
-  ]
-});
-
-console.log(response.choices[0].message.content);` },
-              { label: 'fetch', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer hk_your_api_key",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    model: "herma-auto",
-    messages: [
-      { role: "user", content: "What is machine learning?" }
-    ]
-  })
-});
-
-const data = await response.json();
-console.log(data.choices[0].message.content);` },
-            ]} />
-          </div>
-
-          <h3
-            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
-            style={{ fontFamily: 'var(--font-ui)' }}
-          >
-            Streaming
-          </h3>
-          <div className="mb-8">
-            <TabGroup tabs={[
-              { label: 'Python', code: `from openai import OpenAI
-
-client = OpenAI(
-    api_key="hk_your_api_key",
-    base_url="${API_URL}/v1"
-)
-
-stream = client.chat.completions.create(
-    model="herma-auto",
-    messages=[
-        {"role": "user", "content": "Write a haiku about coding"}
-    ],
-    stream=True
-)
-
-for chunk in stream:
-    if chunk.choices[0].delta.content:
-        print(chunk.choices[0].delta.content, end="")` },
-              { label: 'Node.js', code: `import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: "hk_your_api_key",
-  baseURL: "${API_URL}/v1"
-});
-
-const stream = await client.chat.completions.create({
-  model: "herma-auto",
-  messages: [
-    { role: "user", content: "Write a haiku about coding" }
-  ],
-  stream: true
-});
-
-for await (const chunk of stream) {
-  const content = chunk.choices[0]?.delta?.content;
-  if (content) process.stdout.write(content);
-}` },
-              { label: 'fetch (SSE)', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer hk_your_api_key",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    model: "herma-auto",
-    messages: [
-      { role: "user", content: "Write a haiku about coding" }
-    ],
-    stream: true
-  })
-});
-
-const reader = response.body.getReader();
-const decoder = new TextDecoder();
-
-while (true) {
-  const { done, value } = await reader.read();
-  if (done) break;
-  const text = decoder.decode(value);
-  // Parse SSE lines: "data: {...}"
-  for (const line of text.split("\\n")) {
-    if (line.startsWith("data: ") && line.slice(6) !== "[DONE]") {
-      const chunk = JSON.parse(line.slice(6));
-      const content = chunk.choices?.[0]?.delta?.content;
-      if (content) process.stdout.write(content);
-    }
-  }
-}` },
-            ]} />
           </div>
         </section>
 
@@ -944,6 +801,161 @@ while (true) {
             Returns <code className="bg-[var(--bg-secondary)] px-1 py-0.5 rounded text-[var(--accent-primary)] text-sm">herma-auto</code> (the
             intelligent router) plus all supported upstream models.
           </p>
+        </section>
+
+        {/* Examples */}
+        <section className="mb-12">
+          <h2
+            className="text-2xl font-bold text-[var(--text-primary)] mb-6"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Examples
+          </h2>
+
+          <h3
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Basic Request
+          </h3>
+          <div className="mb-8">
+            <TabGroup tabs={[
+              { label: 'cURL', code: `curl ${API_URL}/v1/chat/completions \\
+  -H "Authorization: Bearer herma_sk_your_api_key" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "herma-auto",
+    "messages": [
+      {"role": "user", "content": "What is machine learning?"}
+    ]
+  }'` },
+              { label: 'Python', code: `from openai import OpenAI
+
+client = OpenAI(
+    api_key="herma_sk_your_api_key",
+    base_url="${API_URL}/v1"
+)
+
+response = client.chat.completions.create(
+    model="herma-auto",
+    messages=[
+        {"role": "user", "content": "What is machine learning?"}
+    ]
+)
+
+print(response.choices[0].message.content)` },
+              { label: 'Node.js', code: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "herma_sk_your_api_key",
+  baseURL: "${API_URL}/v1"
+});
+
+const response = await client.chat.completions.create({
+  model: "herma-auto",
+  messages: [
+    { role: "user", content: "What is machine learning?" }
+  ]
+});
+
+console.log(response.choices[0].message.content);` },
+              { label: 'fetch', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer herma_sk_your_api_key",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "herma-auto",
+    messages: [
+      { role: "user", content: "What is machine learning?" }
+    ]
+  })
+});
+
+const data = await response.json();
+console.log(data.choices[0].message.content);` },
+            ]} />
+          </div>
+
+          <h3
+            className="text-lg font-semibold text-[var(--text-primary)] mb-3"
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Streaming
+          </h3>
+          <div className="mb-8">
+            <TabGroup tabs={[
+              { label: 'Python', code: `from openai import OpenAI
+
+client = OpenAI(
+    api_key="herma_sk_your_api_key",
+    base_url="${API_URL}/v1"
+)
+
+stream = client.chat.completions.create(
+    model="herma-auto",
+    messages=[
+        {"role": "user", "content": "Write a haiku about coding"}
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="")` },
+              { label: 'Node.js', code: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "herma_sk_your_api_key",
+  baseURL: "${API_URL}/v1"
+});
+
+const stream = await client.chat.completions.create({
+  model: "herma-auto",
+  messages: [
+    { role: "user", content: "Write a haiku about coding" }
+  ],
+  stream: true
+});
+
+for await (const chunk of stream) {
+  const content = chunk.choices[0]?.delta?.content;
+  if (content) process.stdout.write(content);
+}` },
+              { label: 'fetch (SSE)', code: `const response = await fetch("${API_URL}/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer herma_sk_your_api_key",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "herma-auto",
+    messages: [
+      { role: "user", content: "Write a haiku about coding" }
+    ],
+    stream: true
+  })
+});
+
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  const text = decoder.decode(value);
+  // Parse SSE lines: "data: {...}"
+  for (const line of text.split("\\n")) {
+    if (line.startsWith("data: ") && line.slice(6) !== "[DONE]") {
+      const chunk = JSON.parse(line.slice(6));
+      const content = chunk.choices?.[0]?.delta?.content;
+      if (content) process.stdout.write(content);
+    }
+  }
+}` },
+            ]} />
+          </div>
         </section>
 
         {/* Rate Limits */}

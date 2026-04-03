@@ -58,7 +58,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="https://api.hermaai.com/v1",
-    api_key="your-herma-key"
+    api_key="herma_sk_your_api_key"
 )
 
 response = client.chat.completions.create(
@@ -74,7 +74,7 @@ import OpenAI from 'openai';
 
 const client = new OpenAI({
     baseURL: 'https://api.hermaai.com/v1',
-    apiKey: 'your-herma-key'
+    apiKey: 'herma_sk_your_api_key'
 });
 
 const response = await client.chat.completions.create({
@@ -87,7 +87,7 @@ console.log(response.choices[0].message.content);
 ### cURL
 ```bash
 curl https://api.hermaai.com/v1/chat/completions \
-  -H "Authorization: Bearer your-herma-key" \
+  -H "Authorization: Bearer herma_sk_your_api_key" \
   -H "Content-Type: application/json" \
   -d '{"model":"herma-auto","messages":[{"role":"user","content":"Hello!"}]}'
 ```
@@ -135,7 +135,7 @@ llm = LlamaOpenAI(
 ## Environment Variables
 
 ```
-HERMA_API_KEY=hk-your-api-key-here
+HERMA_API_KEY=herma_sk_your_api_key_here
 HERMA_BASE_URL=https://api.hermaai.com/v1
 ```
 
