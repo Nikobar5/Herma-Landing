@@ -18,6 +18,7 @@ import {
   getAdminLatency,
   getSiteAnalytics,
   getRetentionOverview,
+  getAdminCustomerDetail,
   getObservabilitySummary,
   getObservabilitySessionLogs,
   getObservabilityAlerts,
@@ -436,6 +437,7 @@ function AdminDashboardInner() {
     overview: 'Dashboard Overview', models: 'Model Performance', requests: 'Recent Requests',
     latency: 'Latency Analysis', retention: 'Customer Retention',
     'site-analytics': 'Site Analytics', funnel: 'Conversion Funnel',
+    customers: 'Customer Lookup',
     'agent-status': 'Agent Overview', 'agent-activity': 'Agent Activity Log', 'agent-alerts': 'Agent Alerts',
   };
 
@@ -486,6 +488,7 @@ function AdminDashboardInner() {
           {tab === 'retention' && <RetentionTab data={retention} />}
           {tab === 'site-analytics' && <SiteAnalyticsTab data={siteAnalytics} />}
           {tab === 'funnel' && <FunnelTab />}
+          {tab === 'customers' && <CustomersTab customers={retention?.customers || []} />}
           {/* Agent tabs */}
           {tab === 'agent-status' && (
             <AgentStatusTab
@@ -1062,6 +1065,198 @@ function RetentionTab({ data }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function CustomersTab({ customers }) {
+  const [selectedEmail, setSelectedEmail] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState(null);
+
+  const statusColor = (s) => s === 'active' ? 'text-green-400' : s === 'at_risk' ? 'text-yellow-400' : 'text-red-400';
+  const statusBg = (s) => s === 'active' ? 'bg-green-400/10' : s === 'at_risk' ? 'bg-yellow-400/10' : 'bg-red-400/10';
+
+  const handleViewCustomer = useCallback(async (email) => {
+    setSelectedEmail(email);
+    setDetail(null);
+    setDetailError(null);
+    setDetailLoading(true);
+    try {
+      const data = await getAdminCustomerDetail(email);
+      setDetail(data);
+    } catch (err) {
+      setDetailError(err.message);
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
+  const handleBack = () => {
+    setSelectedEmail(null);
+    setDetail(null);
+    setDetailError(null);
+  };
+
+  const customerBase = selectedEmail ? customers.find((c) => c.email === selectedEmail) : null;
+
+  const columns = [
+    {
+      key: 'email',
+      label: 'Email',
+      render: (v) => <span style={{ fontFamily: 'var(--font-code)' }} className="text-xs text-[var(--text-secondary)]">{v}</span>,
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      align: 'center',
+      render: (v) => (
+        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${statusColor(v)} ${statusBg(v)}`}>
+          {v}
+        </span>
+      ),
+    },
+    { key: 'requests_7d', label: '7d Reqs', align: 'right', render: (v) => fmtInt(v) },
+    { key: 'total_spend', label: 'Spend', align: 'right', render: (v) => fmtUsd(v) },
+    {
+      key: 'days_since_last_request',
+      label: 'Last Seen',
+      align: 'right',
+      render: (v) => (v === 0 ? 'today' : `${v}d ago`),
+    },
+    {
+      key: '_action',
+      label: '',
+      sortable: false,
+      align: 'right',
+      render: (_, row) => (
+        <button
+          onClick={() => handleViewCustomer(row.email)}
+          className="text-xs px-3 py-1 rounded-md bg-[var(--bg-tertiary)] border border-[var(--border-secondary)] text-[var(--text-primary)] hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)]/30 transition-colors"
+        >
+          View
+        </button>
+      ),
+    },
+  ];
+
+  if (selectedEmail) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back
+          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-code)' }}>
+              {selectedEmail}
+            </span>
+            {customerBase && (
+              <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${statusColor(customerBase.status)} ${statusBg(customerBase.status)}`}>
+                {customerBase.status}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* KPI cards */}
+        {detailLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard
+              label="Credit Balance"
+              value={detail ? fmtUsd(detail.balance_usd) : '—'}
+              sub={detailError ? 'Requires /admin/customers/lookup endpoint' : (detail ? 'current balance' : undefined)}
+              accent={detail?.balance_usd > 0}
+            />
+            <StatCard
+              label="Subscription"
+              value={detail ? (detail.subscription_plan || 'None') : '—'}
+              sub={detail ? (detail.subscription_status || undefined) : (detailError ? 'unavailable' : undefined)}
+            />
+            <StatCard
+              label="Requests (7d)"
+              value={customerBase ? fmtInt(customerBase.requests_7d) : '—'}
+              sub={customerBase ? `${fmtInt(customerBase.requests_30d)} last 30d` : undefined}
+            />
+            <StatCard
+              label="Total Spend"
+              value={customerBase ? fmtUsd(customerBase.total_spend) : '—'}
+              sub={customerBase ? `${fmtInt(customerBase.total_requests)} total requests` : undefined}
+            />
+          </div>
+        )}
+
+        {/* Account detail rows */}
+        {customerBase && (
+          <div className="rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-medium text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+              Account Details
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 text-xs">
+              <div>
+                <div className="text-[var(--text-tertiary)] mb-0.5 uppercase tracking-wider text-[10px]">Customer ID</div>
+                <div className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-code)' }}>{customerBase.customer_id || '—'}</div>
+              </div>
+              <div>
+                <div className="text-[var(--text-tertiary)] mb-0.5 uppercase tracking-wider text-[10px]">Last Active</div>
+                <div className="text-[var(--text-secondary)]">
+                  {customerBase.days_since_last_request === 0 ? 'Today' : `${customerBase.days_since_last_request}d ago`}
+                </div>
+              </div>
+              <div>
+                <div className="text-[var(--text-tertiary)] mb-0.5 uppercase tracking-wider text-[10px]">Weekly Trend</div>
+                <div className={customerBase.weekly_trend >= 1 ? 'text-green-400' : customerBase.weekly_trend > 0 ? 'text-yellow-400' : 'text-[var(--text-tertiary)]'}>
+                  {customerBase.weekly_trend > 0 ? `${customerBase.weekly_trend.toFixed(1)}x` : '—'}
+                </div>
+              </div>
+              {detail?.subscription_status && (
+                <div>
+                  <div className="text-[var(--text-tertiary)] mb-0.5 uppercase tracking-wider text-[10px]">Subscription Status</div>
+                  <div className="text-[var(--text-secondary)]">{detail.subscription_status}</div>
+                </div>
+              )}
+              <div>
+                <div className="text-[var(--text-tertiary)] mb-0.5 uppercase tracking-wider text-[10px]">Requests (30d)</div>
+                <div className="text-[var(--text-secondary)]">{fmtInt(customerBase.requests_30d)}</div>
+              </div>
+              <div>
+                <div className="text-[var(--text-tertiary)] mb-0.5 uppercase tracking-wider text-[10px]">Total Requests</div>
+                <div className="text-[var(--text-secondary)]">{fmtInt(customerBase.total_requests)}</div>
+              </div>
+            </div>
+            {detailError && (
+              <div className="text-xs text-[var(--text-tertiary)] bg-[var(--bg-primary)] border border-[var(--border-secondary)] rounded-lg px-3 py-2">
+                Balance and subscription data unavailable — add a{' '}
+                <code className="text-[var(--accent-primary)]">GET /admin/customers/lookup?email=</code>{' '}
+                endpoint to your backend to enable this.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <DataTable
+      data={customers}
+      columns={columns}
+      searchKeys={['email']}
+      defaultSort={{ key: 'total_spend', dir: 'desc' }}
+      emptyMessage="No customer data yet."
+      pageSize={20}
+    />
   );
 }
 

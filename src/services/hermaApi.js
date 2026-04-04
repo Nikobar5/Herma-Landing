@@ -291,6 +291,10 @@ export function getRetentionOverview() {
   return authFetch('/admin/analytics/retention');
 }
 
+export function getAdminCustomerDetail(email) {
+  return authFetch(`/admin/analytics/customers/lookup?email=${encodeURIComponent(email)}`);
+}
+
 // --- Latency (Admin) ---
 
 export function getAdminLatency(days = 7) {
