@@ -97,6 +97,8 @@ function formatCost(promptTokens, completionTokens, promptPricePerM, completionP
   return cost < 0.01 ? `$${cost.toFixed(5)}` : `$${cost.toFixed(4)}`;
 }
 
+const COMPARISON_TIMEOUT_MS = 30_000;
+
 const SmartRouterComparison = () => {
   const [models] = useState(FALLBACK_MODELS);
   const [query, setQuery] = useState('');
@@ -151,6 +153,11 @@ const SmartRouterComparison = () => {
     const chatFn = isAuthenticated ? streamChat : streamDemoChat;
     const chatOpts = isAuthenticated ? { skipMemory: true } : {};
 
+    const hermaController = new AbortController();
+    const stdController = new AbortController();
+    const hermaTimer = setTimeout(() => hermaController.abort(), COMPARISON_TIMEOUT_MS);
+    const stdTimer = setTimeout(() => stdController.abort(), COMPARISON_TIMEOUT_MS);
+
     // 1. Herma Router (auto-routed)
     const hermaPromise = (async () => {
       try {
@@ -158,6 +165,7 @@ const SmartRouterComparison = () => {
         await chatFn([{ role: 'user', content: query }], {
           model: 'openrouter/auto',
           ...chatOpts,
+          signal: hermaController.signal,
           onChunk: (delta) => {
             if (delta.type === 'reasoning') {
               setHermaResult(prev => ({ ...prev, thinking: true }));
@@ -167,22 +175,22 @@ const SmartRouterComparison = () => {
             }
           },
           onDone: (usage) => {
-            const promptTokens = usage?.prompt_tokens || 0;
-            const completionTokens = usage?.completion_tokens || 0;
-            const cost = formatCost(promptTokens, completionTokens, HERMA_INPUT_PRICE, HERMA_OUTPUT_PRICE);
-            setHermaResult(prev => ({
-              ...prev,
-              loading: false,
-              time: ((Date.now() - startTime) / 1000).toFixed(2),
-              cost
-            }));
+            setHermaResult(prev => {
+              if (!prev.content) {
+                return { ...prev, loading: false, error: 'No response received. Please try again.' };
+              }
+              const promptTokens = usage?.prompt_tokens || 0;
+              const completionTokens = usage?.completion_tokens || 0;
+              const cost = formatCost(promptTokens, completionTokens, HERMA_INPUT_PRICE, HERMA_OUTPUT_PRICE);
+              return { ...prev, loading: false, time: ((Date.now() - startTime) / 1000).toFixed(2), cost };
+            });
           },
-          onError: (err) => {
-            setHermaResult(prev => ({ ...prev, loading: false, error: err.message }));
-          }
         });
       } catch (err) {
-        setHermaResult(prev => ({ ...prev, loading: false, error: err.message }));
+        const msg = err.name === 'AbortError' ? 'Request timed out. Please try again.' : err.message;
+        setHermaResult(prev => ({ ...prev, loading: false, error: msg }));
+      } finally {
+        clearTimeout(hermaTimer);
       }
     })();
 
@@ -193,6 +201,7 @@ const SmartRouterComparison = () => {
         await chatFn([{ role: 'user', content: query }], {
           model: selectedModel,
           ...chatOpts,
+          signal: stdController.signal,
           onChunk: (delta) => {
             if (delta.type === 'reasoning') {
               setStdResult(prev => ({ ...prev, thinking: true }));
@@ -202,23 +211,23 @@ const SmartRouterComparison = () => {
             }
           },
           onDone: (usage) => {
-            // Show what the user would pay at the model's direct pricing
-            const promptTokens = usage?.prompt_tokens || 0;
-            const completionTokens = usage?.completion_tokens || 0;
-            const cost = formatCost(promptTokens, completionTokens, selectedModelObj.promptPrice, selectedModelObj.completionPrice);
-            setStdResult(prev => ({
-              ...prev,
-              loading: false,
-              time: ((Date.now() - startTime) / 1000).toFixed(2),
-              cost
-            }));
+            setStdResult(prev => {
+              if (!prev.content) {
+                return { ...prev, loading: false, error: 'No response received. Please try again.' };
+              }
+              // Show what the user would pay at the model's direct pricing
+              const promptTokens = usage?.prompt_tokens || 0;
+              const completionTokens = usage?.completion_tokens || 0;
+              const cost = formatCost(promptTokens, completionTokens, selectedModelObj.promptPrice, selectedModelObj.completionPrice);
+              return { ...prev, loading: false, time: ((Date.now() - startTime) / 1000).toFixed(2), cost };
+            });
           },
-          onError: (err) => {
-            setStdResult(prev => ({ ...prev, loading: false, error: err.message }));
-          }
         });
       } catch (err) {
-        setStdResult(prev => ({ ...prev, loading: false, error: err.message }));
+        const msg = err.name === 'AbortError' ? 'Request timed out. Please try again.' : err.message;
+        setStdResult(prev => ({ ...prev, loading: false, error: msg }));
+      } finally {
+        clearTimeout(stdTimer);
       }
     })();
 
@@ -344,8 +353,11 @@ const SmartRouterComparison = () => {
               ) : stdResult.loading && stdResult.content ? (
                 <ComparisonMarkdown content={stdResult.content} />
               ) : stdResult.error ? (
-                <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
-                  {stdResult.error}
+                <div className="bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
+                  <p className="text-[var(--error)]">{stdResult.error}</p>
+                  <button onClick={handleCompare} className="mt-3 text-xs text-[var(--accent-primary)] underline hover:no-underline">
+                    Try again
+                  </button>
                 </div>
               ) : stdResult.content ? (
                 <ComparisonMarkdown content={stdResult.content} />
@@ -408,8 +420,11 @@ const SmartRouterComparison = () => {
               ) : hermaResult.loading && hermaResult.content ? (
                 <ComparisonMarkdown content={hermaResult.content} />
               ) : hermaResult.error ? (
-                <div className="text-[var(--error)] bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
-                  {hermaResult.error}
+                <div className="bg-[var(--error)]/5 p-4 rounded-lg text-center text-sm">
+                  <p className="text-[var(--error)]">{hermaResult.error}</p>
+                  <button onClick={handleCompare} className="mt-3 text-xs text-[var(--accent-primary)] underline hover:no-underline">
+                    Try again
+                  </button>
                 </div>
               ) : hermaResult.content ? (
                 <ComparisonMarkdown content={hermaResult.content} />

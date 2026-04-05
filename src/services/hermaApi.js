@@ -403,7 +403,6 @@ export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpe
           if (parsed.error) {
             const err = new Error(parsed.error.message || 'An error occurred');
             err.type = parsed.error.type;
-            onError?.(err);
             throw err;
           }
           if (parsed.usage) lastUsage = parsed.usage;
@@ -419,7 +418,8 @@ export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpe
             onChunk?.({ type: 'content', content: delta.content });
           }
         } catch (parseErr) {
-          if (parseErr.type === 'stream_error' || parseErr.type === 'upstream_error') throw parseErr;
+          if (parseErr instanceof SyntaxError) continue;
+          throw parseErr;
         }
       }
     }
@@ -515,7 +515,6 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
             const errMsg = parsed.error.message || 'An error occurred';
             const err = new Error(errMsg);
             err.type = parsed.error.type;
-            onError?.(err);
             throw err;
           }
           if (parsed.usage) {
@@ -534,8 +533,8 @@ export async function streamChat(messages, { onChunk, onDone, onError, onOpen, s
             onChunk?.({ type: 'content', content: delta.content });
           }
         } catch (parseErr) {
-          if (parseErr.type === 'stream_error' || parseErr.type === 'upstream_error') throw parseErr;
-          // skip malformed JSON lines
+          if (parseErr instanceof SyntaxError) continue;
+          throw parseErr;
         }
       }
     }
