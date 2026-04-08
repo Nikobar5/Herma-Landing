@@ -449,21 +449,27 @@ function SafetyTab() {
               <tbody className="divide-y divide-[var(--border-secondary)]">
                 {customers.length === 0
                   ? <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-[var(--text-tertiary)]">No customers yet.</td></tr>
-                  : customers.filter(c => canView(c.email)).map(c => (
-                      <tr key={c.id} className="hover:bg-[var(--bg-tertiary)]/30">
-                        <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{c.name}</td>
-                        <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.email}</td>
-                        <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.company || '—'}</td>
-                        <td className="px-4 py-3 text-right text-[var(--text-secondary)]">{c.total_requests?.toLocaleString() || 0}</td>
-                        <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.last_active ? new Date(c.last_active).toLocaleDateString() : 'Never'}</td>
-                        <td className="px-4 py-3 text-right">
-                          <button onClick={() => openCustomer(c)}
-                            className="px-3 py-1 text-xs bg-[var(--bg-tertiary)] hover:bg-[var(--border-secondary)] text-[var(--text-primary)] rounded-md font-medium transition-colors">
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                  : customers.map(c => {
+                      const allowed = canView(c.email);
+                      return (
+                        <tr key={c.id} className="hover:bg-[var(--bg-tertiary)]/30">
+                          <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{c.name}</td>
+                          <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.email}</td>
+                          <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.company || '—'}</td>
+                          <td className="px-4 py-3 text-right text-[var(--text-secondary)]">{c.total_requests?.toLocaleString() || 0}</td>
+                          <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.last_active ? new Date(c.last_active).toLocaleDateString() : 'Never'}</td>
+                          <td className="px-4 py-3 text-right">
+                            {allowed
+                              ? <button onClick={() => openCustomer(c)}
+                                  className="px-3 py-1 text-xs bg-[var(--bg-tertiary)] hover:bg-[var(--border-secondary)] text-[var(--text-primary)] rounded-md font-medium transition-colors">
+                                  View
+                                </button>
+                              : <span className="px-3 py-1 text-xs text-[var(--text-tertiary)] italic">Private</span>
+                            }
+                          </td>
+                        </tr>
+                      );
+                    })
                 }
               </tbody>
             </table>
