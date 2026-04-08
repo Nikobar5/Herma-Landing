@@ -279,6 +279,167 @@ export default function AdminDashboard() {
   );
 }
 
+function SafetyTab() {
+  const API_BASE = process.env.REACT_APP_HERMA_API_URL || '';
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  function authHeaders() {
+    const token = localStorage.getItem('herma_token');
+    return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+  }
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_BASE}/admin/analytics/customers?limit=200`, { headers: authHeaders() });
+        if (res.ok) setCustomers(await res.json());
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  async function openCustomer(customer) {
+    setSelectedCustomer(customer);
+    setDetail(null);
+    setDetailLoading(true);
+    const [memRes, convRes] = await Promise.all([
+      fetch(`${API_BASE}/admin/analytics/memory/${customer.id}`, { headers: authHeaders() }),
+      fetch(`${API_BASE}/admin/analytics/conversations/${customer.id}`, { headers: authHeaders() }),
+    ]);
+    setDetail({
+      memories: memRes.ok ? (await memRes.json()).memories || [] : [],
+      conversations: convRes.ok ? (await convRes.json()).conversations || [] : [],
+    });
+    setDetailLoading(false);
+  }
+
+  if (selectedCustomer) {
+    return (
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setSelectedCustomer(null)} className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </button>
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">{selectedCustomer.name}</h3>
+            <p className="text-sm text-[var(--text-tertiary)]">{selectedCustomer.email}</p>
+          </div>
+        </div>
+
+        {detailLoading && <p className="text-sm text-[var(--text-tertiary)]">Loading decrypted content…</p>}
+
+        {detail && (
+          <div className="space-y-8">
+            {/* Memories */}
+            <div>
+              <h4 className="text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)] mb-3">Extracted Memories ({detail.memories.length})</h4>
+              {detail.memories.length === 0
+                ? <p className="text-sm text-[var(--text-tertiary)] italic">No memories stored.</p>
+                : <div className="space-y-2">
+                    {detail.memories.map(m => (
+                      <div key={m.id} className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">{m.category}</span>
+                          <span className="text-xs text-[var(--text-tertiary)]">{new Date(m.created_at).toLocaleString()}</span>
+                        </div>
+                        <p className="text-sm text-[var(--text-primary)]">{m.content}</p>
+                        {m.source_snippet && <p className="text-xs text-[var(--text-tertiary)] mt-2 pt-2 border-t border-[var(--border-secondary)] italic">"{m.source_snippet}"</p>}
+                      </div>
+                    ))}
+                  </div>
+              }
+            </div>
+
+            {/* Conversations */}
+            <div>
+              <h4 className="text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)] mb-3">Dashboard Conversations ({detail.conversations.length})</h4>
+              {detail.conversations.length === 0
+                ? <p className="text-sm text-[var(--text-tertiary)] italic">No dashboard conversations stored.</p>
+                : <div className="space-y-4">
+                    {detail.conversations.map(conv => (
+                      <div key={conv.id} className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg overflow-hidden">
+                        <div className="px-4 py-3 bg-[var(--bg-tertiary)] border-b border-[var(--border-secondary)] flex items-center justify-between">
+                          <span className="text-sm font-medium text-[var(--text-primary)]">{conv.title || 'Untitled'}</span>
+                          <span className="text-xs text-[var(--text-tertiary)]">{new Date(conv.created_at).toLocaleString()} · {(conv.messages || []).length} messages</span>
+                        </div>
+                        <div className="divide-y divide-[var(--border-secondary)]">
+                          {(conv.messages || []).map(msg => (
+                            <div key={msg.id} className={`px-4 py-3 ${msg.role === 'user' ? '' : 'bg-[var(--bg-tertiary)]/30'}`}>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className={`text-xs font-semibold uppercase tracking-wider ${msg.role === 'user' ? 'text-blue-400' : 'text-purple-400'}`}>{msg.role}</span>
+                                <span className="text-xs text-[var(--text-tertiary)]">{new Date(msg.created_at).toLocaleString()}</span>
+                              </div>
+                              <p className="text-sm text-[var(--text-primary)] whitespace-pre-wrap">{msg.content}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+              }
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)]">Safety Review</h2>
+        <p className="text-sm text-[var(--text-tertiary)] mt-1">Decrypted conversation and memory access for safety monitoring. All access is logged.</p>
+      </div>
+
+      {loading
+        ? <p className="text-sm text-[var(--text-tertiary)]">Loading customers…</p>
+        : <div className="bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-[var(--bg-tertiary)] border-b border-[var(--border-secondary)]">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-tertiary)]">Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-tertiary)]">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-tertiary)]">Company</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-[var(--text-tertiary)]">Requests</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-tertiary)]">Last Active</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-secondary)]">
+                {customers.length === 0
+                  ? <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-[var(--text-tertiary)]">No customers yet.</td></tr>
+                  : customers.map(c => (
+                      <tr key={c.id} className="hover:bg-[var(--bg-tertiary)]/30">
+                        <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{c.name}</td>
+                        <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.email}</td>
+                        <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.company || '—'}</td>
+                        <td className="px-4 py-3 text-right text-[var(--text-secondary)]">{c.total_requests?.toLocaleString() || 0}</td>
+                        <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.last_active ? new Date(c.last_active).toLocaleDateString() : 'Never'}</td>
+                        <td className="px-4 py-3 text-right">
+                          <button onClick={() => openCustomer(c)}
+                            className="px-3 py-1 text-xs bg-[var(--bg-tertiary)] hover:bg-[var(--border-secondary)] text-[var(--text-primary)] rounded-md font-medium transition-colors">
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                }
+              </tbody>
+            </table>
+          </div>
+      }
+    </div>
+  );
+}
+
 function AdminDashboardInner() {
   const { isAdmin, logout } = useHermaAuth();
   const navigate = useNavigate();
@@ -439,6 +600,7 @@ function AdminDashboardInner() {
     'site-analytics': 'Site Analytics', funnel: 'Conversion Funnel',
     customers: 'Customer Lookup',
     'agent-status': 'Agent Overview', 'agent-activity': 'Agent Activity Log', 'agent-alerts': 'Agent Alerts',
+    safety: 'Safety Review',
   };
 
   return (
@@ -508,6 +670,7 @@ function AdminDashboardInner() {
             />
           )}
           {tab === 'agent-alerts' && <AgentAlertsTab alerts={agentAlerts} logs={agentLogs} onRefresh={loadData} acknowledgedErrors={acknowledgedErrors} acknowledgeError={acknowledgeError} />}
+          {tab === 'safety' && <SafetyTab />}
         </div>
       </div>
 
