@@ -56,7 +56,10 @@ const PrivacyPolicy = () => {
             We process your inputs and outputs in real-time to deliver AI model responses. We do not use your content to train AI models. We collect derivative metrics about interaction characteristics (such as query type and routing performance) to improve our service. Content is encrypted and handled in accordance with data minimization principles.
           </p>
           <p>
-            To provide personalization features, we may extract and store encrypted summaries of your stated preferences and relevant context from conversations. These encrypted summaries are used solely to personalize your experience and are not accessible in readable form to our team.
+            To provide personalization features, we may extract and store encrypted summaries of your stated preferences and relevant context from conversations. These encrypted summaries are used solely to personalize your experience.
+          </p>
+          <p>
+            <strong>Safety Review.</strong> As an AI gateway routing requests across multiple model providers, Herma occupies a unique position of visibility into cross-provider AI interactions. To fulfill our safety responsibilities, authorized Herma personnel may access and review conversation content — in decrypted form, in a controlled internal environment — when necessary to investigate potential safety concerns, detect emergent or harmful AI behavior, prevent misuse, or comply with legal obligations. Such access is logged, limited to personnel with a legitimate need, and conducted in accordance with our security policies. This review capability is essential to responsible operation of an AI routing service.
           </p>
 
           <h2>4. DATA RETENTION</h2>

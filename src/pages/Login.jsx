@@ -161,8 +161,14 @@ const Login = () => {
         >
           {isLogin
             ? 'Access your API dashboard'
-            : 'Get started with $1.00 in free credits'}
+            : 'Get $1.00 in free credits — save 65%+ on AI costs'}
         </p>
+        {!isLogin && (
+          <div className="mt-4 flex flex-col items-center gap-1.5 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+            <span>OpenAI-compatible API — one URL swap, no code changes</span>
+            <span>868+ benchmark tests passing — quality verified</span>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

@@ -92,6 +92,67 @@ curl https://api.hermaai.com/v1/chat/completions \
   -d '{"model":"herma-auto","messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
+### LangChain (Python)
+```python
+from langchain_openai import ChatOpenAI
+import os
+
+llm = ChatOpenAI(
+    model="herma-auto",
+    openai_api_key=os.environ["HERMA_API_KEY"],
+    openai_api_base="https://api.hermaai.com/v1"
+)
+```
+
+### Vercel AI SDK
+```javascript
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText } from "ai";
+
+const herma = createOpenAI({
+  apiKey: process.env.HERMA_API_KEY,
+  baseURL: "https://api.hermaai.com/v1"
+});
+
+const { text } = await generateText({
+  model: herma("herma-auto"),
+  prompt: "Hello!"
+});
+```
+
+### LlamaIndex (Python)
+```python
+from llama_index.llms.openai import OpenAI as LlamaOpenAI
+import os
+
+llm = LlamaOpenAI(
+    model="herma-auto",
+    api_key=os.environ["HERMA_API_KEY"],
+    api_base="https://api.hermaai.com/v1"
+)
+```
+
+## Environment Variables
+
+```
+HERMA_API_KEY=hk-your-api-key-here
+HERMA_BASE_URL=https://api.hermaai.com/v1
+```
+
+## AI Coding Tool Integration
+
+Drop a configuration file into your project root so your AI coding assistant automatically uses Herma:
+
+| Tool | File to create | Download |
+|------|---------------|----------|
+| Claude Code | `CLAUDE.md` | https://hermaai.com/integration/CLAUDE.md |
+| Cursor | `.cursorrules` | https://hermaai.com/integration/cursor-rules.txt |
+| Windsurf | `.windsurfrules` | https://hermaai.com/integration/windsurf-rules.txt |
+| Codex / Devin / other agents | `AGENTS.md` | https://hermaai.com/integration/AGENTS.md |
+| Environment variables | `.env.example` | https://hermaai.com/integration/.env.example |
+
+Herma is also registered at https://hermaai.com/llms.txt (llms.txt standard) so AI tools can auto-discover integration details.
+
 ## Features
 
 - **Intelligent Model Routing**: Automatically selects the best model for each query based on task type and complexity
