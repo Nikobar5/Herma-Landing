@@ -279,8 +279,37 @@ export default function AdminDashboard() {
   );
 }
 
+// Emails that only the named founder can view in Safety Review
+const NIKO_PRIVATE = new Set([
+  'nbarciak4@gmail.com',
+  'barciakdarina@gmail.com',
+  'abarciak77@gmail.com',
+  'lucykkelley@gmail.com',
+  'niko.barciak@hermaai.com',
+]);
+const NICK_PRIVATE = new Set([
+  'mcp6@illinois.edu',
+  'nickpisme4@gmail.com',
+  'nick.pianfetti@hermaai.com',
+]);
+
 function SafetyTab() {
   const API_BASE = process.env.REACT_APP_HERMA_API_URL || '';
+  const { user } = useHermaAuth();
+  const viewerEmail = user?.email || '';
+  const isNiko = viewerEmail === 'niko.barciak@hermaai.com';
+  const isNick = viewerEmail === 'nick.pianfetti@hermaai.com';
+
+  function canView(customerEmail) {
+    const email = (customerEmail || '').toLowerCase();
+    // If customer is in Niko's private list, only Niko can view
+    if (NIKO_PRIVATE.has(email)) return isNiko;
+    // If customer is in Nick's private list, only Nick can view
+    if (NICK_PRIVATE.has(email)) return isNick;
+    // Everyone else is visible to all admins
+    return true;
+  }
+
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -306,6 +335,10 @@ function SafetyTab() {
   }, []);
 
   async function openCustomer(customer) {
+    if (!canView(customer.email)) {
+      alert('You do not have access to this customer.');
+      return;
+    }
     setSelectedCustomer(customer);
     setDetail(null);
     setDetailLoading(true);
@@ -416,7 +449,7 @@ function SafetyTab() {
               <tbody className="divide-y divide-[var(--border-secondary)]">
                 {customers.length === 0
                   ? <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-[var(--text-tertiary)]">No customers yet.</td></tr>
-                  : customers.map(c => (
+                  : customers.filter(c => canView(c.email)).map(c => (
                       <tr key={c.id} className="hover:bg-[var(--bg-tertiary)]/30">
                         <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{c.name}</td>
                         <td className="px-4 py-3 text-[var(--text-tertiary)]">{c.email}</td>
