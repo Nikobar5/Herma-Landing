@@ -296,9 +296,9 @@ const NICK_PRIVATE = new Set([
 function SafetyTab() {
   const API_BASE = process.env.REACT_APP_HERMA_API_URL || '';
   const { user } = useHermaAuth();
-  const viewerEmail = user?.email || '';
-  const isNiko = viewerEmail === 'niko.barciak@hermaai.com';
-  const isNick = viewerEmail === 'nick.pianfetti@hermaai.com';
+  const viewerEmail = (user?.email || '').toLowerCase();
+  const isNiko = NIKO_PRIVATE.has(viewerEmail);
+  const isNick = NICK_PRIVATE.has(viewerEmail);
 
   function canView(customerEmail) {
     const email = (customerEmail || '').toLowerCase();
