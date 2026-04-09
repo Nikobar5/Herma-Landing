@@ -1,3 +1,43 @@
+# Change Log — 2026-04-09
+
+## Session: setup.md integration + home page gap fixes
+
+### 1. `public/setup.md` — model table correction
+- Removed `claude-opus-4-6` and `claude-sonnet-4-6` rows from Available Models — only `herma-auto` is supported through the router
+- Added a note that Herma's router selects the underlying model automatically
+
+### 2. Integration files — setup.md reference + tool setup sections
+Each file now includes tool-specific instructions for routing the AI tool itself through Herma (not just using Herma in code), plus a link to `https://hermaai.com/setup.md`.
+
+- `public/integration/CLAUDE.md` — added Claude Code one-liner installer, manual env var setup (`ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_MODEL`), and explanation of why `AUTH_TOKEN` is used instead of `API_KEY`
+- `public/integration/AGENTS.md` — added Aider, Continue.dev, Cursor, and Windsurf setup blocks
+- `public/integration/cursor-rules.txt` — added Cursor Settings UI steps and env var alternative
+- `public/integration/windsurf-rules.txt` — added Windsurf Settings UI steps
+
+### 3. `public/llms.txt` + `public/llms-full.txt` — setup.md link added
+- `llms.txt`: added `https://hermaai.com/setup.md` at the top of the AI Coding Tool Integration section
+- `llms-full.txt`: added bolded "Full setup guide" link with description of covered tools
+
+### 4. `public/sitemap.xml` — setup.md entry
+- Added `/setup.md` with `changefreq: monthly`, `priority: 0.7`
+
+### 5. `src/pages/Documentation.jsx` — new "Route Your AI Tool Through Herma" section
+- Added between "Quick Start with Coding Tools" and "Base URL"
+- `TabGroup` with 4 tabs: Claude Code (one-liner + env vars), Cursor, Windsurf, Aider/Continue.dev
+- "View full setup guide →" link to `/setup.md`
+
+### 6. `src/App.jsx` — removed PricingTeaser
+- Removed `PricingTeaser` import and `<PricingTeaser />` from the home page
+- **Why:** Component used `animate-on-scroll` CSS classes but never attached IntersectionObserver refs, so all content rendered at `opacity: 0` while still occupying full layout height — creating a large blank gap between "Drop-in Replacement" and "How Herma Performs". Content also showed outdated subscription pricing that no longer matches the credits model.
+
+### 7. `src/components/FAQAccordion.jsx` — fixed invisible content + outdated copy
+- Removed broken `animate-on-scroll fade-up` classes from heading, FAQ item divs, and footer link
+- Removed unused `useScrollAnimation` import and call
+- **Why:** Same root cause as PricingTeaser — `useScrollAnimation()` return value was discarded, so no IntersectionObserver was attached and all content stayed at `opacity: 0`, creating another blank gap below "How Herma Performs"
+- Updated FAQ answer for "How much does Herma cost?" — removed mention of "Monthly subscriptions ($10, $25, $50/mo)", replaced with pay-as-you-go language
+
+---
+
 # Change Log — 2026-04-04
 
 ## Session: Admin Customer Lookup Tab

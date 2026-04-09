@@ -42,8 +42,22 @@ const response = await client.chat.completions.create({
 });
 ```
 
+## Setting Up Cursor to Route Through Herma
+
+If the user needs to configure Cursor itself to use Herma, go to Cursor Settings → Models → OpenAI API Key section:
+
+- **API Key:** `herma_sk_YOUR_KEY`
+- **Base URL:** `https://api.hermaai.com/v1`
+
+Or via environment variables:
+```bash
+export OPENAI_API_KEY="herma_sk_YOUR_KEY"
+export OPENAI_BASE_URL="https://api.hermaai.com/v1"
+```
+
 ## Reference
 
+- Full setup guide (all tools): https://hermaai.com/setup.md
 - Model: always `herma-auto`
 - Docs: https://hermaai.com/docs
 - Get API key: https://hermaai.com/dashboard/api-keys

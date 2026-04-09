@@ -103,6 +103,8 @@ llm = LlamaOpenAI(model="herma-auto", api_key=os.environ["HERMA_API_KEY"], api_b
   - https://github.com/Nikobar5/herma-eval
 
 ## AI Coding Tool Integration
+Full setup guide (Claude Code, Cursor, Windsurf, Aider, Continue.dev, SDKs, curl): https://hermaai.com/setup.md
+
 Drop a configuration file into your project root so your AI coding assistant automatically uses Herma for all LLM calls:
 - Claude Code (CLAUDE.md): https://hermaai.com/integration/CLAUDE.md
 - Cursor (.cursorrules): https://hermaai.com/integration/cursor-rules.txt
