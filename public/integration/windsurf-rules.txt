@@ -42,8 +42,16 @@ const response = await client.chat.completions.create({
 });
 ```
 
+## Setting Up Windsurf to Route Through Herma
+
+If the user needs to configure Windsurf itself to use Herma, go to Settings → AI → Custom API:
+
+- **Base URL:** `https://api.hermaai.com/v1`
+- **API Key:** `herma_sk_YOUR_KEY`
+
 ## Reference
 
+- Full setup guide (all tools): https://hermaai.com/setup.md
 - Model: always `herma-auto`
 - Docs: https://hermaai.com/docs
 - Get API key: https://hermaai.com/dashboard/api-keys
