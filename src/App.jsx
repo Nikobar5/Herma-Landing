@@ -7,6 +7,8 @@ import Hero from './components/Hero';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import BenchmarkTrust from './components/BenchmarkTrust';
+import FAQAccordion from './components/FAQAccordion';
+import MobileStickyCTA from './components/MobileStickyCTA';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -163,6 +165,8 @@ const Home = () => {
       <ValueProposition />
       <HowItWorksSection />
       <BenchmarkTrust />
+      <FAQAccordion />
+      <MobileStickyCTA />
     </>
   );
 };

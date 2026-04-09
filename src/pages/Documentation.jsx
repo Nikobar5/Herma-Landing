@@ -500,6 +500,96 @@ HERMA_API_KEY=herma_sk_your_api_key_here`}</CodeBlock>
           </div>
         </section>
 
+        {/* Route Your AI Tool Through Herma */}
+        <section className="mb-12" id="route-your-tool">
+          <h2
+            className="text-2xl font-bold text-[var(--text-primary)] mb-3"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Route Your AI Tool Through Herma
+          </h2>
+          <p
+            className="text-[var(--text-secondary)] mb-6"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Instead of just using Herma in your code, you can route Claude Code, Cursor, or Windsurf
+            itself through Herma — every request your AI tool makes gets intelligently routed,
+            saving 60–90% automatically.
+          </p>
+
+          <TabGroup tabs={[
+            {
+              label: 'Claude Code',
+              code: `# One-liner installer (recommended)
+curl -fsSL https://api.hermaai.com/install/claude-code | bash -s -- herma_sk_YOUR_KEY
+
+# Or add manually to ~/.zshrc or ~/.bashrc:
+export ANTHROPIC_BASE_URL="https://api.hermaai.com"
+export ANTHROPIC_AUTH_TOKEN="herma_sk_YOUR_KEY"
+export ANTHROPIC_MODEL="herma-auto"
+
+# Then open a new terminal and run: claude
+
+# Note: use ANTHROPIC_AUTH_TOKEN (not ANTHROPIC_API_KEY) — this sends your key
+# directly as a Bearer token and bypasses Anthropic's OAuth login flow.
+# Already logged into Claude? No need to log out — AUTH_TOKEN takes priority.
+# To revert: remove the three export lines and open a new terminal.`,
+            },
+            {
+              label: 'Cursor',
+              code: `# Cursor Settings → Models → OpenAI API Key section:
+#
+#   API Key:  herma_sk_YOUR_KEY
+#   Base URL: https://api.hermaai.com/v1
+#
+# Or via environment (if Cursor respects shell env):
+export OPENAI_API_KEY="herma_sk_YOUR_KEY"
+export OPENAI_BASE_URL="https://api.hermaai.com/v1"`,
+            },
+            {
+              label: 'Windsurf',
+              code: `# Windsurf Settings → AI → Custom API:
+#
+#   Base URL: https://api.hermaai.com/v1
+#   API Key:  herma_sk_YOUR_KEY`,
+            },
+            {
+              label: 'Aider / Continue.dev',
+              code: `# Aider
+export OPENAI_API_KEY="herma_sk_YOUR_KEY"
+export OPENAI_API_BASE="https://api.hermaai.com/v1"
+aider --model herma-auto
+
+# Continue.dev — add to ~/.continue/config.json:
+# {
+#   "models": [{
+#     "title": "Herma Auto",
+#     "provider": "openai",
+#     "model": "herma-auto",
+#     "apiKey": "herma_sk_YOUR_KEY",
+#     "apiBase": "https://api.hermaai.com/v1"
+#   }]
+# }`,
+            },
+          ]} />
+
+          <div className="mt-4 flex items-center justify-between px-1">
+            <p className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
+              Replace <code className="bg-[var(--bg-tertiary)] px-1 py-0.5 rounded text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>herma_sk_YOUR_KEY</code> with your key from{' '}
+              <a href="/dashboard/api-keys" className="text-[var(--accent-primary)] underline">Dashboard → API Keys</a>.
+            </p>
+            <a
+              href="/setup.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors flex items-center gap-1 font-medium whitespace-nowrap ml-4"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              View full setup guide →
+            </a>
+          </div>
+        </section>
+
         {/* Base URL */}
         <section className="mb-12">
           <h2
