@@ -4,6 +4,8 @@ import { useHermaAuth } from '../context/HermaAuthContext';
 import { ToastProvider, useToast } from '../context/ToastContext';
 import AdminSidebar from '../components/AdminSidebar';
 import FunnelTab from './dashboard/FunnelTab';
+import RoutingIntelTab from './dashboard/RoutingIntelTab';
+import ApiContentTab from './dashboard/ApiContentTab';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Area, AreaChart, Legend,
@@ -638,6 +640,8 @@ function AdminDashboardInner() {
     latency: 'Latency Analysis', retention: 'Customer Retention',
     'site-analytics': 'Site Analytics', funnel: 'Conversion Funnel',
     customers: 'Customer Lookup',
+    'routing-intel': 'Routing Intelligence',
+    'api-content': 'API Requests',
     'agent-status': 'Agent Overview', 'agent-activity': 'Agent Activity Log', 'agent-alerts': 'Agent Alerts',
     safety: 'Safety Review',
   };
@@ -710,6 +714,8 @@ function AdminDashboardInner() {
           )}
           {tab === 'agent-alerts' && <AgentAlertsTab alerts={agentAlerts} logs={agentLogs} onRefresh={loadData} acknowledgedErrors={acknowledgedErrors} acknowledgeError={acknowledgeError} />}
           {tab === 'safety' && <SafetyTab />}
+          {tab === 'routing-intel' && <RoutingIntelTab />}
+          {tab === 'api-content' && <ApiContentTab />}
         </div>
       </div>
 

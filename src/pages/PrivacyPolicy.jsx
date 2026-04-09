@@ -53,7 +53,7 @@ const PrivacyPolicy = () => {
 
           <h2>3. CONTENT HANDLING</h2>
           <p>
-            We process your inputs and outputs in real-time to deliver AI model responses. We do not use your content to train AI models. We collect derivative metrics about interaction characteristics (such as query type and routing performance) to improve our service. Content is encrypted and handled in accordance with data minimization principles.
+            We process your inputs and outputs in real-time to deliver AI model responses. We do not use your content to train AI models. We collect derivative metrics about interaction characteristics (such as query type and routing performance) to improve our service. Content is encrypted and handled in accordance with data minimization principles. For both API and dashboard usage, request and response content may be temporarily retained in encrypted form for service operation, quality assurance, safety review, and routing optimization. This content is subject to the same encryption, access controls, and data minimization standards described in this policy.
           </p>
           <p>
             To provide personalization features, we may extract and store encrypted summaries of your stated preferences and relevant context from conversations. These encrypted summaries are used solely to personalize your experience.
@@ -139,7 +139,7 @@ const PrivacyPolicy = () => {
           </div>
 
           <p className="policy-updated">
-            Last updated: February 24, 2026
+            Last updated: April 8, 2026
           </p>
         </div>
       </div>

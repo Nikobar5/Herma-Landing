@@ -323,6 +323,26 @@ export function getObservabilityAlerts(limit = 50) {
   return authFetch(`/admin/analytics/observability/alerts?limit=${limit}`);
 }
 
+// --- Routing Intelligence (Admin) ---
+
+export function getDerivativeOverview(days = 7) {
+  return authFetch(`/admin/analytics/derivatives?days=${days}`);
+}
+
+export function getDerivativesByCell(days = 7) {
+  return authFetch(`/admin/analytics/derivatives/by-cell?days=${days}`);
+}
+
+export function getApiContentLog(limit = 50, offset = 0, customerId = null) {
+  const params = new URLSearchParams({ limit, offset });
+  if (customerId) params.set('customer_id', customerId);
+  return authFetch(`/admin/analytics/api-content?${params}`);
+}
+
+export function getApiContentDetail(requestId) {
+  return authFetch(`/admin/analytics/api-content/${requestId}`);
+}
+
 // --- Conversations (server-side storage) ---
 
 export function createConversation(title = 'New chat') {
