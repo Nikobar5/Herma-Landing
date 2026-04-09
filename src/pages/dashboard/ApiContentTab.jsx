@@ -75,7 +75,20 @@ function ExpandedRow({ requestId, onClose }) {
     setLoading(true);
     setError(null);
     getApiContentDetail(requestId)
-      .then((d) => { setDetail(d); setLoading(false); })
+      .then((d) => {
+        // Normalize: parse messages_json string into array, map field names
+        let messages = d.messages || [];
+        if (!messages.length && d.messages_json) {
+          try { messages = JSON.parse(d.messages_json); } catch { messages = []; }
+        }
+        setDetail({
+          ...d,
+          messages,
+          model: d.model_used || d.model,
+          total_tokens: d.total_tokens || ((d.prompt_tokens || 0) + (d.completion_tokens || 0)),
+        });
+        setLoading(false);
+      })
       .catch((err) => { setError(err.message); setLoading(false); });
   }, [requestId]);
 
@@ -282,13 +295,17 @@ export default function ApiContentTab() {
                 </tr>
               )}
               {rows.map((row) => {
-                const queryText = lastUserMessage(row.messages);
-                const isExpanded = expandedId === row.id;
+                const rowId = row.request_id || row.id;
+                const queryText = row.messages_preview || lastUserMessage(row.messages);
+                const responseText = row.response_preview || row.response_content;
+                const modelName = row.model_used || row.model;
+                const totalTokens = row.total_tokens || ((row.prompt_tokens || 0) + (row.completion_tokens || 0)) || null;
+                const isExpanded = expandedId === rowId;
                 return (
-                  <React.Fragment key={row.id}>
+                  <React.Fragment key={rowId}>
                     <tr
                       className={`border-b border-[var(--border-secondary)]/50 cursor-pointer transition-colors ${isExpanded ? 'bg-[var(--bg-secondary)]/50' : 'hover:bg-[var(--bg-tertiary)]/30'}`}
-                      onClick={() => handleRowClick(row.id)}
+                      onClick={() => handleRowClick(rowId)}
                     >
                       <td className="px-4 py-2 text-xs text-[var(--text-tertiary)] whitespace-nowrap">
                         {timeAgo(row.created_at)}
@@ -302,17 +319,17 @@ export default function ApiContentTab() {
                         </span>
                       </td>
                       <td className="px-4 py-2 text-xs text-[var(--text-secondary)] max-w-[200px]">
-                        <span className="truncate block" title={row.response_content || ''}>
-                          {truncate(row.response_content, 100)}
+                        <span className="truncate block" title={responseText || ''}>
+                          {truncate(responseText, 100)}
                         </span>
                       </td>
                       <td className="px-4 py-2 text-xs">
                         <span className="font-mono text-[var(--text-tertiary)] text-[10px]">
-                          {row.model ? row.model.split('/').pop() : '—'}
+                          {modelName ? modelName.split('/').pop() : '—'}
                         </span>
                       </td>
                       <td className="px-4 py-2 text-xs text-right text-[var(--text-secondary)]">
-                        {fmtInt(row.total_tokens)}
+                        {fmtInt(totalTokens)}
                       </td>
                       <td className="px-4 py-2 text-xs text-right text-[var(--text-secondary)]">
                         {fmtUsd(row.cost)}
@@ -320,7 +337,7 @@ export default function ApiContentTab() {
                     </tr>
                     {isExpanded && (
                       <ExpandedRow
-                        requestId={row.id}
+                        requestId={rowId}
                         onClose={() => setExpandedId(null)}
                       />
                     )}
