@@ -10,7 +10,7 @@ All LLM API calls in this project use Herma. Use the following client configurat
 |-----------|------------------------------------|
 | Base URL  | `https://api.hermaai.com/v1`       |
 | Model     | `herma-auto`                       |
-| API Key   | `$HERMA_API_KEY` (starts with `hk-`) |
+| API Key   | `$HERMA_API_KEY` (starts with `herma_sk`) |
 
 Get your API key: https://hermaai.com/dashboard/api-keys
 
@@ -49,6 +49,27 @@ const response = await client.chat.completions.create({
 console.log(response.choices[0].message.content);
 ```
 
+## Setting Up Claude Code to Route Through Herma
+
+If the user wants Claude Code itself (this tool) to route through Herma, add these to `~/.zshrc` or `~/.bashrc`:
+
+```bash
+export ANTHROPIC_BASE_URL="https://api.hermaai.com"
+export ANTHROPIC_AUTH_TOKEN="herma_sk_YOUR_KEY"
+export ANTHROPIC_MODEL="herma-auto"
+```
+
+Then open a new terminal and run `claude`.
+
+Or use the one-liner installer:
+```bash
+curl -fsSL https://api.hermaai.com/install/claude-code | bash -s -- herma_sk_YOUR_KEY
+```
+
+> **Why `ANTHROPIC_AUTH_TOKEN` and not `ANTHROPIC_API_KEY`?** Claude Code treats these differently: `ANTHROPIC_API_KEY` triggers Anthropic's OAuth browser login flow. `ANTHROPIC_AUTH_TOKEN` sends the value directly as a Bearer token and bypasses OAuth entirely, so Herma's key works without conflict.
+
+> **Already logged into Claude?** No need to log out. `ANTHROPIC_AUTH_TOKEN` takes priority over your existing session automatically. To revert to your Claude subscription later, remove the three export lines and open a new terminal.
+
 ## Rules
 
 - Always use `herma-auto` as the model. Herma selects the optimal underlying model per request.
@@ -59,6 +80,7 @@ console.log(response.choices[0].message.content);
 
 ## Reference
 
+- Full setup guide (all tools): https://hermaai.com/setup.md
 - API Documentation: https://hermaai.com/docs
 - Pricing: $2/M input tokens, $8/M output tokens
 - Test the router free (no auth required): `POST https://api.hermaai.com/v1/classify`

@@ -8,7 +8,7 @@ Herma is an OpenAI-compatible intelligent model router. Use it as the LLM provid
 |----------|------------------------------------|
 | Base URL | `https://api.hermaai.com/v1`       |
 | Model    | `herma-auto`                       |
-| API Key  | `$HERMA_API_KEY` (starts with `hk-`) |
+| API Key  | `$HERMA_API_KEY` (starts with `herma_sk`) |
 
 Get your API key: https://hermaai.com/dashboard/api-keys
 
@@ -46,6 +46,49 @@ const response = await client.chat.completions.create({
 });
 ```
 
+## Configuring AI Coding Tools to Route Through Herma
+
+If the user wants their AI coding tool to route through Herma, use the instructions below for their specific tool.
+
+### Aider
+
+```bash
+export OPENAI_API_KEY="herma_sk_YOUR_KEY"
+export OPENAI_API_BASE="https://api.hermaai.com/v1"
+aider --model herma-auto
+```
+
+### Continue.dev (VS Code / JetBrains)
+
+In `~/.continue/config.json`:
+```json
+{
+  "models": [
+    {
+      "title": "Herma Auto",
+      "provider": "openai",
+      "model": "herma-auto",
+      "apiKey": "herma_sk_YOUR_KEY",
+      "apiBase": "https://api.hermaai.com/v1"
+    }
+  ]
+}
+```
+
+### Cursor
+
+In Cursor Settings → Models → OpenAI API Key section:
+- **API Key:** `herma_sk_YOUR_KEY`
+- **Base URL:** `https://api.hermaai.com/v1`
+
+### Windsurf
+
+In Settings → AI → Custom API:
+- **Base URL:** `https://api.hermaai.com/v1`
+- **API Key:** `herma_sk_YOUR_KEY`
+
+For the full setup guide covering all tools: https://hermaai.com/setup.md
+
 ## Agent-Specific Notes
 
 - **Streaming**: Fully supported. Pass `stream: true` in any request.
@@ -66,6 +109,7 @@ const response = await client.chat.completions.create({
 
 ## Reference
 
+- Full setup guide (all tools): https://hermaai.com/setup.md
 - API Documentation: https://hermaai.com/docs
 - Pricing: $2/M input tokens, $8/M output tokens
 - Test the router free (no auth required): `POST https://api.hermaai.com/v1/classify`
