@@ -326,11 +326,11 @@ export function getObservabilityAlerts(limit = 50) {
 // --- Routing Intelligence (Admin) ---
 
 export function getDerivativeOverview(days = 7) {
-  return authFetch(`/admin/analytics/derivatives?days=${days}`);
+  return authFetch(`/admin/analytics/request-derivatives?days=${days}`);
 }
 
 export function getDerivativesByCell(days = 7) {
-  return authFetch(`/admin/analytics/derivatives/by-cell?days=${days}`);
+  return authFetch(`/admin/analytics/request-derivatives/by-cell?days=${days}`);
 }
 
 export function getApiContentLog(limit = 50, offset = 0, customerId = null) {
