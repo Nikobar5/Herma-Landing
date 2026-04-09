@@ -92,7 +92,7 @@ const TermsOfService = () => {
               If you have any questions about these Terms, contact us at:
             </p>
             <p>
-              <a href="mailto:hermalocal@gmail.com">hermalocal@gmail.com</a>
+              <a href="mailto:niko.barciak@hermaai.com">niko.barciak@hermaai.com</a>
             </p>
           </div>
 

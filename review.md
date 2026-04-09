@@ -1,5 +1,29 @@
 # Change Log — 2026-04-09
 
+## Session: Fix contact emails + improve support visibility
+
+### 1. Email address — all contact touchpoints
+Replaced non-existent/outdated emails (`support@hermaai.com`, `hermalocal@gmail.com`) with the correct address `niko.barciak@hermaai.com` across all files.
+
+- `src/components/SuccessPage.jsx` — "Contact Support" button mailto
+- `src/pages/PrivacyPolicy.jsx` — privacy rights contact email
+- `src/pages/TermsOfService.jsx` — terms questions contact email
+- `src/pages/Attributions.jsx` — also fixed broken href (was `mailto:herma@email.com`) to match display text
+
+### 2. `src/pages/Documentation.jsx` — clickable support link
+- "contact support" in the 500 error row was plain text — made it a clickable `mailto:niko.barciak@hermaai.com` link
+
+### 3. `src/pages/FAQPage.jsx` — "Still have questions?" CTA
+- Added a contact section at the bottom of the FAQ page with an "Email Support" button linking to `niko.barciak@hermaai.com`
+
+### 4. `src/components/Footer.jsx` — contact updates
+- CTA "Contact us" link changed from Calendly URL → `mailto:niko.barciak@hermaai.com`
+- Added Email icon button next to LinkedIn and GitHub in the brand column
+
+---
+
+# Change Log — 2026-04-09
+
 ## Session: setup.md integration + home page gap fixes
 
 ### 1. `public/setup.md` — model table correction

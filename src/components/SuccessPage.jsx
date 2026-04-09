@@ -185,7 +185,7 @@ const SuccessPage = () => {
             If you have questions about your credits or need assistance, we're here to help.
           </p>
           <a
-            href="mailto:support@hermaai.com"
+            href="mailto:niko.barciak@hermaai.com"
             className="px-4 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] rounded-lg hover:bg-[var(--accent-hover)] transition duration-300 inline-block"
             style={{ fontFamily: 'var(--font-ui)' }}
           >

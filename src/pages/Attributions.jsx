@@ -272,7 +272,7 @@ const Attributions = () => {
           <div className="policy-contact">
             <p>
               If you have any questions about third-party software used in this application or our compliance with open source licenses, please contact us at: 
-              <a href="mailto:herma@email.com"> hermalocal@gmail.com</a>
+              <a href="mailto:niko.barciak@hermaai.com">niko.barciak@hermaai.com</a>
             </p>
           </div>
           
