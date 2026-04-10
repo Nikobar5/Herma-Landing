@@ -820,7 +820,7 @@ aider --model herma-auto
                 </tr>
                 <tr>
                   <td className="px-4 py-3"><code className="text-sm font-bold text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-code)' }}>500</code></td>
-                  <td className="px-4 py-3 text-[var(--text-secondary)]">Server error — retry or contact support</td>
+                  <td className="px-4 py-3 text-[var(--text-secondary)]">Server error — retry or <a href="mailto:niko.barciak@hermaai.com" className="text-[var(--accent-primary)] hover:underline">contact support</a></td>
                 </tr>
               </tbody>
             </table>

@@ -134,7 +134,7 @@ const PrivacyPolicy = () => {
               For questions about this Privacy Policy or to exercise your privacy rights, contact us at:
             </p>
             <p>
-              <a href="mailto:hermalocal@gmail.com">hermalocal@gmail.com</a>
+              <a href="mailto:niko.barciak@hermaai.com">niko.barciak@hermaai.com</a>
             </p>
           </div>
 
