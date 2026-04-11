@@ -83,19 +83,20 @@ function SavingsChart() {
     FRONTIER_MODELS.find((m) => m.value === frontierModel)?.label || frontierModel;
 
   // Compute summary stats — API returns flat array with actual_cost field
+  // Note: Decimal fields arrive as strings from Pydantic — must parseFloat before arithmetic
   const dailyItems = Array.isArray(savingsData) ? savingsData : (savingsData?.daily_savings || []);
   const totalYourCost =
-    dailyItems.reduce((sum, d) => sum + (d.actual_cost || d.your_cost || 0), 0);
+    dailyItems.reduce((sum, d) => sum + parseFloat(d.actual_cost || d.your_cost || 0), 0);
   const totalFrontierCost =
-    dailyItems.reduce((sum, d) => sum + (d.frontier_cost || 0), 0);
+    dailyItems.reduce((sum, d) => sum + parseFloat(d.frontier_cost || 0), 0);
   const totalSaved = totalFrontierCost - totalYourCost;
   const totalSavingsPct =
     totalFrontierCost > 0 ? ((totalSaved / totalFrontierCost) * 100).toFixed(1) : 0;
 
   const chartData = dailyItems.map((d) => ({
     date: d.date,
-    your_cost: d.actual_cost || d.your_cost || 0,
-    frontier_cost: d.frontier_cost,
+    your_cost: parseFloat(d.actual_cost || d.your_cost || 0),
+    frontier_cost: parseFloat(d.frontier_cost || 0),
   }));
 
   const hasData = chartData.length > 0 && totalFrontierCost > 0;
