@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getBalance, getUsageSummary, getDailySavings, getChatBalance } from '../../services/hermaApi';
+import { getBalance, getUsageSummary, getDailySavings, getChatBalance, getFrontierModels } from '../../services/hermaApi';
 import { useHermaAuth } from '../../context/HermaAuthContext';
 import OnboardingModal, { ONBOARDING_KEY } from '../../components/OnboardingModal';
 import {
@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const FRONTIER_MODELS = [
+const FALLBACK_FRONTIER_MODELS = [
   { label: 'Claude Opus 4.6', value: 'anthropic/claude-opus-4.6' },
   { label: 'Claude Sonnet 4.6', value: 'anthropic/claude-sonnet-4.6' },
   { label: 'GPT-4.1', value: 'openai/gpt-4.1' },
@@ -57,10 +57,30 @@ function SavingsTooltip({ active, payload, label }) {
 }
 
 function SavingsChart() {
+  const [frontierModels, setFrontierModels] = useState(FALLBACK_FRONTIER_MODELS);
   const [frontierModel, setFrontierModel] = useState('anthropic/claude-opus-4.6');
   const [savingsData, setSavingsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Fetch available frontier models from backend (OpenRouter pricing)
+  useEffect(() => {
+    let cancelled = false;
+    getFrontierModels()
+      .then((models) => {
+        if (!cancelled && models && models.length > 0) {
+          setFrontierModels(models);
+          // Keep current selection if it exists in new list, otherwise pick first
+          if (!models.some((m) => m.value === frontierModel)) {
+            // Pick Claude Opus if available, otherwise first model
+            const opus = models.find((m) => m.value.includes('claude-opus'));
+            setFrontierModel(opus ? opus.value : models[0].value);
+          }
+        }
+      })
+      .catch(() => { /* keep fallback models */ });
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSavings = useCallback(async (model) => {
     setLoading(true);
@@ -80,7 +100,7 @@ function SavingsChart() {
   }, [frontierModel, fetchSavings]);
 
   const selectedModelLabel =
-    FRONTIER_MODELS.find((m) => m.value === frontierModel)?.label || frontierModel;
+    frontierModels.find((m) => m.value === frontierModel)?.label || frontierModel;
 
   // Compute summary stats — API returns flat array with actual_cost field
   // Note: Decimal fields arrive as strings from Pydantic — must parseFloat before arithmetic
@@ -131,7 +151,7 @@ function SavingsChart() {
             fontFamily: 'var(--font-ui)',
           }}
         >
-          {FRONTIER_MODELS.map((m) => (
+          {frontierModels.map((m) => (
             <option key={m.value} value={m.value}>
               Compare vs. {m.label}
             </option>
@@ -396,8 +416,8 @@ const Overview = () => {
     },
     {
       label: 'Total Savings',
-      value: usage ? `$${parseFloat(usage.total_savings_usd ?? 0).toFixed(4)}` : '$0.0000',
-      subtext: 'vs. paying frontier prices',
+      value: usage ? `$${parseFloat(usage.total_savings_usd ?? 0).toFixed(2)}` : '$0.00',
+      subtext: 'vs. Claude Opus pricing',
       icon: (
         <svg className="w-6 h-6 text-[#5BAF8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />

@@ -186,6 +186,10 @@ export function getDailySavings(days = 30, frontierModel = 'anthropic/claude-opu
   return authFetch(`/portal/usage/daily-savings?days=${days}&frontier_model=${encodeURIComponent(frontierModel)}`);
 }
 
+export function getFrontierModels() {
+  return authFetch('/portal/frontier-models');
+}
+
 export function getUsageLogs({ limit = 25, offset = 0 } = {}) {
   return authFetch(`/portal/usage?limit=${limit}&offset=${offset}`);
 }
