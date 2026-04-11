@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from './chat/CodeBlock';
-import { streamChat, streamDemoChat } from '../services/hermaApi';
+import { streamChat, streamDemoChat, getPublicFrontierModels } from '../services/hermaApi';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
 const ComparisonMarkdown = ({ content }) => (
@@ -100,7 +100,7 @@ function formatCost(promptTokens, completionTokens, promptPricePerM, completionP
 const COMPARISON_TIMEOUT_MS = 30_000;
 
 const SmartRouterComparison = () => {
-  const [models] = useState(FALLBACK_MODELS);
+  const [models, setModels] = useState(FALLBACK_MODELS);
   const [query, setQuery] = useState('');
   const [selectedModel, setSelectedModel] = useState(FALLBACK_MODELS[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -123,7 +123,33 @@ const SmartRouterComparison = () => {
     }
   }, [isAuthenticated]);
 
-  // Models are defined statically in FALLBACK_MODELS above — no external fetch needed.
+  // Fetch frontier models dynamically from OpenRouter pricing
+  useEffect(() => {
+    let cancelled = false;
+    getPublicFrontierModels()
+      .then((data) => {
+        if (cancelled || !data || data.length === 0) return;
+        const mapped = data.map((m) => {
+          const parts = m.value.split('/');
+          const provider = parts[0] || '';
+          return {
+            id: m.value,
+            name: m.label,
+            provider,
+            promptPrice: m.input_price_per_million,
+            completionPrice: m.output_price_per_million,
+          };
+        });
+        setModels(mapped);
+        // Keep selection if still valid, otherwise pick first
+        if (!mapped.some((m) => m.id === selectedModel)) {
+          setSelectedModel(mapped[0].id);
+          setStdResult((prev) => ({ ...prev, model: mapped[0].name }));
+        }
+      })
+      .catch(() => { /* keep fallback */ });
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const examples = [
     "Summarize this quarterly report",

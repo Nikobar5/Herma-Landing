@@ -41,6 +41,14 @@ async function authFetch(path, options = {}) {
   return res.json();
 }
 
+// --- Public endpoints (no token needed) ---
+
+export async function getPublicFrontierModels() {
+  const res = await fetch(`${API_URL}/models/frontier`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
 // --- Auth (no token needed) ---
 
 export async function signup({ name, email, password, company }) {
