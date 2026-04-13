@@ -151,6 +151,29 @@ const FAQPage = () => {
               </div>
             ))}
           </div>
+
+          {/* Contact CTA */}
+          <div className="mt-12 rounded-xl border border-[var(--border-accent)] bg-[var(--accent-muted)] p-8 text-center">
+            <h2
+              className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-3"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              Still have questions?
+            </h2>
+            <p
+              className="text-[var(--text-secondary)] mb-6"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              We're happy to help. Reach out and we'll get back to you quickly.
+            </p>
+            <a
+              href="mailto:niko.barciak@hermaai.com"
+              className="inline-block px-6 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition duration-300"
+              style={{ fontFamily: 'var(--font-ui)' }}
+            >
+              Email Support
+            </a>
+          </div>
         </div>
       </section>
     </main>

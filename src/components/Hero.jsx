@@ -14,11 +14,11 @@ const Hero = () => {
   return (
     <div className="relative w-full bg-[var(--bg-primary)] overflow-hidden">
       {/* Hero Section */}
-      <section className="relative w-full min-h-[70vh] sm:min-h-[80vh] md:min-h-[85vh] flex items-center justify-center pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 md:pb-24">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 overflow-hidden opacity-30">
-          <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-[var(--accent-primary)] opacity-5 rounded-bl-full transform -translate-y-1/4 translate-x-1/4"></div>
-          <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-indigo-500 opacity-5 rounded-tr-full transform translate-y-1/4 -translate-x-1/4"></div>
+      <section className="relative w-full min-h-[70vh] sm:min-h-[80vh] md:min-h-[85vh] flex items-center justify-center pt-24 sm:pt-28 md:pt-32 pb-10 sm:pb-12 md:pb-14">
+        {/* Background shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-8%] right-[-4%] w-80 h-80 rounded-full bg-[var(--accent-primary)]/5 blur-3xl" />
+          <div className="absolute bottom-[15%] left-[-6%] w-96 h-96 rounded-full bg-[var(--accent-primary)]/4 blur-3xl" />
         </div>
 
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
@@ -42,7 +42,7 @@ const Hero = () => {
               >
                 <span className="text-[var(--text-primary)]">Same AI Quality.</span>
                 <br />
-                <span className="text-[var(--accent-primary)]">Save 65%+ on AI Costs.</span>
+                <span className="gradient-text-hero">Save 65%+ on AI Costs.</span>
               </h1>
 
               <p
@@ -52,26 +52,19 @@ const Hero = () => {
                 Swap your AI calls to Herma. We route each query to the cheapest model that matches frontier quality, automatically. No code changes, no quality loss.
               </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 animate-hero-delayed-more">
+              {/* CTA Button */}
+              <div className="flex flex-col items-center gap-3 mb-3 animate-hero-delayed-more">
                 <button
-                  onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
-                  className="px-8 py-4 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] min-w-[200px]"
-                  style={{ fontFamily: 'var(--font-ui)' }}
+                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/upgrade')}
+                  className="px-10 py-4 bg-[var(--accent-primary)] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 min-w-[240px] text-lg"
+                  style={{ fontFamily: 'var(--font-heading)' }}
                 >
                   <span className="flex items-center justify-center gap-2">
-                    {isAuthenticated ? 'Go to chat' : 'Start saving'}
-                    <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {isAuthenticated ? 'Go to dashboard' : 'Start saving free'}
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
-                </button>
-                <button
-                  onClick={handleTryItOut}
-                  className="px-8 py-4 border border-[var(--accent-primary)]/50 text-[var(--accent-primary)] bg-[var(--accent-primary)]/5 font-semibold rounded-lg hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)] transition-all duration-200 min-w-[200px]"
-                  style={{ fontFamily: 'var(--font-ui)' }}
-                >
-                  Try the demo
                 </button>
               </div>
 
@@ -83,22 +76,24 @@ const Hero = () => {
                 Free $1 credit to start &middot; No credit card required
               </p>
 
-              {/* CRO: trust bar — surface benchmark social proof near CTA, not just below the fold */}
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 animate-hero-delayed-more">
+              {/* Trust bar — 4 checkmark stats near CTA for immediate social proof */}
+              <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 animate-hero-delayed-more">
                 {[
-                  '89% avg. cost savings',
-                  'OpenAI-compatible API',
-                  '8/8 subset of Terminal-Bench',
+                  { stat: '89%', label: 'avg. cost savings' },
+                  { stat: '8/8', label: 'benchmarks passed' },
+                  { stat: '$1', label: 'free credit to start' },
+                  { stat: 'OpenAI', label: 'compatible API' },
                 ].map((item) => (
                   <span
-                    key={item}
-                    className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]"
+                    key={item.stat}
+                    className="flex items-center gap-2"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    <svg className="w-3.5 h-3.5 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
-                    {item}
+                    <span className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>{item.stat}</span>
+                    <span className="text-sm text-[var(--text-secondary)]">{item.label}</span>
                   </span>
                 ))}
               </div>
