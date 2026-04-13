@@ -170,7 +170,7 @@ const MenuOverlay = ({ isOpen, onClose }) => {
               className="w-full py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-[var(--accent-hover)] transition-colors"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              <span>{isAuthenticated ? 'Try it out' : 'Sign up free'}</span>
+              <span>{isAuthenticated ? 'Try it out' : 'Sign up — $1 free'}</span>
               <svg className="w-4 h-4 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

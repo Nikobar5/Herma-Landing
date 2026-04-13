@@ -85,7 +85,7 @@ const ValueProposition = () => {
   const hermaBarWidth = costs.directCost > 0 ? (costs.hermaCost / costs.directCost) * 100 : 0;
 
   return (
-    <section className="pt-24 pb-12 sm:pb-16 bg-[var(--bg-primary)]" id="savings-calculator">
+    <section className="pt-14 pb-10 sm:pb-12 bg-[var(--bg-primary)]" id="savings-calculator">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div

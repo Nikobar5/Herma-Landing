@@ -113,6 +113,7 @@ const SmartRouterComparison = () => {
 
   const [hermaResult, setHermaResult] = useState({ content: '', cost: null, model: 'Herma Router', time: 0, loading: false, error: null, thinking: false });
   const [stdResult, setStdResult] = useState({ content: '', cost: null, model: FALLBACK_MODELS[0].name, time: 0, loading: false, error: null, thinking: false });
+  const [mobileTab, setMobileTab] = useState('herma');
 
   // Clear demo counter when user logs in
   useEffect(() => {
@@ -344,12 +345,30 @@ const SmartRouterComparison = () => {
         </div>
 
         {/* Results Comparison Area */}
+        {/* Mobile tab switcher — only visible below md */}
+        <div className="md:hidden flex border-b border-[var(--border-secondary)]">
+          <button
+            onClick={() => setMobileTab('direct')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileTab === 'direct' ? 'text-[var(--text-primary)] border-b-2 border-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'}`}
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Direct Pricing
+          </button>
+          <button
+            onClick={() => setMobileTab('herma')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileTab === 'herma' ? 'text-[var(--accent-primary)] border-b-2 border-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'}`}
+            style={{ fontFamily: 'var(--font-ui)' }}
+          >
+            Herma Pricing
+          </button>
+        </div>
+
         <div className="flex flex-col md:grid md:grid-cols-2 gap-0 relative">
           {/* Vertical Divider for Desktop */}
           <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-[var(--border-secondary)] -ml-px z-10"></div>
 
           {/* Selected Model Side */}
-          <div className="p-4 sm:p-6 md:p-8 bg-[var(--bg-secondary)] relative group min-h-[250px] sm:min-h-[300px] flex flex-col">
+          <div className={`${mobileTab === 'direct' ? 'block' : 'hidden'} md:block p-4 sm:p-6 md:p-8 bg-[var(--bg-secondary)] relative group min-h-[250px] sm:min-h-[300px] flex flex-col`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs">AI</div>
@@ -407,11 +426,8 @@ const SmartRouterComparison = () => {
             </div>
           </div>
 
-          {/* Horizontal Divider for Mobile */}
-          <div className="md:hidden h-px bg-[var(--border-secondary)]"></div>
-
           {/* Herma Router Side */}
-          <div className="p-4 sm:p-6 md:p-8 bg-[var(--bg-secondary)]/50 relative overflow-hidden min-h-[250px] sm:min-h-[300px] flex flex-col">
+          <div className={`${mobileTab === 'herma' ? 'block' : 'hidden'} md:block p-4 sm:p-6 md:p-8 bg-[var(--bg-secondary)]/50 relative overflow-hidden min-h-[250px] sm:min-h-[300px] flex flex-col`}>
             {/* Highlight Glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent-primary)]/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
 

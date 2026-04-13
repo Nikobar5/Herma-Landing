@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
-// Animated counter that counts up from 0 to target when visible
+// Animated counter — initializes to target so it always shows a real value on load,
+// then resets to 0 and counts up when scrolled into view.
 const AnimatedNumber = ({ target, suffix = '', prefix = '', duration = 1500, decimals = 0 }) => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(target);
   const [hasStarted, setHasStarted] = useState(false);
   const ref = useRef(null);
 
@@ -13,6 +14,7 @@ const AnimatedNumber = ({ target, suffix = '', prefix = '', duration = 1500, dec
       ([entry]) => {
         if (entry.isIntersecting && !hasStarted) {
           setHasStarted(true);
+          setCount(0);
           observer.unobserve(entry.target);
         }
       },
@@ -63,7 +65,7 @@ const BenchmarkTrust = () => {
   const [ctaRef, ctaVisible] = useScrollAnimation(0.1);
 
   return (
-    <section className="py-24 bg-[var(--bg-primary)]" id="benchmarks">
+    <section className="py-16 bg-[var(--bg-primary)]" id="benchmarks">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div

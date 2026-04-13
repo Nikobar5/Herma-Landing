@@ -1,12 +1,12 @@
 /* Import fonts - Modern font stack inspired by Martian */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=PT+Serif:wght@400;700&family=Inconsolata:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inconsolata:wght@400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 /* Base reset */
 body {
   margin: 0;
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -251,4 +251,33 @@ a {
   animation: glow-pulse 1.2s ease-in-out infinite;
   vertical-align: text-bottom;
   margin-left: 2px;
+}
+
+/* ===== Conversion Redesign Utilities ===== */
+
+/* Gradient hero headline text */
+.gradient-text-hero {
+  background: linear-gradient(135deg, #3730A3 0%, #4338CA 50%, #6366F1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hero background aura */
+@keyframes aura-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1) translateX(-50%); }
+  50% { opacity: 0.65; transform: scale(1.06) translateX(-50%); }
+}
+.hero-aura {
+  animation: aura-pulse 7s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+/* Mobile sticky CTA entrance */
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
 }
