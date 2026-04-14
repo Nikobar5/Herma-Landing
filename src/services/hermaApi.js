@@ -51,11 +51,11 @@ export async function getPublicFrontierModels() {
 
 // --- Auth (no token needed) ---
 
-export async function signup({ name, email, password, company }) {
+export async function signup({ name, email, password, company, turnstileToken }) {
   const res = await fetch(`${API_URL}/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password, company: company || null }),
+    body: JSON.stringify({ name, email, password, company: company || null, turnstile_token: turnstileToken || null }),
   });
 
   if (!res.ok) {
@@ -146,11 +146,11 @@ export function resendVerification() {
 
 // --- Password reset ---
 
-export async function forgotPassword(email) {
+export async function forgotPassword(email, turnstileToken) {
   const res = await fetch(`${API_URL}/auth/forgot-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, turnstile_token: turnstileToken || null }),
   });
 
   if (!res.ok) {

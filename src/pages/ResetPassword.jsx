@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { forgotPassword, resetPassword } from '../services/hermaApi';
+
+const TURNSTILE_SITE_KEY = process.env.REACT_APP_TURNSTILE_SITE_KEY;
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('idle'); // idle | loading | sent | success | error
   const [errorMsg, setErrorMsg] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   // --- Mode 2: Token in URL — new password form ---
   if (token) {
@@ -162,7 +166,7 @@ const ResetPassword = () => {
     setErrorMsg('');
     setStatus('loading');
     try {
-      await forgotPassword(email);
+      await forgotPassword(email, turnstileToken);
       setStatus('sent');
     } catch (err) {
       setStatus('error');
@@ -305,9 +309,20 @@ const ResetPassword = () => {
               />
             </div>
 
+            {/* Cloudflare Turnstile bot protection */}
+            {TURNSTILE_SITE_KEY && (
+              <Turnstile
+                siteKey={TURNSTILE_SITE_KEY}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setTurnstileToken('')}
+                onExpire={() => setTurnstileToken('')}
+                options={{ theme: 'light' }}
+              />
+            )}
+
             <button
               type="submit"
-              disabled={status === 'loading'}
+              disabled={status === 'loading' || (TURNSTILE_SITE_KEY && !turnstileToken)}
               className="w-full flex justify-center py-2.5 px-4 text-sm font-medium text-[var(--text-inverse)] bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
               style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
             >
