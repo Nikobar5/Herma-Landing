@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+const TURNSTILE_SITE_KEY = process.env.REACT_APP_TURNSTILE_SITE_KEY;
 
 const Login = () => {
   const initialSearchParams = new URLSearchParams(window.location.search);
@@ -12,10 +14,12 @@ const Login = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    website_url: '',  // honeypot — hidden from real users
   });
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
   const { login, signup, loginWithGoogle } = useHermaAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -66,10 +70,16 @@ const Login = () => {
         if (formData.password.length < 8) {
           throw new Error('Password must be at least 8 characters');
         }
+        // Honeypot: bots fill hidden fields, humans don't
+        if (formData.website_url) {
+          navigate('/verify-email', { replace: true });
+          return;
+        }
         const signupData = await signup({
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          turnstileToken,
         });
         if (!signupData.email_verified) {
           navigate('/verify-email', { replace: true });
@@ -304,9 +314,34 @@ const Login = () => {
               </div>
             )}
 
+            {/* Honeypot — hidden from real users, traps simple bots */}
+            {!isLogin && (
+              <input
+                type="text"
+                name="website_url"
+                value={formData.website_url}
+                onChange={handleChange}
+                autoComplete="off"
+                tabIndex={-1}
+                aria-hidden="true"
+                style={{ display: 'none' }}
+              />
+            )}
+
+            {/* Cloudflare Turnstile bot protection (signup only) */}
+            {!isLogin && TURNSTILE_SITE_KEY && (
+              <Turnstile
+                siteKey={TURNSTILE_SITE_KEY}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setTurnstileToken('')}
+                onExpire={() => setTurnstileToken('')}
+                options={{ theme: 'light' }}
+              />
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (!isLogin && TURNSTILE_SITE_KEY && !turnstileToken)}
               className="w-full flex justify-center py-2.5 px-4 text-sm font-medium text-[var(--text-inverse)] bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent-primary)] focus:ring-offset-[var(--bg-secondary)] disabled:opacity-50 transition-colors"
               style={{ borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-ui)' }}
             >
@@ -319,6 +354,7 @@ const Login = () => {
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError('');
+                setTurnstileToken('');
               }}
               className="text-sm text-[var(--accent-primary)] hover:underline"
               style={{ fontFamily: 'var(--font-ui)' }}

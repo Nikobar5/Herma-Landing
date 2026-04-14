@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@marsidev/react-turnstile": "^1.5.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -44,10 +45,25 @@
     ]
   },
   "reactSnap": {
-    "include": ["/", "/demo", "/blog", "/blog/cost-quality-matrix", "/blog/shadow-routing", "/blog/ev-routing", "/blog/how-we-benchmark", "/docs", "/about", "/faq", "/upgrade", "/login"],
+    "include": [
+      "/",
+      "/demo",
+      "/blog",
+      "/blog/cost-quality-matrix",
+      "/blog/shadow-routing",
+      "/blog/ev-routing",
+      "/blog/how-we-benchmark",
+      "/docs",
+      "/about",
+      "/faq",
+      "/upgrade",
+      "/login"
+    ],
     "skipThirdPartyRequests": true,
     "headless": true,
-    "puppeteerArgs": ["--no-sandbox"]
+    "puppeteerArgs": [
+      "--no-sandbox"
+    ]
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
