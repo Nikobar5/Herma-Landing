@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getBalance, getUsageSummary, getDailySavings, getChatBalance, getFrontierModels } from '../../services/hermaApi';
+import { getBalance, getUsageSummary, getDailySavings, getFrontierModels } from '../../services/hermaApi';
 import { useHermaAuth } from '../../context/HermaAuthContext';
 import OnboardingModal, { ONBOARDING_KEY } from '../../components/OnboardingModal';
 import {
@@ -331,7 +331,6 @@ function SavingsChart() {
 const Overview = () => {
   const { user } = useHermaAuth();
   const [balance, setBalance] = useState(null);
-  const [chatBalance, setChatBalance] = useState(null);
   const [usage, setUsage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -344,14 +343,12 @@ const Overview = () => {
 
     async function fetchData() {
       try {
-        const [balData, usageData, chatBalData] = await Promise.all([
+        const [balData, usageData] = await Promise.all([
           getBalance(),
           getUsageSummary(),
-          getChatBalance().catch(() => null),
         ]);
         if (!cancelled) {
           setBalance(balData);
-          setChatBalance(chatBalData);
           setUsage(usageData);
         }
       } catch (err) {
@@ -390,14 +387,8 @@ const Overview = () => {
   const cards = [
     {
       label: 'Available Credits',
-      value: (() => {
-        const bal = balance ? parseFloat(balance.balance_usd) : 0;
-        const free = chatBalance?.chat_free_credit_usd ? parseFloat(chatBalance.chat_free_credit_usd) : 0;
-        return `$${(bal + free).toFixed(2)}`;
-      })(),
-      subtext: chatBalance?.chat_free_credit_usd && parseFloat(chatBalance.chat_free_credit_usd) > 0
-        ? `Includes $${parseFloat(chatBalance.chat_free_credit_usd).toFixed(2)} free credit`
-        : 'Available credits',
+      value: `$${(balance ? parseFloat(balance.balance_usd) : 0).toFixed(2)}`,
+      subtext: 'Available credits',
       icon: (
         <svg className="w-6 h-6 text-[#5BAF8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -436,11 +427,7 @@ const Overview = () => {
     },
   ];
 
-  const totalBalance = (() => {
-    const bal = balance ? parseFloat(balance.balance_usd) : 0;
-    const free = chatBalance?.chat_free_credit_usd ? parseFloat(chatBalance.chat_free_credit_usd) : 0;
-    return bal + free;
-  })();
+  const totalBalance = balance ? parseFloat(balance.balance_usd) : 0;
 
   return (
     <div className="space-y-8 animate-fade-in">

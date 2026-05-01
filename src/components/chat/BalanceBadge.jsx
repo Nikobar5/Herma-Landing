@@ -1,9 +1,8 @@
 import React from 'react';
 import { manageSubscription } from '../../services/hermaApi';
 
-const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
+const BalanceBadge = ({ balance, subscription }) => {
   const hasBalance = balance !== null && balance !== undefined;
-  const hasFreeCredit = chatFreeCredit !== null && chatFreeCredit !== undefined && chatFreeCredit > 0;
 
   const handleManage = async () => {
     try {
@@ -14,9 +13,7 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
     }
   };
 
-  const totalAvailable =
-    (hasBalance ? parseFloat(balance) : 0) +
-    (hasFreeCredit ? parseFloat(chatFreeCredit) : 0);
+  const totalAvailable = hasBalance ? parseFloat(balance) : 0;
 
   return (
     <div className="px-4 py-3 space-y-3">
@@ -49,17 +46,6 @@ const BalanceBadge = ({ balance, chatFreeCredit, subscription }) => {
           ${totalAvailable.toFixed(2)}
         </span>
       </div>
-
-      {hasFreeCredit && (
-        <div className="flex items-center justify-between pt-1 border-t border-[var(--border-primary)]/50">
-          <span className="text-[10px] text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-            Includes free credit
-          </span>
-          <span className="text-[10px] text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-code)' }}>
-            +${parseFloat(chatFreeCredit).toFixed(2)}
-          </span>
-        </div>
-      )}
     </div>
   );
 };

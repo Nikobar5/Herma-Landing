@@ -3,16 +3,13 @@ import React, { useState } from 'react';
 const LOW_BALANCE_THRESHOLD = 0.50;
 const CRITICAL_THRESHOLD = 0.10;
 
-const LowBalanceBanner = ({ balance, chatFreeCredit }) => {
+const LowBalanceBanner = ({ balance }) => {
   const [dismissed, setDismissed] = useState(false);
 
-  const hasAnyBalance = balance != null || chatFreeCredit != null;
-  const totalBalance =
-    (balance != null ? parseFloat(balance) : 0) +
-    (chatFreeCredit != null ? parseFloat(chatFreeCredit) : 0);
+  const totalBalance = balance != null ? parseFloat(balance) : 0;
 
   // Don't show if no balance loaded yet, total is above threshold, or was dismissed
-  if (!hasAnyBalance || totalBalance >= LOW_BALANCE_THRESHOLD || dismissed) {
+  if (balance == null || totalBalance >= LOW_BALANCE_THRESHOLD || dismissed) {
     return null;
   }
 

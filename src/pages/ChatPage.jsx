@@ -48,7 +48,6 @@ const ChatPage = () => {
   ]);
 
   const [balance, setBalance] = useState(null);
-  const [chatFreeCredit, setChatFreeCredit] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -67,7 +66,6 @@ const ChatPage = () => {
     try {
       const data = await getChatBalance();
       setBalance(data.balance_usd ?? null);
-      setChatFreeCredit(data.chat_free_credit_usd ?? null);
       setSubscription(data.has_subscription ? { plan: data.plan } : null);
     } catch { }
   }, []);
@@ -132,7 +130,6 @@ const ChatPage = () => {
         onRename={renameConversation}
         onDelete={deleteConversation}
         balance={balance}
-        chatFreeCredit={chatFreeCredit}
         subscription={subscription}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -202,7 +199,7 @@ const ChatPage = () => {
         </div>
 
         {/* Low balance warning */}
-        <LowBalanceBanner balance={balance} chatFreeCredit={chatFreeCredit} />
+        <LowBalanceBanner balance={balance} />
 
         {/* Main content area */}
         <div className="flex-1 overflow-hidden relative flex flex-col">

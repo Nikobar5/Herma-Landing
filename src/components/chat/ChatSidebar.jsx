@@ -9,7 +9,6 @@ const ChatSidebar = ({
   onRename,
   onDelete,
   balance,
-  chatFreeCredit,
   subscription,
   isOpen,
   onClose,
@@ -138,7 +137,7 @@ const ChatSidebar = ({
 
       {/* Balance + guide button */}
       <div className="border-t border-[var(--border-primary)]">
-        <BalanceBadge balance={balance} chatFreeCredit={chatFreeCredit} subscription={subscription} />
+        <BalanceBadge balance={balance} subscription={subscription} />
         {onShowGuide && (
           <div className="px-4 pb-3">
             <button
