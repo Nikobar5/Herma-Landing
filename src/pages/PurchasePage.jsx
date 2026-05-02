@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
-import { createCheckout, createSubscriptionCheckout, getBalance } from '../services/hermaApi';
+import { createCheckout, createSubscriptionCheckout, getBalance, getSubscriptionStatus, changeSubscription } from '../services/hermaApi';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
 import { trackClick } from '../services/analyticsTracker';
 
@@ -41,7 +41,10 @@ const PurchasePage = () => {
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [subLoading, setSubLoading] = useState(null);
+  const [planChangeLoading, setPlanChangeLoading] = useState(null);
+  const [currentPlan, setCurrentPlan] = useState(null);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +61,9 @@ const PurchasePage = () => {
     if (isAuthenticated) {
       getBalance()
         .then((data) => setBalance(data.balance ?? data.balance_usd ?? 0))
+        .catch(() => { });
+      getSubscriptionStatus()
+        .then((data) => { if (data.has_subscription && data.status === 'active') setCurrentPlan(data.plan); })
         .catch(() => { });
     }
   }, [isAuthenticated]);
@@ -92,8 +98,31 @@ const PurchasePage = () => {
       navigate('/login');
       return;
     }
+
+    // Upgrade / downgrade flow for existing subscribers
+    if (currentPlan) {
+      if (currentPlan === planId) return;
+      setError(null);
+      setSuccess(null);
+      setPlanChangeLoading(planId);
+      trackClick('plan_change_initiated', { from: currentPlan, to: planId });
+      if (window.posthog) window.posthog.capture('plan_change_initiated', { from: currentPlan, to: planId });
+      try {
+        await changeSubscription(planId);
+        setCurrentPlan(planId);
+        setSuccess(`Switched to ${SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name} — takes effect at your next billing cycle.`);
+      } catch (err) {
+        setError(err.message || 'Failed to change plan.');
+      } finally {
+        setPlanChangeLoading(null);
+      }
+      return;
+    }
+
+    // New subscription flow
     setSubLoading(planId);
     setError(null);
+    setSuccess(null);
     trackClick('checkout_initiated', { type: 'subscription', plan: planId });
     if (window.posthog) window.posthog.capture('checkout_initiated', { type: 'subscription', plan: planId });
     try {
@@ -145,6 +174,11 @@ const PurchasePage = () => {
           </div>
         )}
 
+        {success && (
+          <div className="mb-6 p-4 bg-[#5BAF8A]/10 border border-[#5BAF8A]/30 rounded-lg">
+            <p className="text-[#5BAF8A] text-sm text-center" style={{ fontFamily: 'var(--font-body)' }}>{success}</p>
+          </div>
+        )}
         {error && (
           <div className="mb-6 p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 rounded-lg">
             <p className="text-[var(--error)] text-sm text-center" style={{ fontFamily: 'var(--font-body)' }}>{error}</p>
@@ -163,55 +197,82 @@ const PurchasePage = () => {
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">
-            {SUBSCRIPTION_PLANS.map((plan) => (
-              <button
-                key={plan.id}
-                onClick={() => handleSubscribe(plan.id)}
-                disabled={subLoading !== null}
-                className={`w-full text-left p-5 rounded-xl border-2 transition-all flex flex-col ${plan.popular
-                    ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
-                    : 'border-[var(--border-secondary)] hover:border-[var(--border-accent)]'
-                  } ${subLoading === plan.id ? 'opacity-60' : ''}`}
-              >
-                {/* Name + badges */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                    {plan.name}
-                  </span>
-                  {plan.popular && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium">
-                      Most Popular
+            {SUBSCRIPTION_PLANS.map((plan) => {
+              const isCurrent = currentPlan === plan.id;
+              const isAnyLoading = subLoading !== null || planChangeLoading !== null;
+              return (
+                <button
+                  key={plan.id}
+                  onClick={() => handleSubscribe(plan.id)}
+                  disabled={isAnyLoading || isCurrent}
+                  className={`w-full text-left p-5 rounded-xl border-2 transition-all flex flex-col ${
+                    isCurrent
+                      ? 'border-[#5BAF8A] bg-[#5BAF8A]/5 cursor-default'
+                      : plan.popular
+                      ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
+                      : 'border-[var(--border-secondary)] hover:border-[var(--border-accent)]'
+                  } ${planChangeLoading === plan.id || subLoading === plan.id ? 'opacity-60' : ''}`}
+                >
+                  {/* Name + badges */}
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+                      {plan.name}
                     </span>
-                  )}
-                </div>
+                    {isCurrent && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#5BAF8A] text-white font-medium">
+                        Current Plan
+                      </span>
+                    )}
+                    {!isCurrent && plan.popular && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium">
+                        Most Popular
+                      </span>
+                    )}
+                  </div>
 
-                {/* Price */}
-                <div className="mb-1">
-                  <span className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
-                    ${plan.price}
-                  </span>
-                  <span className="text-sm text-[var(--text-tertiary)]">/mo</span>
-                </div>
+                  {/* Price */}
+                  <div className="mb-1">
+                    <span className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+                      ${plan.price}
+                    </span>
+                    <span className="text-sm text-[var(--text-tertiary)]">/mo</span>
+                  </div>
 
-                {/* Credits + bonus */}
-                <p className="text-xs text-[var(--text-tertiary)] mb-4" style={{ fontFamily: 'var(--font-ui)' }}>
-                  ${plan.credits} in credits &middot;{' '}
-                  <span className="text-[#5BAF8A] font-medium">+{plan.bonus}% bonus</span>
-                </p>
+                  {/* Credits + bonus */}
+                  <p className="text-xs text-[var(--text-tertiary)] mb-4" style={{ fontFamily: 'var(--font-ui)' }}>
+                    ${plan.credits} in credits &middot;{' '}
+                    <span className="text-[#5BAF8A] font-medium">+{plan.bonus}% bonus</span>
+                  </p>
 
-                {/* Features */}
-                <ul className="space-y-1.5 mt-auto">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                      <svg className="w-3 h-3 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </button>
-            ))}
+                  {/* Features */}
+                  <ul className="space-y-1.5 mt-auto">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
+                        <svg className="w-3 h-3 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Action label */}
+                  <div className="mt-4 pt-3 border-t border-[var(--border-primary)]">
+                    {isCurrent ? (
+                      <span className="text-xs font-medium text-[#5BAF8A]" style={{ fontFamily: 'var(--font-ui)' }}>✓ Active</span>
+                    ) : planChangeLoading === plan.id ? (
+                      <span className="text-xs font-medium text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>Switching...</span>
+                    ) : subLoading === plan.id ? (
+                      <span className="text-xs font-medium text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>Loading...</span>
+                    ) : currentPlan ? (
+                      <span className="text-xs font-medium text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>Switch to {plan.name} →</span>
+                    ) : (
+                      <span className="text-xs font-medium text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>Get Started →</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 

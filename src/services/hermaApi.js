@@ -264,6 +264,17 @@ export function manageSubscription() {
   });
 }
 
+export function getSubscriptionStatus() {
+  return authFetch('/portal/subscription');
+}
+
+export function changeSubscription(plan) {
+  return authFetch('/portal/subscribe/change', {
+    method: 'POST',
+    body: JSON.stringify({ plan }),
+  });
+}
+
 export function getChatBalance() {
   return authFetch('/portal/chat-balance');
 }
