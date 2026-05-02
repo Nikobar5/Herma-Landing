@@ -40,6 +40,7 @@ const PurchasePage = () => {
   const [balance, setBalance] = useState(null);
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
+  const [subStatusLoading, setSubStatusLoading] = useState(false);
   const [subLoading, setSubLoading] = useState(null);
   const [planChangeLoading, setPlanChangeLoading] = useState(null);
   const [currentPlan, setCurrentPlan] = useState(null);
@@ -62,9 +63,11 @@ const PurchasePage = () => {
       getBalance()
         .then((data) => setBalance(data.balance ?? data.balance_usd ?? 0))
         .catch(() => { });
+      setSubStatusLoading(true);
       getSubscriptionStatus()
         .then((data) => { if (data.has_subscription && data.status === 'active') setCurrentPlan(data.plan); })
-        .catch(() => { });
+        .catch(() => { })
+        .finally(() => setSubStatusLoading(false));
     }
   }, [isAuthenticated]);
 
@@ -110,7 +113,7 @@ const PurchasePage = () => {
       try {
         await changeSubscription(planId);
         setCurrentPlan(planId);
-        setSuccess(`Switched to ${SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name} — takes effect at your next billing cycle.`);
+        setSuccess(`Switched to ${SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name} plan.`);
       } catch (err) {
         setError(err.message || 'Failed to change plan.');
       } finally {
@@ -129,6 +132,23 @@ const PurchasePage = () => {
       const data = await createSubscriptionCheckout(planId);
       window.location.href = data.checkout_url;
     } catch (err) {
+      // Race condition fallback: subscription status fetch hadn't resolved when user clicked.
+      // Re-fetch status and retry as a plan change if they already have an active subscription.
+      if (err.message?.includes('already have an active subscription')) {
+        try {
+          const status = await getSubscriptionStatus();
+          if (status.has_subscription && status.status === 'active') {
+            setCurrentPlan(status.plan);
+            if (status.plan !== planId) {
+              await changeSubscription(planId);
+              setCurrentPlan(planId);
+              setSuccess(`Switched to ${SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name} plan.`);
+            }
+            setSubLoading(null);
+            return;
+          }
+        } catch { /* fall through to original error */ }
+      }
       setError(err.message || 'Failed to start checkout.');
       setSubLoading(null);
     }
@@ -204,7 +224,7 @@ const PurchasePage = () => {
                 <button
                   key={plan.id}
                   onClick={() => handleSubscribe(plan.id)}
-                  disabled={isAnyLoading || isCurrent}
+                  disabled={isAnyLoading || isCurrent || subStatusLoading}
                   className={`w-full text-left p-5 rounded-xl border-2 transition-all flex flex-col ${
                     isCurrent
                       ? 'border-[#5BAF8A] bg-[#5BAF8A]/5 cursor-default'
