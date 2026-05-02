@@ -385,8 +385,6 @@ export function deleteConversation(id) {
   });
 }
 
-// --- Portal Chat (streaming) ---
-
 export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpen, signal, model } = {}) {
   const body = { messages, stream: true };
   if (model) body.model = model;

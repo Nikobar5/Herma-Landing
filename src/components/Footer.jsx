@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [ctaRef, ctaVisible] = useScrollAnimation(0.1);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const columns = [
     {
@@ -35,7 +36,7 @@ const Footer = () => {
   return (
     <>
       {/* CTA Section */}
-      <section className="py-10 sm:py-12 md:py-16 bg-[var(--bg-primary)]">
+      {location.pathname !== '/upgrade' && <section className="py-10 sm:py-12 md:py-16 bg-[var(--bg-primary)]">
         <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div
             ref={ctaRef}
@@ -45,7 +46,7 @@ const Footer = () => {
               className="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-6 sm:mb-8"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              Stop overpaying for AI. Start for free today.
+              Stop overpaying for AI. Start saving today.
             </h2>
 
             <button
@@ -54,7 +55,7 @@ const Footer = () => {
               style={{ fontFamily: 'var(--font-ui)' }}
             >
               <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
-                See pricing
+                Start saving today
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -75,7 +76,7 @@ const Footer = () => {
             </p>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* Footer */}
       <footer className="bg-[var(--bg-secondary)] border-t border-[var(--border-primary)] py-10 sm:py-12">

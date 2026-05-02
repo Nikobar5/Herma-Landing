@@ -72,11 +72,6 @@ const PAGES = [
     description: 'Technical deep-dives on intelligent model routing from the Herma engineering team.',
   },
   {
-    route: 'demo',
-    title: 'Try Herma — Free AI Router Demo',
-    description: 'Try Herma\'s intelligent model router for free. Same quality, fraction of the price. No signup required.',
-  },
-  {
     route: 'docs',
     title: 'API Documentation | Herma',
     description: 'Herma API documentation. OpenAI-compatible, change two lines of code. $2/M input, $8/M output tokens.',

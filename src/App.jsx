@@ -27,7 +27,6 @@ const ApiKeys = lazy(() => import('./pages/dashboard/ApiKeys'));
 const Billing = lazy(() => import('./pages/dashboard/Billing'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const DemoChat = lazy(() => import('./pages/DemoChat'));
 const PurchasePage = lazy(() => import('./pages/PurchasePage'));
 const SuccessPage = lazy(() => import('./components/SuccessPage'));
 const Documentation = lazy(() => import('./pages/Documentation'));
@@ -118,14 +117,14 @@ const RouteTracker = () => {
 // Conditionally render Header (hide on chat page — chat has its own top bar)
 const ConditionalHeader = () => {
   const location = useLocation();
-  if (location.pathname === '/chat' || location.pathname === '/demo' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname.startsWith('/admin')) return null;
+  if (location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname.startsWith('/admin')) return null;
   return <Header />;
 };
 
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/demo' || location.pathname === '/verify-email' || location.pathname === '/reset-password';
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password';
   if (hideFooter) return null;
   return <Footer />;
 };
@@ -224,8 +223,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/demo" element={<DemoChat />} />
-                <Route path="/docs" element={<Documentation />} />
+<Route path="/docs" element={<Documentation />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/blog" element={<BlogIndex />} />

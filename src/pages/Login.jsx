@@ -43,7 +43,7 @@ const Login = () => {
     } else if (np) {
       navigate(np, { replace: true });
     } else {
-      navigate(isLoginRef.current && !isNewUser ? (f || '/dashboard') : '/chat', { replace: true });
+      navigate(f || '/upgrade', { replace: true });
     }
   };
 

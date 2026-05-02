@@ -271,11 +271,11 @@ const ValueProposition = () => {
               {costs.savings > 0 && (
                 <div className="flex justify-center mt-6">
                   <button
-                    onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
+                    onClick={() => navigate(isAuthenticated ? '/dashboard' : '/upgrade')}
                     className="px-8 py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    Save {formatDollars(costs.savings)}/mo — Get started free
+                    Save {formatDollars(costs.savings)}/mo — Start saving today
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
