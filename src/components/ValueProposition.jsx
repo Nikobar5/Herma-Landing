@@ -36,6 +36,8 @@ function formatDollars(amount) {
 }
 
 const ValueProposition = () => {
+  /* eslint-disable no-unreachable */
+  return null;
   const navigate = useNavigate();
   const { isAuthenticated } = useHermaAuth();
   const [headerRef, headerVisible] = useScrollAnimation(0.1);

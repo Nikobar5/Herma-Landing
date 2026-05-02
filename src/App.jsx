@@ -9,6 +9,8 @@ import HowItWorksSection from './components/HowItWorksSection';
 import BenchmarkTrust from './components/BenchmarkTrust';
 import FAQAccordion from './components/FAQAccordion';
 import MobileStickyCTA from './components/MobileStickyCTA';
+import AskHermaWidget from './components/AskHermaWidget';
+import { AskHermaProvider } from './context/AskHermaContext';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -159,14 +161,15 @@ const Home = () => {
   }, []);
 
   return (
-    <>
+    <AskHermaProvider>
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
       <BenchmarkTrust />
       <FAQAccordion />
       <MobileStickyCTA />
-    </>
+      <AskHermaWidget />
+    </AskHermaProvider>
   );
 };
 

@@ -468,7 +468,6 @@ export async function streamDemoChat(messages, { onChunk, onDone, onError, onOpe
   } catch (err) {
     if (err.name === 'AbortError') return;
     onError?.(err);
-    throw err;
   }
 }
 

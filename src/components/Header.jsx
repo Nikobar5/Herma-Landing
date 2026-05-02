@@ -101,56 +101,34 @@ const Header = () => {
                 >
                   About
                 </Link>
-                <Link
-                  to="/blog"
-                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                  style={{ fontFamily: 'var(--font-ui)' }}
-                >
-                  Blog
-                </Link>
-                <Link
-                  to="/upgrade"
-                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                  style={{ fontFamily: 'var(--font-ui)' }}
-                >
-                  Pricing
-                </Link>
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      to="/chat"
-                      className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                      style={{ fontFamily: 'var(--font-ui)' }}
-                    >
-                      Chat
-                    </Link>
-                    <Link
-                      to="/dashboard"
-                      className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                      style={{ fontFamily: 'var(--font-ui)' }}
-                    >
-                      Dashboard
-                    </Link>
-                  </>
-                ) : (
+                {!isAuthenticated && (
                   <Link
-                    to="/login"
+                    to="/upgrade"
                     className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    Log in
+                    Pricing
+                  </Link>
+                )}
+                {isAuthenticated && (
+                  <Link
+                    to="/chat"
+                    className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
+                    style={{ fontFamily: 'var(--font-ui)' }}
+                  >
+                    Chat
                   </Link>
                 )}
               </nav>
 
               {/* CTA Button */}
               <button
-                onClick={() => navigate(isAuthenticated ? '/chat' : '/login?signup=true')}
+                onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
                 className="hidden sm:flex px-5 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-full shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)] transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group"
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 <span className="text-sm">
-                  {isAuthenticated ? 'Try it out' : 'Sign up free'}
+                  {isAuthenticated ? 'Try it out' : 'Login'}
                 </span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

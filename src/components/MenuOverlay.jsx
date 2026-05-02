@@ -79,23 +79,17 @@ const MenuOverlay = ({ isOpen, onClose }) => {
             >
               About
             </Link>
-            <Link
-              to="/blog"
-              onClick={onClose}
-              className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-              style={{ fontFamily: 'var(--font-ui)' }}
-            >
-              Blog
-            </Link>
-            <Link
-              to="/upgrade"
-              onClick={onClose}
-              className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-              style={{ fontFamily: 'var(--font-ui)' }}
-            >
-              Pricing
-            </Link>
-            {isAuthenticated ? (
+            {!isAuthenticated && (
+              <Link
+                to="/upgrade"
+                onClick={onClose}
+                className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                style={{ fontFamily: 'var(--font-ui)' }}
+              >
+                Pricing
+              </Link>
+            )}
+            {isAuthenticated && (
               <>
                 <Link
                   to="/chat"
@@ -104,14 +98,6 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                   style={{ fontFamily: 'var(--font-ui)' }}
                 >
                   Chat
-                </Link>
-                <Link
-                  to="/dashboard"
-                  onClick={onClose}
-                  className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                  style={{ fontFamily: 'var(--font-ui)' }}
-                >
-                  Dashboard
                 </Link>
                 <Link
                   to="/dashboard/usage"
@@ -138,15 +124,6 @@ const MenuOverlay = ({ isOpen, onClose }) => {
                   Billing
                 </Link>
               </>
-            ) : (
-              <Link
-                to="/login"
-                onClick={onClose}
-                className="px-4 py-3 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                style={{ fontFamily: 'var(--font-ui)' }}
-              >
-                Log in
-              </Link>
             )}
           </nav>
 
@@ -164,13 +141,13 @@ const MenuOverlay = ({ isOpen, onClose }) => {
 
             <button
               onClick={() => {
-                navigate(isAuthenticated ? '/chat' : '/login?signup=true');
+                navigate(isAuthenticated ? '/dashboard' : '/login');
                 onClose();
               }}
               className="w-full py-3 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-[var(--accent-hover)] transition-colors"
               style={{ fontFamily: 'var(--font-ui)' }}
             >
-              <span>{isAuthenticated ? 'Try it out' : 'Sign up — $1 free'}</span>
+              <span>{isAuthenticated ? 'Try it out' : 'Login'}</span>
               <svg className="w-4 h-4 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

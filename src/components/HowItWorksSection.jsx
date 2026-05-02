@@ -4,6 +4,8 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const HowItWorksSection = () => {
+  return null;
+  // eslint-disable-next-line no-unreachable
   const [headerRef, headerVisible] = useScrollAnimation(0.1);
   const [codeRef, codeVisible] = useScrollAnimation(0.05);
 
