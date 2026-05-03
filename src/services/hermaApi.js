@@ -242,37 +242,15 @@ export function getAutoRechargeSettings() {
   return authFetch('/portal/auto-recharge');
 }
 
-export function updateAutoRechargeSettings({ enabled, threshold_usd, amount_usd }) {
+export function updateAutoRechargeSettings({ enabled, threshold_usd, amount_usd, frequency, day, day_of_week }) {
   return authFetch('/portal/auto-recharge', {
     method: 'POST',
-    body: JSON.stringify({ enabled, threshold_usd, amount_usd }),
-  });
-}
-
-// --- Subscriptions ---
-
-export function createSubscriptionCheckout(plan) {
-  return authFetch('/portal/subscribe', {
-    method: 'POST',
-    body: JSON.stringify({ plan }),
-  });
-}
-
-export function manageSubscription() {
-  return authFetch('/portal/subscription/manage', {
-    method: 'POST',
+    body: JSON.stringify({ enabled, threshold_usd, amount_usd, frequency: frequency || null, day: day || null, day_of_week: day_of_week ?? null }),
   });
 }
 
 export function getSubscriptionStatus() {
   return authFetch('/portal/subscription');
-}
-
-export function changeSubscription(plan) {
-  return authFetch('/portal/subscribe/change', {
-    method: 'POST',
-    body: JSON.stringify({ plan }),
-  });
 }
 
 export function getChatBalance() {

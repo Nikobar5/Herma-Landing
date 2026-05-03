@@ -9,27 +9,27 @@
 }
 
 :root {
-  /* Design: warm tan light theme + deep indigo accent */
+  /* Design: purple desert palette — pulled from hero sky gradient */
 
   /* Backgrounds */
-  --bg-primary: #FAFAF8;
-  --bg-secondary: #F3F2EF;
-  --bg-tertiary: #ECEAE5;
-  --bg-hover: #E2E0DB;
-  --bg-active: #D8D5CE;
-  --bg-input: #F3F2EF;
+  --bg-primary: #1e1230;
+  --bg-secondary: #2a1a40;
+  --bg-tertiary: #3d2555;
+  --bg-hover: #4a2d65;
+  --bg-active: #56356e;
+  --bg-input: #241640;
 
   /* Text */
-  --text-primary: #1A1916;
-  --text-secondary: #6B6762;
-  --text-tertiary: #9A9691;
-  --text-inverse: #FFFFFF;
+  --text-primary: #ece6d8;
+  --text-secondary: #a59cb1;
+  --text-tertiary: #6e6479;
+  --text-inverse: #1e1230;
 
-  /* Accent — deep indigo */
-  --accent-primary: #4338CA;
-  --accent-hover: #3730A3;
-  --accent-muted: rgba(67, 56, 202, 0.10);
-  --accent-secondary: #6366F1;
+  /* Accent — bronze/copper */
+  --accent-primary: #e8956a;
+  --accent-hover: #f0a57e;
+  --accent-muted: rgba(232, 149, 106, 0.12);
+  --accent-secondary: #d4837f;
 
   /* Semantic */
   --success: #16A34A;
@@ -38,23 +38,23 @@
   --info: #2563EB;
 
   /* Borders */
-  --border-primary: rgba(0, 0, 0, 0.08);
-  --border-secondary: rgba(0, 0, 0, 0.12);
-  --border-hover: rgba(0, 0, 0, 0.20);
-  --border-accent: rgba(67, 56, 202, 0.30);
+  --border-primary: rgba(255, 255, 255, 0.10);
+  --border-secondary: rgba(255, 255, 255, 0.16);
+  --border-hover: rgba(255, 255, 255, 0.28);
+  --border-accent: rgba(232, 149, 106, 0.30);
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.06);
-  --shadow-glow: 0 0 24px rgba(67, 56, 202, 0.18);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.30), 0 1px 2px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.30);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.50), 0 4px 8px rgba(0, 0, 0, 0.30);
+  --shadow-glow: 0 0 24px rgba(232, 149, 106, 0.25);
 
   /* Legacy aliases */
-  --primary-bg: #FAFAF8;
-  --secondary-bg: #6366F1;
-  --highlight-color: #4338CA;
-  --border-color: rgba(0, 0, 0, 0.08);
-  --text-color: #1A1916;
+  --primary-bg: #1e1230;
+  --secondary-bg: #e8956a;
+  --highlight-color: #e8956a;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --text-color: #ece6d8;
 
   /* Typography: Space Grotesk headings + DM Sans body — recommended for AI/SaaS */
   --font-body: 'DM Sans', -apple-system, sans-serif;
@@ -121,6 +121,12 @@ body {
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 .container {

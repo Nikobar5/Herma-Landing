@@ -73,7 +73,7 @@ const BenchmarkTrust = () => {
         >
           <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
             <p
-              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-purple-400 bg-clip-text text-transparent mb-2"
+              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-[var(--hero-moon)] bg-clip-text text-transparent mb-2"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               <AnimatedNumber target={8} suffix="/8" duration={1200} />
@@ -85,7 +85,7 @@ const BenchmarkTrust = () => {
 
           <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
             <p
-              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[#5BAF8A] to-[var(--accent-primary)] bg-clip-text text-transparent mb-2"
+              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[var(--accent-secondary)] to-[var(--accent-primary)] bg-clip-text text-transparent mb-2"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               <AnimatedNumber target={89} suffix="%" duration={1300} />
@@ -97,7 +97,7 @@ const BenchmarkTrust = () => {
 
           <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 sm:p-8 text-center border border-[var(--border-secondary)] hover:border-[var(--border-accent)] transition-colors duration-300">
             <p
-              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-400 to-[#5BAF8A] bg-clip-text text-transparent mb-2"
+              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[var(--hero-moon)] to-[var(--accent-secondary)] bg-clip-text text-transparent mb-2"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
               <AnimatedNumber target={868} suffix="+" duration={1500} />

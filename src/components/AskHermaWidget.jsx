@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAskHerma } from '../context/AskHermaContext';
 import { PLACEHOLDER_QUESTIONS } from './Hero';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-function Sparkle({ size = 14, color = 'var(--accent-primary)' }) {
+function Sparkle({ size = 16 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0 }}>
-      <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-    </svg>
+    <img src="/herma-logo.png" alt="Herma" style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
   );
 }
 
@@ -30,6 +28,7 @@ function WaitingDots() {
 
 export default function AskHermaWidget() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { messages, inputValue, setInputValue, isStreaming, error, submit, stop, clear } = useAskHerma();
 
   const [heroVisible, setHeroVisible] = useState(true);
@@ -44,14 +43,17 @@ export default function AskHermaWidget() {
   const showPanel = panelOpen || hasMessages;
   const canSend = inputValue.trim() && !isStreaming;
 
-  // IntersectionObserver — hide widget when hero is visible
+  // Hide widget when hero is in view; show it on all other routes
   useEffect(() => {
     const heroEl = document.getElementById('hero-section');
-    if (!heroEl) return;
+    if (!heroEl) {
+      setHeroVisible(false);
+      return;
+    }
     const obs = new IntersectionObserver(([e]) => setHeroVisible(e.isIntersecting), { threshold: 0.05 });
     obs.observe(heroEl);
     return () => obs.disconnect();
-  }, []);
+  }, [location.pathname]);
 
   // Open panel when messages arrive
   useEffect(() => {
@@ -110,13 +112,13 @@ export default function AskHermaWidget() {
         .widget-markdown p:last-child { margin-bottom: 0; }
         .widget-markdown ul, .widget-markdown ol { margin: 4px 0 8px; padding-left: 18px; }
         .widget-markdown li { margin: 2px 0; }
-        .widget-markdown code { background: rgba(67,56,202,0.08); border-radius: 4px; padding: 1px 5px; font-family: var(--font-code); font-size: 0.88em; }
-        .widget-markdown pre { background: rgba(0,0,0,0.05); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin: 6px 0; }
+        .widget-markdown code { background: rgba(232,149,106,0.10); border-radius: 4px; padding: 1px 5px; font-family: var(--font-code); font-size: 0.88em; }
+        .widget-markdown pre { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin: 6px 0; }
         .widget-markdown pre code { background: none; padding: 0; }
         .widget-markdown strong { font-weight: 600; }
         .widget-pill:focus-within {
-          border-color: rgba(67,56,202,0.4) !important;
-          box-shadow: 0 0 0 3px rgba(67,56,202,0.08), 0 4px 24px rgba(0,0,0,0.10) !important;
+          border-color: rgba(232,149,106,0.4) !important;
+          box-shadow: 0 0 0 3px rgba(232,149,106,0.10), 0 4px 24px rgba(0,0,0,0.30) !important;
         }
       `}</style>
 
@@ -141,10 +143,10 @@ export default function AskHermaWidget() {
           {showPanel && (
             <div
               style={{
-                background: '#fff',
-                border: '1px solid rgba(0,0,0,0.08)',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-primary)',
                 borderRadius: 16,
-                boxShadow: '0 4px 32px rgba(0,0,0,0.10)',
+                boxShadow: 'var(--shadow-lg)',
                 marginBottom: 8,
                 overflow: 'hidden',
                 animation: 'widgetCardIn 240ms ease',
@@ -154,7 +156,7 @@ export default function AskHermaWidget() {
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8,
                 padding: '10px 14px',
-                borderBottom: '1px solid rgba(0,0,0,0.06)',
+                borderBottom: '1px solid var(--border-primary)',
               }}>
                 <Sparkle size={14} />
                 <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -259,8 +261,8 @@ export default function AskHermaWidget() {
                 {error && (
                   <div role="alert" style={{
                     padding: '7px 11px', borderRadius: 8,
-                    background: error === 'rate_limit' ? 'var(--bg-hover)' : '#FEF2F2',
-                    border: error === 'rate_limit' ? '1px solid var(--border-primary)' : '1px solid #FECACA',
+                    background: error === 'rate_limit' ? 'var(--bg-hover)' : 'rgba(220,38,38,0.12)',
+                    border: error === 'rate_limit' ? '1px solid var(--border-primary)' : '1px solid rgba(220,38,38,0.3)',
                     fontFamily: 'var(--font-ui)', fontSize: 12,
                     color: error === 'rate_limit' ? 'var(--text-secondary)' : '#DC2626',
                   }}>
@@ -283,15 +285,13 @@ export default function AskHermaWidget() {
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '8px 8px 8px 16px',
-              background: '#fff',
-              border: '1.5px solid rgba(67,56,202,0.15)',
+              background: 'var(--bg-secondary)',
+              border: '1.5px solid var(--border-accent)',
               borderRadius: 9999,
-              boxShadow: '0 4px 24px rgba(0,0,0,0.09)',
+              boxShadow: 'var(--shadow-md)',
               transition: 'border-color 200ms ease, box-shadow 200ms ease',
             }}
           >
-            <Sparkle size={15} />
-
             {/* Input with rotating placeholder */}
             <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
               <input
@@ -353,8 +353,8 @@ export default function AskHermaWidget() {
                 style={{
                   width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                   border: 'none',
-                  background: canSend ? 'var(--accent-primary)' : '#E5E7EB',
-                  color: canSend ? '#fff' : '#9CA3AF',
+                  background: canSend ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
+                  color: canSend ? 'var(--text-inverse)' : 'var(--text-tertiary)',
                   cursor: canSend ? 'pointer' : 'default',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 150ms ease',

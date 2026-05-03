@@ -1,50 +1,12 @@
-import React, { useState } from 'react';
-import { createSubscriptionCheckout } from '../../services/hermaApi';
-
-const PLANS = [
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: '$10',
-    credits: '$12',
-    bonus: '20%',
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: '$25',
-    credits: '$32',
-    bonus: '28%',
-    popular: true,
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: '$50',
-    credits: '$65',
-    bonus: '30%',
-  },
-];
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const PaywallModal = ({ isOpen, onClose }) => {
-  const [loading, setLoading] = useState(null);
-
   if (!isOpen) return null;
-
-  const handleSubscribe = async (planId) => {
-    setLoading(planId);
-    try {
-      const data = await createSubscriptionCheckout(planId);
-      window.location.href = data.checkout_url;
-    } catch (err) {
-      alert(err.message || 'Failed to start checkout');
-      setLoading(null);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-xl border border-[var(--border-secondary)] max-w-lg w-full mx-4 p-6">
+      <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-xl border border-[var(--border-secondary)] max-w-sm w-full mx-4 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2
             className="text-xl font-bold text-[var(--text-primary)]"
@@ -63,74 +25,35 @@ const PaywallModal = ({ isOpen, onClose }) => {
         </div>
 
         <p className="text-sm text-[var(--text-secondary)] mb-6" style={{ fontFamily: 'var(--font-body)' }}>
-          Subscribe to get bonus credits every month, or buy a one-time package.
+          Top up your balance to keep chatting. Credits never expire.
         </p>
 
-        <div className="space-y-3 mb-6">
-          {PLANS.map((plan) => (
-            <button
-              key={plan.id}
-              onClick={() => handleSubscribe(plan.id)}
-              disabled={loading !== null}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                plan.popular
-                  ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
-                  : 'border-[var(--border-secondary)] hover:border-[var(--border-accent)]'
-              } ${loading === plan.id ? 'opacity-60' : ''}`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="font-semibold text-[var(--text-primary)]"
-                      style={{ fontFamily: 'var(--font-ui)' }}
-                    >
-                      {plan.name}
-                    </span>
-                    {plan.popular && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium">
-                        Popular
-                      </span>
-                    )}
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#5BAF8A]/15 text-[#5BAF8A] font-medium">
-                      +{plan.bonus} bonus
-                    </span>
-                  </div>
-                  <span className="text-xs text-[var(--text-tertiary)] mt-0.5 block" style={{ fontFamily: 'var(--font-ui)' }}>
-                    Pay {plan.price}/mo &rarr; get {plan.credits} in credits
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span
-                    className="text-lg font-bold text-[var(--text-primary)]"
-                    style={{ fontFamily: 'var(--font-ui)' }}
-                  >
-                    {plan.price}
-                  </span>
-                  <span className="text-xs text-[var(--text-tertiary)] block">/month</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+        <Link
+          to="/upgrade"
+          onClick={onClose}
+          className="block w-full py-3 text-center font-semibold rounded-xl bg-[var(--accent-primary)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] transition-colors mb-3"
+          style={{ fontFamily: 'var(--font-ui)' }}
+        >
+          Add Credits
+        </Link>
 
-        <div className="text-center space-y-2">
-          <a
-            href="/upgrade"
-            className="text-sm text-[var(--accent-primary)] hover:underline"
+        <Link
+          to="/dashboard/billing"
+          onClick={onClose}
+          className="block w-full py-2.5 text-center text-sm font-medium rounded-xl border border-[var(--border-primary)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors mb-4"
+          style={{ fontFamily: 'var(--font-ui)' }}
+        >
+          Set up Auto-Recharge
+        </Link>
+
+        <div className="text-center">
+          <button
+            onClick={onClose}
+            className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
-            Buy one-time credits instead
-          </a>
-          <div>
-            <button
-              onClick={onClose}
-              className="text-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
-              style={{ fontFamily: 'var(--font-ui)' }}
-            >
-              Maybe later
-            </button>
-          </div>
+            Maybe later
+          </button>
         </div>
       </div>
     </div>

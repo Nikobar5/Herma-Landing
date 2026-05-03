@@ -1,188 +1,225 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
-import { createCheckout, createSubscriptionCheckout, getBalance, getSubscriptionStatus, changeSubscription } from '../services/hermaApi';
+import {
+  createCheckout,
+  getAutoRechargeSettings,
+  updateAutoRechargeSettings,
+} from '../services/hermaApi';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
 import { trackClick } from '../services/analyticsTracker';
 
-const QUICK_AMOUNTS = [5, 10, 25, 50, 100];
+const QUICK_AMOUNTS = [5, 25, 50, 100, 200];
 
-const SUBSCRIPTION_PLANS = [
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: 10,
-    credits: 12,
-    bonus: 20,
-    features: ['Smart model routing', 'Standard response speed', 'Email support'],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 25,
-    credits: 32,
-    bonus: 28,
-    popular: true,
-    features: ['Smart model routing', 'Priority response speed', 'Priority email support', 'Usage analytics dashboard'],
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 50,
-    credits: 65,
-    bonus: 30,
-    features: ['Smart model routing', 'Highest priority routing', 'Dedicated support', 'Usage analytics dashboard', 'Volume discounts'],
-  },
-];
+const ordinal = (n) => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
+const Toggle = ({ checked, onChange, disabled }) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    disabled={disabled}
+    onClick={() => onChange(!checked)}
+    className={`
+      relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent
+      transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]
+      ${checked ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-tertiary)] border border-[var(--border-primary)]'}
+      ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+    `}
+  >
+    <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200 ease-in-out ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+  </button>
+);
+
+const AmountInput = ({ value, onChange }) => (
+  <div className="relative w-32">
+    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-[var(--text-tertiary)]">$</span>
+    <input
+      type="number"
+      min="0"
+      step="0.01"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onWheel={(e) => e.target.blur()}
+      className="w-full pl-7 pr-3 py-1.5 text-sm bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+    />
+  </div>
+);
 
 const PurchasePage = () => {
   const { isAuthenticated } = useHermaAuth();
-  const [balance, setBalance] = useState(null);
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
-  const [subStatusLoading, setSubStatusLoading] = useState(false);
-  const [subLoading, setSubLoading] = useState(null);
-  const [planChangeLoading, setPlanChangeLoading] = useState(null);
-  const [currentPlan, setCurrentPlan] = useState(null);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
 
+  // threshold = when to trigger; restore_to = target balance after recharge
+  // charge amount (sent to API as amount_usd) = restore_to - threshold
+  const [arSettings, setArSettings] = useState({
+    enabled: false,
+    threshold_usd: '1.00',
+    restore_to_usd: '10.00',
+    day: null,
+  });
+  const [arSettingsBase, setArSettingsBase] = useState(null);
+  const [arLoading, setArLoading] = useState(false);
+  const [arSaving, setArSaving] = useState(false);
+  const [arMsg, setArMsg] = useState('');
+  const [arError, setArError] = useState('');
+
+  const isArDirty = arSettingsBase !== null &&
+    JSON.stringify(arSettings) !== JSON.stringify(arSettingsBase);
+
+  const thresholdVal = parseFloat(arSettings.threshold_usd);
+  const restoreVal = parseFloat(arSettings.restore_to_usd);
+  const rechargeAmt = !isNaN(thresholdVal) && !isNaN(restoreVal) && restoreVal > thresholdVal
+    ? (restoreVal - thresholdVal).toFixed(2)
+    : null;
+
   useEffect(() => {
-    // SEO: per-page title for pricing page
     setPageMeta(
-      'Pricing | AI Model Router',
-      'Herma pricing: $2/M input tokens, $8/M output tokens. No minimums, no hidden fees. Subscribe for bonus credits or pay as you go. Free $1 to start.',
+      'Add Credits | Herma AI Router',
+      'Herma pricing: $2/M input tokens, $8/M output tokens. No minimums, no hidden fees. Pay as you go. Free $1 to start.',
       { url: 'https://hermaai.com/upgrade' }
     );
     return () => resetPageMeta();
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      getBalance()
-        .then((data) => setBalance(data.balance ?? data.balance_usd ?? 0))
-        .catch(() => { });
-      setSubStatusLoading(true);
-      getSubscriptionStatus()
-        .then((data) => { if (data.has_subscription && data.status === 'active') setCurrentPlan(data.plan); })
-        .catch(() => { })
-        .finally(() => setSubStatusLoading(false));
-    }
+    if (!isAuthenticated) return;
+    setArLoading(true);
+    getAutoRechargeSettings()
+      .then((data) => {
+        if (data) {
+          const threshold = data.threshold_usd != null ? parseFloat(data.threshold_usd) : 1;
+          const amount = data.amount_usd != null ? parseFloat(data.amount_usd) : 9;
+          const loaded = {
+            enabled: data.enabled || false,
+            threshold_usd: threshold.toFixed(2),
+            restore_to_usd: (threshold + amount).toFixed(2),
+            day: data.day ?? null,
+          };
+          setArSettings(loaded);
+          setArSettingsBase(loaded);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setArLoading(false));
   }, [isAuthenticated]);
 
-  const parsedAmount = parseFloat(amount);
-  const isValidAmount = !isNaN(parsedAmount) && parsedAmount >= 5 && parsedAmount <= 1000;
-
-  const handlePurchase = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-    if (!isValidAmount) return;
-
+  const triggerCheckout = useCallback(async (amt) => {
     setLoading(true);
     setError(null);
-    trackClick('checkout_initiated', { type: 'one_time', amount: parsedAmount });
-    if (window.posthog) window.posthog.capture('checkout_initiated', { type: 'one_time', amount: parsedAmount });
-
+    trackClick('checkout_initiated', { type: 'one_time', amount: amt });
+    if (window.posthog) window.posthog.capture('checkout_initiated', { type: 'one_time', amount: amt });
     try {
-      const data = await createCheckout(parsedAmount);
+      const data = await createCheckout(amt);
       window.location.href = data.checkout_url;
     } catch (err) {
-      console.error('Checkout error:', err);
       setError(err.message || 'Failed to start checkout. Please try again.');
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const raw = sessionStorage.getItem('pendingCheckout');
+    if (!raw) return;
+    try {
+      const { amount: pendingAmt } = JSON.parse(raw);
+      sessionStorage.removeItem('pendingCheckout');
+      setAmount(String(pendingAmt));
+      const timer = setTimeout(() => triggerCheckout(pendingAmt), 400);
+      return () => clearTimeout(timer);
+    } catch {
+      sessionStorage.removeItem('pendingCheckout');
+    }
+  }, [isAuthenticated, triggerCheckout]);
+
+  const parsedAmount = parseFloat(amount);
+  const isValidAmount = !isNaN(parsedAmount) && parsedAmount >= 5;
+
+  const handlePurchase = async () => {
+    if (!isAuthenticated) {
+      if (isValidAmount) {
+        sessionStorage.setItem('pendingCheckout', JSON.stringify({ amount: parsedAmount }));
+      }
+      navigate('/login?next=/upgrade');
+      return;
+    }
+    if (!isValidAmount) return;
+    triggerCheckout(parsedAmount);
   };
 
-  const handleSubscribe = async (planId) => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
+  const handleArSave = async () => {
+    const threshold = parseFloat(arSettings.threshold_usd);
+    const restore = parseFloat(arSettings.restore_to_usd);
+    const chargeAmt = restore - threshold;
+    const day = arSettings.day;
 
-    // Upgrade / downgrade flow for existing subscribers
-    if (currentPlan) {
-      if (currentPlan === planId) return;
-      setError(null);
-      setSuccess(null);
-      setPlanChangeLoading(planId);
-      trackClick('plan_change_initiated', { from: currentPlan, to: planId });
-      if (window.posthog) window.posthog.capture('plan_change_initiated', { from: currentPlan, to: planId });
-      try {
-        await changeSubscription(planId);
-        setCurrentPlan(planId);
-        setSuccess(`Switched to ${SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name} plan.`);
-      } catch (err) {
-        setError(err.message || 'Failed to change plan.');
-      } finally {
-        setPlanChangeLoading(null);
+    if (arSettings.enabled) {
+      if (isNaN(threshold) || threshold < 0.5) {
+        setArError('Threshold must be at least $0.50');
+        return;
       }
-      return;
+      if (isNaN(restore) || restore <= threshold) {
+        setArError('"Restore balance to" must be greater than the threshold');
+        return;
+      }
+      if (chargeAmt < 5) {
+        setArError('Recharge amount (restore minus threshold) must be at least $5.00');
+        return;
+      }
     }
 
-    // New subscription flow
-    setSubLoading(planId);
-    setError(null);
-    setSuccess(null);
-    trackClick('checkout_initiated', { type: 'subscription', plan: planId });
-    if (window.posthog) window.posthog.capture('checkout_initiated', { type: 'subscription', plan: planId });
+    setArSaving(true);
+    setArError('');
+    setArMsg('');
     try {
-      const data = await createSubscriptionCheckout(planId);
-      window.location.href = data.checkout_url;
+      await updateAutoRechargeSettings({
+        enabled: arSettings.enabled,
+        threshold_usd: threshold,
+        amount_usd: chargeAmt,
+        day,
+      });
+      setArSettingsBase({ ...arSettings });
+      setArMsg('Settings saved.');
+      setTimeout(() => setArMsg(''), 4000);
     } catch (err) {
-      // Race condition fallback: subscription status fetch hadn't resolved when user clicked.
-      // Re-fetch status and retry as a plan change if they already have an active subscription.
-      if (err.message?.includes('already have an active subscription')) {
-        try {
-          const status = await getSubscriptionStatus();
-          if (status.has_subscription && status.status === 'active') {
-            setCurrentPlan(status.plan);
-            if (status.plan !== planId) {
-              await changeSubscription(planId);
-              setCurrentPlan(planId);
-              setSuccess(`Switched to ${SUBSCRIPTION_PLANS.find(p => p.id === planId)?.name} plan.`);
-            }
-            setSubLoading(null);
-            return;
-          }
-        } catch { /* fall through to original error */ }
-      }
-      setError(err.message || 'Failed to start checkout.');
-      setSubLoading(null);
+      setArError(err.message);
+    } finally {
+      setArSaving(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] pt-32">
-      <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+      <div className="container mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+
         {/* Header */}
         <div className="text-center mb-10">
           <h1
-            className="text-4xl md:text-5xl font-bold mb-6 text-[var(--text-primary)]"
+            className="text-4xl md:text-5xl font-bold mb-4 text-[var(--text-primary)]"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Add <span className="text-[var(--accent-primary)]">Credits</span>
           </h1>
-          <p
-            className="text-xl text-[var(--text-secondary)] mb-4"
-            style={{ fontFamily: 'var(--font-body)' }}
-          >
-            Subscribe for bonus credits, or pay as you go
+          <p className="text-lg text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+            Pay as you go. Set up auto-recharge to never run out.
           </p>
-          {isAuthenticated && balance !== null && (
-            <div className="inline-flex items-center gap-2 bg-[var(--bg-secondary)] px-6 py-3 rounded-full border border-[var(--border-secondary)]">
-              <span className="text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-ui)' }}>Current Balance:</span>
-              <span className="text-2xl font-bold text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>${Number(balance).toFixed(2)}</span>
-            </div>
-          )}
         </div>
 
+        {/* Login prompt */}
         {!isAuthenticated && (
-          <div className="mb-6 p-4 bg-[var(--accent-muted)] border border-[var(--border-accent)] rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="mb-6 p-4 bg-[var(--accent-muted)] border border-[var(--border-accent)] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
-              Sign up free to get <span className="font-semibold text-[var(--text-primary)]">$1.00 in credits</span> and unlock purchasing.
+              Sign up free to get{' '}
+              <span className="font-semibold text-[var(--text-primary)]">$1.00 in credits</span>{' '}
+              and unlock purchasing.
             </p>
             <button
               onClick={() => navigate('/login')}
@@ -194,156 +231,75 @@ const PurchasePage = () => {
           </div>
         )}
 
-        {success && (
-          <div className="mb-6 p-4 bg-[#5BAF8A]/10 border border-[#5BAF8A]/30 rounded-lg">
-            <p className="text-[#5BAF8A] text-sm text-center" style={{ fontFamily: 'var(--font-body)' }}>{success}</p>
-          </div>
-        )}
         {error && (
           <div className="mb-6 p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 rounded-lg">
-            <p className="text-[var(--error)] text-sm text-center" style={{ fontFamily: 'var(--font-body)' }}>{error}</p>
+            <p className="text-[var(--error)] text-sm text-center">{error}</p>
           </div>
         )}
 
-        {/* Subscription Plans */}
+        {/* Main card */}
         <div className="bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-primary)] p-8 mb-6">
+
+          {/* Card header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
-              Monthly Plans
+              Add Credits
             </h2>
-            <span className="text-xs text-[#5BAF8A] font-medium px-3 py-1 bg-[#5BAF8A]/10 rounded-full" style={{ fontFamily: 'var(--font-ui)' }}>
-              Up to 30% bonus credits
-            </span>
+            {isAuthenticated && (
+              <div className="flex items-center gap-2.5">
+                <span className="text-sm text-[var(--text-secondary)]">Auto-Recharge</span>
+                {arLoading ? (
+                  <div className="w-4 h-4 rounded-full border-2 border-[var(--accent-primary)] border-t-transparent animate-spin" />
+                ) : (
+                  <Toggle
+                    checked={arSettings.enabled}
+                    onChange={(val) => {
+                      setArSettings((prev) => ({
+                        ...prev,
+                        enabled: val,
+                        // Pre-fill "restore to" from the purchase amount when turning on
+                        ...(val && isValidAmount ? { restore_to_usd: parsedAmount.toFixed(2) } : {}),
+                      }));
+                      setArError('');
+                      setArMsg('');
+                    }}
+                  />
+                )}
+              </div>
+            )}
           </div>
-
-          <div className="grid sm:grid-cols-3 gap-4">
-            {SUBSCRIPTION_PLANS.map((plan) => {
-              const isCurrent = currentPlan === plan.id;
-              const isAnyLoading = subLoading !== null || planChangeLoading !== null;
-              return (
-                <button
-                  key={plan.id}
-                  onClick={() => handleSubscribe(plan.id)}
-                  disabled={isAnyLoading || isCurrent || subStatusLoading}
-                  className={`w-full text-left p-5 rounded-xl border-2 transition-all flex flex-col ${
-                    isCurrent
-                      ? 'border-[#5BAF8A] bg-[#5BAF8A]/5 cursor-default'
-                      : plan.popular
-                      ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
-                      : 'border-[var(--border-secondary)] hover:border-[var(--border-accent)]'
-                  } ${planChangeLoading === plan.id || subLoading === plan.id ? 'opacity-60' : ''}`}
-                >
-                  {/* Name + badges */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <span className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                      {plan.name}
-                    </span>
-                    {isCurrent && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#5BAF8A] text-white font-medium">
-                        Current Plan
-                      </span>
-                    )}
-                    {!isCurrent && plan.popular && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium">
-                        Most Popular
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Price */}
-                  <div className="mb-1">
-                    <span className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
-                      ${plan.price}
-                    </span>
-                    <span className="text-sm text-[var(--text-tertiary)]">/mo</span>
-                  </div>
-
-                  {/* Credits + bonus */}
-                  <p className="text-xs text-[var(--text-tertiary)] mb-4" style={{ fontFamily: 'var(--font-ui)' }}>
-                    ${plan.credits} in credits &middot;{' '}
-                    <span className="text-[#5BAF8A] font-medium">+{plan.bonus}% bonus</span>
-                  </p>
-
-                  {/* Features */}
-                  <ul className="space-y-1.5 mt-auto">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>
-                        <svg className="w-3 h-3 text-[#5BAF8A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Action label */}
-                  <div className="mt-4 pt-3 border-t border-[var(--border-primary)]">
-                    {isCurrent ? (
-                      <span className="text-xs font-medium text-[#5BAF8A]" style={{ fontFamily: 'var(--font-ui)' }}>✓ Active</span>
-                    ) : planChangeLoading === plan.id ? (
-                      <span className="text-xs font-medium text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>Switching...</span>
-                    ) : subLoading === plan.id ? (
-                      <span className="text-xs font-medium text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>Loading...</span>
-                    ) : currentPlan ? (
-                      <span className="text-xs font-medium text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>Switch to {plan.name} →</span>
-                    ) : (
-                      <span className="text-xs font-medium text-[var(--accent-primary)]" style={{ fontFamily: 'var(--font-ui)' }}>Get Started →</span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-[var(--border-primary)]" />
-          <span className="text-sm text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-ui)' }}>or pay as you go</span>
-          <div className="flex-1 h-px bg-[var(--border-primary)]" />
-        </div>
-
-        {/* One-time Credit Purchase */}
-        <div className="bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-primary)] p-8 mb-8">
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
-            One-Time Credits
-          </h2>
 
           {/* Amount input */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2" style={{ fontFamily: 'var(--font-ui)' }}>
-              Amount
-            </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-[var(--text-tertiary)]">$</span>
               <input
                 type="number"
                 min="5"
-                max="1000"
                 step="0.01"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handlePurchase()}
+                onWheel={(e) => e.target.blur()}
                 placeholder="10"
                 className="w-full pl-10 pr-4 py-4 text-2xl font-bold bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 style={{ fontFamily: 'var(--font-heading)' }}
               />
             </div>
-            <p className="mt-2 text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
-              Minimum $5 · Maximum $1,000 · Credits never expire
-            </p>
+            <p className="mt-2 text-xs text-[var(--text-tertiary)]">Minimum $5 · Credits never expire</p>
           </div>
 
-          {/* Quick amount buttons */}
+          {/* Quick amounts */}
           <div className="flex flex-wrap gap-2 mb-8">
             {QUICK_AMOUNTS.map((val) => (
               <button
                 key={val}
                 onClick={() => setAmount(String(val))}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${amount === String(val)
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  amount === String(val)
                     ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] border-[var(--accent-primary)]'
                     : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'
-                  }`}
+                }`}
                 style={{ fontFamily: 'var(--font-ui)' }}
               >
                 ${val}
@@ -354,20 +310,114 @@ const PurchasePage = () => {
           {/* Purchase button */}
           <button
             onClick={handlePurchase}
-            disabled={loading || !isValidAmount}
+            disabled={loading}
             className="w-full px-6 py-4 font-semibold text-lg rounded-xl transition duration-300 disabled:opacity-40 disabled:cursor-not-allowed bg-[var(--accent-primary)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]"
             style={{ fontFamily: 'var(--font-ui)' }}
           >
-            {loading ? 'Processing...' : isValidAmount ? `Add $${parsedAmount.toFixed(2)} in Credits` : 'Add Credits'}
+            {loading
+              ? 'Processing…'
+              : isValidAmount
+              ? `Add $${parsedAmount.toFixed(2)} in Credits`
+              : isAuthenticated
+              ? 'Add Credits'
+              : 'Sign In to Add Credits'}
           </button>
+
+          {/* Auto-recharge expanded */}
+          {isAuthenticated && arSettings.enabled && (
+            <div className="mt-8 pt-6 border-t border-[var(--border-primary)]">
+
+              <div className="flex items-start justify-between mb-1">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">Auto recharge</p>
+              </div>
+              <p className="text-sm text-[var(--text-secondary)] mb-5">
+                Automatically add credits when your balance runs low.
+              </p>
+
+              {/* Form rows — OpenAI style */}
+              <div className="border-t border-[var(--border-primary)]">
+
+                <div className="flex items-center justify-between py-3.5 border-b border-[var(--border-primary)]">
+                  <label className="text-sm text-[var(--text-primary)]">When balance drops to:</label>
+                  <AmountInput
+                    value={arSettings.threshold_usd}
+                    onChange={(v) => setArSettings((p) => ({ ...p, threshold_usd: v }))}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3.5 border-b border-[var(--border-primary)]">
+                  <label className="text-sm text-[var(--text-primary)]">Restore balance to:</label>
+                  <AmountInput
+                    value={arSettings.restore_to_usd}
+                    onChange={(v) => setArSettings((p) => ({ ...p, restore_to_usd: v }))}
+                  />
+                </div>
+
+                {rechargeAmt && (
+                  <div className="flex items-center justify-between py-3.5 border-b border-[var(--border-primary)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">Recharge amount:</span>
+                    <span className="text-sm font-medium text-[var(--text-primary)] mr-3">${rechargeAmt}</span>
+                  </div>
+                )}
+
+                {/* Monthly recharge */}
+                <div className="py-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[var(--text-primary)]">Also recharge monthly</span>
+                    <Toggle
+                      checked={arSettings.day !== null}
+                      onChange={(val) => setArSettings((p) => ({
+                        ...p,
+                        day: val ? Math.min(new Date().getDate(), 28) : null,
+                      }))}
+                    />
+                  </div>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    {arSettings.day !== null
+                      ? `Recharges on the ${ordinal(arSettings.day)} of every month, regardless of balance`
+                      : 'Enable to also top up on the same date each month'}
+                  </p>
+                </div>
+              </div>
+
+              {arMsg && (
+                <div className="mt-4 p-3 bg-[var(--success)]/10 border border-[var(--success)]/20 rounded-lg text-[var(--success)] text-sm font-medium">
+                  {arMsg}
+                </div>
+              )}
+              {arError && (
+                <div className="mt-4 p-3 bg-[var(--error)]/5 border border-[var(--error)]/20 rounded-lg text-[var(--error)] text-sm">
+                  {arError}
+                </div>
+              )}
+
+              <div className="mt-5 flex items-center gap-3">
+                <button
+                  onClick={handleArSave}
+                  disabled={!isArDirty || arSaving}
+                  className={`px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                    isArDirty && !arSaving
+                      ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]'
+                      : 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed'
+                  }`}
+                  style={{ fontFamily: 'var(--font-ui)' }}
+                >
+                  {arSaving ? 'Saving…' : 'Save Changes'}
+                </button>
+                {isArDirty && !arSaving && (
+                  <p className="text-xs text-[var(--text-tertiary)]">Unsaved changes</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Trust Indicators */}
         <div className="bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-primary)] p-6 mb-12">
           <div className="grid sm:grid-cols-3 gap-6">
             <div className="flex items-center sm:flex-col sm:justify-center gap-4 sm:gap-3 text-left sm:text-center">
-              <div className="w-10 h-10 bg-[#5BAF8A]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-[#5BAF8A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-[var(--success)]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>

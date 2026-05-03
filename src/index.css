@@ -257,7 +257,7 @@ a {
 
 /* Gradient hero headline text */
 .gradient-text-hero {
-  background: linear-gradient(135deg, #3730A3 0%, #4338CA 50%, #6366F1 100%);
+  background: linear-gradient(135deg, #d4837f 0%, #e8956a 50%, #f0a57e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

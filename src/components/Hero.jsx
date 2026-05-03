@@ -177,10 +177,11 @@ export default function Hero() {
         .hero-desert-bg {
           position: absolute;
           inset: 0;
-          background-image: url('/hero-desert.webp');
+          background-image: url('/hero-desert_upscayl_4x_upscayl-standard-4x.png');
           background-size: cover;
           background-position: center 30%;
-          opacity: 0.55;
+          opacity: 0.80;
+          image-rendering: auto;
           pointer-events: none;
         }
 
@@ -208,8 +209,8 @@ export default function Hero() {
           inset: 0;
           pointer-events: none;
           background:
-            linear-gradient(to right, rgba(30,18,48,0.92) 0%, rgba(30,18,48,0.88) 20%, rgba(30,18,48,0.65) 40%, rgba(30,18,48,0.25) 65%, rgba(30,18,48,0.1) 100%),
-            linear-gradient(to bottom, rgba(30,18,48,0.4) 0%, transparent 30%, transparent 70%, rgba(30,18,48,0.6) 100%);
+            linear-gradient(to right, rgba(30,18,48,0.85) 0%, rgba(30,18,48,0.75) 20%, rgba(30,18,48,0.40) 40%, rgba(30,18,48,0.10) 60%, rgba(30,18,48,0.0) 100%),
+            linear-gradient(to bottom, rgba(30,18,48,0.25) 0%, transparent 20%, transparent 75%, rgba(30,18,48,0.45) 100%);
         }
 
         /* Warm golden hour haze */
@@ -283,6 +284,9 @@ export default function Hero() {
           0%, 100% { opacity: 1; } 50% { opacity: 0; }
         }
 
+        /* Hide scrollbar in chat panel */
+        .hero-chat-card div::-webkit-scrollbar { display: none; }
+
         /* Chat glass card */
         .hero-chat-card {
           background: rgba(30,20,48,0.8);
@@ -301,17 +305,27 @@ export default function Hero() {
           align-items: center;
           gap: 10px;
           padding: 8px 8px 8px 16px;
-          background: rgba(30,20,48,0.65);
+          background: rgba(42,26,64,0.72);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1.5px solid rgba(255,255,255,0.1);
+          border: 1.5px solid rgba(255,255,255,0.12);
           border-radius: 9999px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.25);
           transition: border-color 200ms ease, box-shadow 200ms ease;
         }
 
         .hero-chat-pill:focus-within {
           border-color: var(--hero-glow) !important;
-          box-shadow: 0 0 0 3px rgba(232,149,106,0.1), 0 2px 20px rgba(0,0,0,0.2) !important;
+          box-shadow: 0 0 0 3px rgba(232,149,106,0.12), 0 4px 24px rgba(0,0,0,0.4) !important;
+        }
+
+        /* Right-side chat panel slide-in */
+        @keyframes heroPanelSlideIn {
+          from { opacity: 0; transform: translateX(30px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .hero-chat-panel-right {
+          animation: heroPanelSlideIn 360ms cubic-bezier(0.34,1.1,0.64,1);
         }
 
         /* Markdown in dark mode */
@@ -338,6 +352,16 @@ export default function Hero() {
         .hero-md-dark pre code { background: none; padding: 0; color: var(--hero-fg); }
         .hero-md-dark strong { font-weight: 600; color: var(--hero-fg); }
         .hero-md-dark a { color: var(--hero-glow); text-decoration: underline; }
+
+        @keyframes heroFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+
+        @keyframes heroPanelIn {
+          from { opacity: 0; transform: translate(-50%, calc(-50% + 20px)); }
+          to   { opacity: 1; transform: translate(-50%, -50%); }
+        }
 
         /* Hero content fade-in */
         .hero-fade-1 { animation: heroFadeUp 600ms ease both; }
@@ -369,8 +393,11 @@ export default function Hero() {
 
         {/* Content */}
         <section className="relative z-10 w-full min-h-screen flex items-center pt-20 pb-16">
-          <div className="container mx-auto max-w-4xl px-6 sm:px-8 lg:px-12">
-            <div className="flex flex-col items-start">
+          <div className="px-6 sm:px-8 lg:px-16 w-full">
+            <div className="flex items-start" style={{ gap: 48 }}>
+
+              {/* Left column — fixed, never shrinks */}
+              <div className="flex flex-col items-start" style={{ flex: 'none' }}>
 
               {/* Label */}
               <p
@@ -456,113 +483,9 @@ export default function Hero() {
                 </button>
               </div>
 
-              {/* Ask Herma chat */}
-              <div className="hero-fade-5 w-full max-w-xl">
-
-                {/* Response card */}
-                {hasMessages && (
-                  <div className="hero-chat-card mb-2">
-                    <div
-                      className="flex items-center gap-2 px-4 py-2.5"
-                      style={{ borderBottom: '1px solid var(--hero-border)' }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--hero-glow)" style={{ flexShrink: 0 }}>
-                        <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-                      </svg>
-                      <span style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 600, color: 'var(--hero-fg)' }}>
-                        Herma
-                      </span>
-                      {isStreaming && (
-                        <span style={{ fontSize: 11, color: 'var(--hero-fg-dim)' }}>thinking...</span>
-                      )}
-                      <button
-                        className="hero-action-btn ml-auto"
-                        onClick={clear}
-                        aria-label="Close"
-                        style={{
-                          width: 28, height: 28, borderRadius: 8, border: 'none',
-                          background: 'transparent', cursor: 'pointer',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: 'var(--hero-fg-dim)', transition: 'all 150ms',
-                        }}
-                      >
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div
-                      ref={scrollRef}
-                      style={{ maxHeight: 240, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}
-                    >
-                      {messages.map((msg) => {
-                        const isUser = msg.role === 'user';
-                        return (
-                          <div key={msg.id} style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
-                            {isUser ? (
-                              <div style={{
-                                maxWidth: '80%',
-                                background: 'var(--hero-glow)',
-                                color: 'var(--hero-bg)',
-                                borderRadius: '16px 16px 4px 16px',
-                                padding: '7px 12px',
-                                fontFamily: 'var(--font-ui)', fontSize: 13,
-                                lineHeight: 1.5, wordBreak: 'break-word', fontWeight: 500,
-                              }}>
-                                {msg.content}
-                              </div>
-                            ) : (
-                              <div style={{ maxWidth: '90%', fontFamily: 'var(--font-ui)', fontSize: 14, lineHeight: 1.7, color: 'var(--hero-fg)' }}>
-                                {msg.content === '' && msg.streaming ? (
-                                  <WaitingDots />
-                                ) : (
-                                  <>
-                                    <div className="hero-md-dark" style={{ wordBreak: 'break-word' }}>
-                                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                                    </div>
-                                    {msg.streaming && msg.content && (
-                                      <span style={{
-                                        display: 'inline-block', width: 2, height: '1em',
-                                        background: 'var(--hero-glow)', marginLeft: 2,
-                                        verticalAlign: 'text-bottom',
-                                        animation: 'heroCursor 1s step-end infinite',
-                                      }} />
-                                    )}
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {error && (
-                        <div role="alert" style={{
-                          padding: '7px 11px', borderRadius: 8,
-                          background: 'rgba(220,38,38,0.1)',
-                          border: '1px solid rgba(220,38,38,0.2)',
-                          fontFamily: 'var(--font-ui)', fontSize: 13,
-                          color: '#f87171',
-                        }}>
-                          {error === 'rate_limit' ? (
-                            <>Demo limit reached.{' '}
-                              <button onClick={() => navigate('/login?signup=true')} style={{ color: 'var(--hero-glow)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-ui)', padding: 0, textDecoration: 'underline' }}>
-                                Sign up free
-                              </button>
-                              {' '}for unlimited access.</>
-                          ) : error}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Input pill */}
+              {/* Ask Herma input pill — only shown in left col before first message */}
+              <div className="hero-fade-5 w-full max-w-xl" style={{ display: hasMessages ? 'none' : undefined }}>
                 <div className="hero-chat-pill">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--hero-glow)" style={{ flexShrink: 0 }}>
-                    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-                  </svg>
 
                   <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
                     <input
@@ -637,6 +560,184 @@ export default function Hero() {
                 </div>
               </div>
 
+              </div>{/* end left column */}
+
+              {/* Right column — slides into the empty space, never displaces left content */}
+              <div style={{
+                flex: '1 1 0',
+                minWidth: 0,
+                opacity: hasMessages ? 1 : 0,
+                pointerEvents: hasMessages ? 'auto' : 'none',
+                transform: hasMessages ? 'translateX(0)' : 'translateX(40px)',
+                transition: 'opacity 300ms ease 80ms, transform 380ms cubic-bezier(0.34,1.1,0.64,1)',
+                alignSelf: 'center',
+              }}>
+                {hasMessages && (
+                  <div
+                    className="hero-chat-card hero-chat-panel-right"
+                    style={{ maxHeight: '65vh', display: 'flex', flexDirection: 'column' }}
+                  >
+                    {/* Header */}
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '12px 16px',
+                      borderBottom: '1px solid var(--hero-border)',
+                      flexShrink: 0,
+                    }}>
+                      <span style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 600, color: 'var(--hero-fg)' }}>
+                        Herma
+                      </span>
+                      {isStreaming && (
+                        <span style={{ fontSize: 11, color: 'var(--hero-fg-dim)' }}>thinking…</span>
+                      )}
+                      <button
+                        className="hero-action-btn"
+                        onClick={clear}
+                        aria-label="Clear chat"
+                        style={{
+                          marginLeft: 'auto',
+                          width: 28, height: 28, borderRadius: 8, border: 'none',
+                          background: 'transparent', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'var(--hero-fg-dim)', transition: 'all 150ms',
+                        }}
+                      >
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Messages */}
+                    <div
+                      ref={scrollRef}
+                      aria-live="polite"
+                      style={{ flex: 1, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 16, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                      {messages.map((msg) => {
+                        const isUser = msg.role === 'user';
+                        return (
+                          <div key={msg.id} style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+                            {isUser ? (
+                              <div style={{
+                                maxWidth: '80%',
+                                background: 'var(--hero-glow)',
+                                color: 'var(--hero-bg)',
+                                borderRadius: '16px 16px 4px 16px',
+                                padding: '8px 14px',
+                                fontFamily: 'var(--font-ui)', fontSize: 14,
+                                lineHeight: 1.5, wordBreak: 'break-word', fontWeight: 500,
+                              }}>
+                                {msg.content}
+                              </div>
+                            ) : (
+                              <div style={{ fontFamily: 'var(--font-body)', fontSize: 15, lineHeight: 1.75, color: 'var(--hero-fg)' }}>
+                                {msg.content === '' && msg.streaming ? (
+                                  <WaitingDots />
+                                ) : (
+                                  <>
+                                    <div className="hero-md-dark" style={{ wordBreak: 'break-word' }}>
+                                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                                    </div>
+                                    {msg.streaming && msg.content && (
+                                      <span style={{
+                                        display: 'inline-block', width: 2, height: '1em',
+                                        background: 'var(--hero-glow)', marginLeft: 2,
+                                        verticalAlign: 'text-bottom',
+                                        animation: 'heroCursor 1s step-end infinite',
+                                      }} />
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+
+                      {error && (
+                        <div role="alert" style={{
+                          padding: '7px 11px', borderRadius: 8,
+                          background: 'rgba(220,38,38,0.1)',
+                          border: '1px solid rgba(220,38,38,0.2)',
+                          fontFamily: 'var(--font-ui)', fontSize: 13,
+                          color: '#f87171',
+                        }}>
+                          {error === 'rate_limit' ? (
+                            <>Demo limit reached.{' '}
+                              <button onClick={() => navigate('/login?signup=true')} style={{ color: 'var(--hero-glow)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-ui)', padding: 0, textDecoration: 'underline' }}>
+                                Sign up free
+                              </button>
+                              {' '}for unlimited access.</>
+                          ) : error}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Input pill — moves here once chat is open */}
+                    <div style={{ padding: '10px 12px', borderTop: '1px solid var(--hero-border)', flexShrink: 0 }}>
+                      <div className="hero-chat-pill" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                              <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
+                          <input
+                            ref={inputRef}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            onFocus={() => setInputFocused(true)}
+                            onBlur={() => setInputFocused(false)}
+                            placeholder="Ask a follow-up…"
+                            disabled={isStreaming}
+                            aria-label="Ask Herma a follow-up question"
+                            style={{
+                              width: '100%', border: 'none', outline: 'none',
+                              background: 'transparent',
+                              fontFamily: 'var(--font-ui)', fontSize: 14,
+                              color: 'var(--hero-fg)',
+                            }}
+                          />
+                        </div>
+                        {isStreaming ? (
+                          <button
+                            onClick={stop}
+                            aria-label="Stop generating"
+                            style={{
+                              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                              border: '1.5px solid var(--hero-border-strong)',
+                              background: 'transparent', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: 'var(--hero-fg-muted)', transition: 'all 150ms',
+                            }}
+                          >
+                            <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24">
+                              <rect x="3" y="3" width="18" height="18" rx="3" />
+                            </svg>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => submit(inputValue)}
+                            disabled={!canSend}
+                            aria-label="Send"
+                            style={{
+                              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                              border: 'none',
+                              background: canSend ? 'var(--hero-glow)' : 'var(--hero-border)',
+                              color: canSend ? 'var(--hero-bg)' : 'var(--hero-fg-dim)',
+                              cursor: canSend ? 'pointer' : 'default',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              transition: 'all 150ms ease',
+                            }}
+                          >
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19V5M5 12l7-7 7 7" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         </section>
@@ -650,6 +751,7 @@ export default function Hero() {
           <span>&copy; 2026 Herma AI</span>
         </div>
       </div>
+
     </>
   );
 }

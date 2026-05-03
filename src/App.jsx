@@ -161,15 +161,14 @@ const Home = () => {
   }, []);
 
   return (
-    <AskHermaProvider>
+    <>
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
       <BenchmarkTrust />
       <FAQAccordion />
       <MobileStickyCTA />
-      <AskHermaWidget />
-    </AskHermaProvider>
+    </>
   );
 };
 
@@ -187,6 +186,7 @@ function App() {
   return (
     <Router>
       <HermaAuthProvider>
+        <AskHermaProvider>
         <ErrorBoundary>
           <div className="app">
             <RouteTracker />
@@ -257,8 +257,10 @@ function App() {
               </Routes>
             </Suspense>
             <ConditionalFooter />
+            <AskHermaWidget />
           </div>
         </ErrorBoundary>
+        </AskHermaProvider>
       </HermaAuthProvider>
     </Router>
   );

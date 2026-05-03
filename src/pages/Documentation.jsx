@@ -146,9 +146,9 @@ const Documentation = () => {
             Herma provides an OpenAI-compatible API. Change two lines of code and you're up and running.
           </p>
           <div
-            className="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-[#5BAF8A]/10 border border-[#5BAF8A]/20 rounded-lg"
+            className="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-[var(--success)]/10 border border-[var(--success)]/20 rounded-lg"
           >
-            <span className="text-[#5BAF8A] text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
+            <span className="text-[var(--success)] text-sm font-medium" style={{ fontFamily: 'var(--font-ui)' }}>
               Pricing: $2/M input tokens, $8/M output tokens | no minimums
             </span>
           </div>
@@ -633,7 +633,7 @@ aider --model herma-auto
           >
             <div className="flex items-center gap-3 mb-3">
               <span
-                className="px-2.5 py-1 bg-[#5BAF8A]/10 text-[#5BAF8A] text-xs font-bold rounded"
+                className="px-2.5 py-1 bg-[var(--success)]/10 text-[var(--success)] text-xs font-bold rounded"
                 style={{ fontFamily: 'var(--font-code)' }}
               >
                 POST

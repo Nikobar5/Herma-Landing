@@ -21,7 +21,7 @@ const MobileStickyCTA = () => {
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 animate-slide-up">
       <div
         className="bg-[var(--bg-primary)] border-t border-[var(--border-secondary)] px-4 py-3"
-        style={{ boxShadow: '0 -4px 20px rgba(99, 102, 241, 0.12)' }}
+        style={{ boxShadow: '0 -4px 20px rgba(232, 149, 106, 0.18)' }}
       >
         <button
           onClick={() => navigate(isAuthenticated ? '/dashboard' : '/upgrade')}

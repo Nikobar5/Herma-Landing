@@ -108,7 +108,7 @@ const Usage = () => {
                       {log.latency_ms}ms
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <span className={`inline-flex w-2.5 h-2.5 rounded-full ${log.status === 'success' ? 'bg-[#5BAF8A] shadow-[0_0_8px_rgba(91,175,138,0.4)]' : 'bg-red-400'}`} title={log.status} />
+                      <span className={`inline-flex w-2.5 h-2.5 rounded-full ${log.status === 'success' ? 'bg-[var(--success)] shadow-[0_0_8px_rgba(91,175,138,0.4)]' : 'bg-red-400'}`} title={log.status} />
                     </td>
                   </tr>
                 ))
