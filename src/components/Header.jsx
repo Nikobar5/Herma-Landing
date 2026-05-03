@@ -92,7 +92,7 @@ const Header = () => {
                 }`}
                 style={{
                   fontFamily: 'var(--font-ui)',
-                  ...(isOverDark ? { background: 'var(--hero-gold)' } : {}),
+                  ...(isOverDark ? { background: 'var(--hero-glow)' } : {}),
                 }}
               >
                 <span className="text-sm">{isAuthenticated ? 'Dashboard' : 'Login'}</span>

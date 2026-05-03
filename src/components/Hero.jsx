@@ -173,6 +173,27 @@ export default function Hero() {
           overflow: hidden;
         }
 
+        /* Purple desert background image */
+        .hero-desert-bg {
+          position: absolute;
+          inset: 0;
+          background-image: url('/hero-desert.webp');
+          background-size: cover;
+          background-position: center 40%;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+
+        /* Gradient overlay: solid dark on left for text, fades to transparent on right for desert */
+        .hero-desert-overlay {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            linear-gradient(to right, var(--hero-bg) 0%, var(--hero-bg) 15%, rgba(14,12,20,0.85) 35%, rgba(14,12,20,0.4) 65%, rgba(14,12,20,0.2) 100%),
+            linear-gradient(to bottom, rgba(14,12,20,0.6) 0%, rgba(14,12,20,0.1) 40%, rgba(14,12,20,0.5) 100%);
+        }
+
         /* Atmospheric layers */
         .hero-atmosphere {
           position: absolute;
@@ -203,8 +224,8 @@ export default function Hero() {
           right: 0;
           height: 30%;
           background:
-            radial-gradient(ellipse 70% 45% at 65% 80%, rgba(232,181,71,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 90% 30% at 50% 90%, rgba(232,181,71,0.06) 0%, transparent 60%);
+            radial-gradient(ellipse 70% 45% at 65% 80%, rgba(232,149,106,0.12) 0%, transparent 70%),
+            radial-gradient(ellipse 90% 30% at 50% 90%, rgba(232,149,106,0.06) 0%, transparent 60%);
         }
 
         /* Cloud layer */
@@ -258,7 +279,7 @@ export default function Hero() {
           right: 10%;
           width: 45%;
           height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(232,181,71,0.2) 30%, rgba(232,181,71,0.08) 70%, transparent 100%);
+          background: linear-gradient(90deg, transparent 0%, rgba(232,149,106,0.2) 30%, rgba(232,149,106,0.08) 70%, transparent 100%);
           transform: rotate(-3deg);
         }
 
@@ -268,7 +289,7 @@ export default function Hero() {
           right: 25%;
           width: 30%;
           height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(232,181,71,0.12) 40%, rgba(232,181,71,0.04) 80%, transparent 100%);
+          background: linear-gradient(90deg, transparent 0%, rgba(232,149,106,0.12) 40%, rgba(232,149,106,0.04) 80%, transparent 100%);
           transform: rotate(-5deg);
         }
 
@@ -302,7 +323,7 @@ export default function Hero() {
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: var(--hero-gold);
+          background: var(--hero-glow);
           display: inline-block;
           opacity: 0.4;
           animation: heroDotPulse 1.2s ease-in-out infinite;
@@ -351,8 +372,8 @@ export default function Hero() {
         }
 
         .hero-chat-pill:focus-within {
-          border-color: var(--hero-gold) !important;
-          box-shadow: 0 0 0 3px rgba(232,181,71,0.1), 0 2px 20px rgba(0,0,0,0.2) !important;
+          border-color: var(--hero-glow) !important;
+          box-shadow: 0 0 0 3px rgba(232,149,106,0.1), 0 2px 20px rgba(0,0,0,0.2) !important;
         }
 
         /* Markdown in dark mode */
@@ -361,12 +382,12 @@ export default function Hero() {
         .hero-md-dark ul, .hero-md-dark ol { margin: 4px 0 8px; padding-left: 18px; }
         .hero-md-dark li { margin: 2px 0; }
         .hero-md-dark code {
-          background: rgba(232,181,71,0.1);
+          background: rgba(232,149,106,0.1);
           border-radius: 4px;
           padding: 1px 5px;
           font-family: var(--font-code);
           font-size: 0.88em;
-          color: var(--hero-gold);
+          color: var(--hero-glow);
         }
         .hero-md-dark pre {
           background: rgba(0,0,0,0.3);
@@ -378,7 +399,7 @@ export default function Hero() {
         }
         .hero-md-dark pre code { background: none; padding: 0; color: var(--hero-fg); }
         .hero-md-dark strong { font-weight: 600; color: var(--hero-fg); }
-        .hero-md-dark a { color: var(--hero-gold); text-decoration: underline; }
+        .hero-md-dark a { color: var(--hero-glow); text-decoration: underline; }
 
         /* Hero content fade-in */
         .hero-fade-1 { animation: heroFadeUp 600ms ease both; }
@@ -397,7 +418,11 @@ export default function Hero() {
       `}</style>
 
       <div id="hero-section" className="hero-dark">
-        {/* Atmospheric background */}
+        {/* Desert background */}
+        <div className="hero-desert-bg" />
+        <div className="hero-desert-overlay" />
+
+        {/* Atmospheric layers */}
         <div className="hero-atmosphere" />
         <div className="hero-clouds" />
         <StarField />
@@ -423,7 +448,7 @@ export default function Hero() {
               <h1 className="hero-fade-2 mb-6 leading-[1.02] tracking-[-0.01em]" style={{ fontFamily: 'var(--font-serif)' }}>
                 <span
                   className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium italic"
-                  style={{ color: 'var(--hero-gold)' }}
+                  style={{ color: 'var(--hero-glow)' }}
                 >
                   Same quality.
                 </span>
@@ -451,11 +476,11 @@ export default function Hero() {
                   className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
                   style={{
                     fontFamily: 'var(--font-heading)',
-                    background: 'var(--hero-gold)',
+                    background: 'var(--hero-glow)',
                     color: 'var(--hero-bg)',
                   }}
-                  onMouseEnter={(e) => e.target.style.background = 'var(--hero-gold-hover)'}
-                  onMouseLeave={(e) => e.target.style.background = 'var(--hero-gold)'}
+                  onMouseEnter={(e) => e.target.style.background = 'var(--hero-glow-hover)'}
+                  onMouseLeave={(e) => e.target.style.background = 'var(--hero-glow)'}
                 >
                   <span className="flex items-center gap-2">
                     {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
@@ -488,7 +513,7 @@ export default function Hero() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
-                        Prompt for LLMs
+                        Prompt for Agents
                       </>
                     )}
                   </span>
@@ -505,7 +530,7 @@ export default function Hero() {
                       className="flex items-center gap-2 px-4 py-2.5"
                       style={{ borderBottom: '1px solid var(--hero-border)' }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--hero-gold)" style={{ flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--hero-glow)" style={{ flexShrink: 0 }}>
                         <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
                       </svg>
                       <span style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 600, color: 'var(--hero-fg)' }}>
@@ -542,7 +567,7 @@ export default function Hero() {
                             {isUser ? (
                               <div style={{
                                 maxWidth: '80%',
-                                background: 'var(--hero-gold)',
+                                background: 'var(--hero-glow)',
                                 color: 'var(--hero-bg)',
                                 borderRadius: '16px 16px 4px 16px',
                                 padding: '7px 12px',
@@ -563,7 +588,7 @@ export default function Hero() {
                                     {msg.streaming && msg.content && (
                                       <span style={{
                                         display: 'inline-block', width: 2, height: '1em',
-                                        background: 'var(--hero-gold)', marginLeft: 2,
+                                        background: 'var(--hero-glow)', marginLeft: 2,
                                         verticalAlign: 'text-bottom',
                                         animation: 'heroCursor 1s step-end infinite',
                                       }} />
@@ -586,7 +611,7 @@ export default function Hero() {
                         }}>
                           {error === 'rate_limit' ? (
                             <>Demo limit reached.{' '}
-                              <button onClick={() => navigate('/login?signup=true')} style={{ color: 'var(--hero-gold)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-ui)', padding: 0, textDecoration: 'underline' }}>
+                              <button onClick={() => navigate('/login?signup=true')} style={{ color: 'var(--hero-glow)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-ui)', padding: 0, textDecoration: 'underline' }}>
                                 Sign up free
                               </button>
                               {' '}for unlimited access.</>
@@ -599,7 +624,7 @@ export default function Hero() {
 
                 {/* Input pill */}
                 <div className="hero-chat-pill">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--hero-gold)" style={{ flexShrink: 0 }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--hero-glow)" style={{ flexShrink: 0 }}>
                     <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
                   </svg>
 
@@ -661,7 +686,7 @@ export default function Hero() {
                       style={{
                         width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                         border: 'none',
-                        background: canSend ? 'var(--hero-gold)' : 'var(--hero-border)',
+                        background: canSend ? 'var(--hero-glow)' : 'var(--hero-border)',
                         color: canSend ? 'var(--hero-bg)' : 'var(--hero-fg-dim)',
                         cursor: canSend ? 'pointer' : 'default',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
