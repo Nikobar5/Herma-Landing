@@ -169,153 +169,91 @@ export default function Hero() {
         .hero-dark {
           position: relative;
           min-height: 100vh;
-          background: var(--hero-bg);
+          background: #1a1230;
           overflow: hidden;
         }
 
-        /* Purple desert background image */
+        /* Purple desert background image — golden hour, more visible */
         .hero-desert-bg {
           position: absolute;
           inset: 0;
           background-image: url('/hero-desert.webp');
           background-size: cover;
-          background-position: center 40%;
-          opacity: 0.35;
+          background-position: center 30%;
+          opacity: 0.55;
           pointer-events: none;
         }
 
-        /* Gradient overlay: solid dark on left for text, fades to transparent on right for desert */
+        /* Golden hour sky gradient layered behind the image */
+        .hero-sky {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            linear-gradient(to bottom,
+              #2a1a40 0%,
+              #3d2555 15%,
+              #5c3a6e 30%,
+              #8b5a7a 45%,
+              #c47e6a 60%,
+              #e8a070 75%,
+              #d4937a 90%,
+              #2a1a35 100%
+            );
+        }
+
+        /* Gradient overlay: readable left side, desert visible on right */
         .hero-desert-overlay {
           position: absolute;
           inset: 0;
           pointer-events: none;
           background:
-            linear-gradient(to right, var(--hero-bg) 0%, var(--hero-bg) 15%, rgba(14,12,20,0.85) 35%, rgba(14,12,20,0.4) 65%, rgba(14,12,20,0.2) 100%),
-            linear-gradient(to bottom, rgba(14,12,20,0.6) 0%, rgba(14,12,20,0.1) 40%, rgba(14,12,20,0.5) 100%);
+            linear-gradient(to right, rgba(30,18,48,0.92) 0%, rgba(30,18,48,0.88) 20%, rgba(30,18,48,0.65) 40%, rgba(30,18,48,0.25) 65%, rgba(30,18,48,0.1) 100%),
+            linear-gradient(to bottom, rgba(30,18,48,0.4) 0%, transparent 30%, transparent 70%, rgba(30,18,48,0.6) 100%);
         }
 
-        /* Atmospheric layers */
+        /* Warm golden hour haze */
         .hero-atmosphere {
           position: absolute;
           inset: 0;
           pointer-events: none;
         }
 
-        /* Desert ground */
         .hero-atmosphere::before {
           content: '';
           position: absolute;
           bottom: 0;
           left: 0;
           right: 0;
-          height: 45%;
+          height: 50%;
           background:
-            radial-gradient(ellipse 120% 60% at 70% 100%, #2a1f3d 0%, transparent 70%),
-            radial-gradient(ellipse 80% 50% at 30% 100%, #1e1830 0%, transparent 65%),
-            radial-gradient(ellipse 140% 40% at 50% 100%, #251d38 0%, transparent 55%);
+            radial-gradient(ellipse 120% 60% at 70% 100%, rgba(196,126,106,0.2) 0%, transparent 70%),
+            radial-gradient(ellipse 80% 50% at 30% 100%, rgba(60,35,70,0.4) 0%, transparent 65%);
         }
 
-        /* Horizon glow */
+        /* Horizon warm glow — stronger for golden hour */
         .hero-atmosphere::after {
           content: '';
           position: absolute;
-          bottom: 28%;
+          bottom: 25%;
           left: 0;
           right: 0;
-          height: 30%;
+          height: 35%;
           background:
-            radial-gradient(ellipse 70% 45% at 65% 80%, rgba(232,149,106,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 90% 30% at 50% 90%, rgba(232,149,106,0.06) 0%, transparent 60%);
+            radial-gradient(ellipse 80% 50% at 60% 80%, rgba(232,160,112,0.2) 0%, transparent 65%),
+            radial-gradient(ellipse 100% 40% at 50% 90%, rgba(212,147,122,0.12) 0%, transparent 55%);
         }
 
-        /* Cloud layer */
+        /* Warm haze on left for text backdrop */
         .hero-clouds {
           position: absolute;
           inset: 0;
           pointer-events: none;
           background:
-            radial-gradient(ellipse 50% 40% at 15% 25%, rgba(30,20,50,0.9) 0%, transparent 70%),
-            radial-gradient(ellipse 60% 35% at 10% 40%, rgba(25,18,42,0.7) 0%, transparent 65%),
-            radial-gradient(ellipse 40% 25% at 75% 20%, rgba(40,30,60,0.4) 0%, transparent 60%),
-            radial-gradient(ellipse 35% 20% at 85% 35%, rgba(35,25,55,0.3) 0%, transparent 55%);
-        }
-
-        /* Dune ridges */
-        .hero-dunes {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 35%;
-          pointer-events: none;
-        }
-
-        .hero-dunes::before {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: -5%;
-          width: 70%;
-          height: 100%;
-          background: radial-gradient(ellipse 100% 80% at 50% 100%, #1c1628 0%, transparent 65%);
-          border-radius: 50% 50% 0 0;
-        }
-
-        .hero-dunes::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          right: -10%;
-          width: 80%;
-          height: 120%;
-          background: radial-gradient(ellipse 100% 70% at 50% 100%, #211a30 0%, transparent 60%);
-          border-radius: 50% 50% 0 0;
-        }
-
-        /* Gold ridge highlight */
-        .hero-ridge {
-          position: absolute;
-          bottom: 32%;
-          right: 10%;
-          width: 45%;
-          height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(232,149,106,0.2) 30%, rgba(232,149,106,0.08) 70%, transparent 100%);
-          transform: rotate(-3deg);
-        }
-
-        .hero-ridge-2 {
-          position: absolute;
-          bottom: 38%;
-          right: 25%;
-          width: 30%;
-          height: 1px;
-          background: linear-gradient(90deg, transparent 0%, rgba(232,149,106,0.12) 40%, rgba(232,149,106,0.04) 80%, transparent 100%);
-          transform: rotate(-5deg);
-        }
-
-        /* Moon */
-        .hero-moon {
-          position: absolute;
-          top: 8%;
-          right: 38%;
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: var(--hero-moon);
-          box-shadow: 0 0 20px 6px rgba(216,201,232,0.15), 0 0 60px 20px rgba(216,201,232,0.05);
-        }
-
-        /* Star twinkle */
-        .hero-star {
-          position: absolute;
-          border-radius: 50%;
-          background: var(--hero-fg);
-          animation: heroTwinkle 3s ease-in-out infinite;
-        }
-
-        @keyframes heroTwinkle {
-          0%, 100% { opacity: var(--tw-opacity, 0.3); }
-          50% { opacity: 0.05; }
+            radial-gradient(ellipse 50% 50% at 10% 35%, rgba(42,26,64,0.8) 0%, transparent 70%),
+            radial-gradient(ellipse 60% 40% at 5% 50%, rgba(35,20,55,0.6) 0%, transparent 65%),
+            radial-gradient(ellipse 45% 30% at 80% 25%, rgba(140,90,120,0.15) 0%, transparent 55%),
+            radial-gradient(ellipse 50% 35% at 90% 60%, rgba(196,126,106,0.1) 0%, transparent 55%);
         }
 
         /* Dot loading */
@@ -347,12 +285,12 @@ export default function Hero() {
 
         /* Chat glass card */
         .hero-chat-card {
-          background: rgba(22,19,30,0.85);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid var(--hero-border);
+          background: rgba(30,20,48,0.8);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.08);
           border-radius: 16px;
-          box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+          box-shadow: 0 4px 30px rgba(0,0,0,0.25);
           animation: heroCardIn 240ms ease;
           overflow: hidden;
         }
@@ -363,10 +301,10 @@ export default function Hero() {
           align-items: center;
           gap: 10px;
           padding: 8px 8px 8px 16px;
-          background: rgba(22,19,30,0.7);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1.5px solid var(--hero-border);
+          background: rgba(30,20,48,0.65);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1.5px solid rgba(255,255,255,0.1);
           border-radius: 9999px;
           transition: border-color 200ms ease, box-shadow 200ms ease;
         }
@@ -418,18 +356,16 @@ export default function Hero() {
       `}</style>
 
       <div id="hero-section" className="hero-dark">
-        {/* Desert background */}
+        {/* Golden hour sky */}
+        <div className="hero-sky" />
+
+        {/* Desert background image */}
         <div className="hero-desert-bg" />
         <div className="hero-desert-overlay" />
 
         {/* Atmospheric layers */}
         <div className="hero-atmosphere" />
         <div className="hero-clouds" />
-        <StarField />
-        <div className="hero-dunes" />
-        <div className="hero-ridge" />
-        <div className="hero-ridge-2" />
-        <div className="hero-moon" />
 
         {/* Content */}
         <section className="relative z-10 w-full min-h-screen flex items-center pt-20 pb-16">
