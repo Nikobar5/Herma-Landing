@@ -56,41 +56,13 @@ const response = await client.chat.completions.create({
 console.log(response.choices[0].message.content);
 \`\`\`
 
-## Setting Up Claude Code to Route Through Herma
-
-If the user wants Claude Code itself (this tool) to route through Herma, add these to \`~/.zshrc\` or \`~/.bashrc\`:
-
-\`\`\`bash
-export ANTHROPIC_BASE_URL="https://api.hermaai.com"
-export ANTHROPIC_AUTH_TOKEN="herma_sk_YOUR_KEY"
-export ANTHROPIC_MODEL="herma-auto"
-\`\`\`
-
-Then open a new terminal and run \`claude\`.
-
-Or use the one-liner installer:
-\`\`\`bash
-curl -fsSL https://api.hermaai.com/install/claude-code | bash -s -- herma_sk_YOUR_KEY
-\`\`\`
-
-> **Why \`ANTHROPIC_AUTH_TOKEN\` and not \`ANTHROPIC_API_KEY\`?** Claude Code treats these differently: \`ANTHROPIC_API_KEY\` triggers Anthropic's OAuth browser login flow. \`ANTHROPIC_AUTH_TOKEN\` sends the value directly as a Bearer token and bypasses OAuth entirely, so Herma's key works without conflict.
-
-> **Already logged into Claude?** No need to log out. \`ANTHROPIC_AUTH_TOKEN\` takes priority over your existing session automatically. To revert to your Claude subscription later, remove the three export lines and open a new terminal.
-
 ## Rules
 
-- Always use \`herma-auto\` as the model. Herma selects the optimal underlying model per request.
+- Always use \`herma-auto\` as the model.
 - Never call \`api.openai.com\` endpoints directly — always use \`https://api.hermaai.com/v1\`.
 - Never hardcode API keys. Always read from the \`HERMA_API_KEY\` environment variable.
 - Streaming (\`stream: true\`) and tool/function calling are fully supported.
 - The API is fully OpenAI-compatible — all standard SDK parameters work unchanged.
-
-## Reference
-
-- Full setup guide (all tools): https://hermaai.com/setup.md
-- API Documentation: https://hermaai.com/docs
-- Pricing: $2/M input tokens, $8/M output tokens
-- Test the router free (no auth required): \`POST https://api.hermaai.com/v1/classify\`
 `;
 
 export const PLACEHOLDER_QUESTIONS = [
@@ -100,30 +72,47 @@ export const PLACEHOLDER_QUESTIONS = [
   'What models does Herma route to?',
   'How do I get an API key?',
   'Is Herma OpenAI compatible?',
-  'Can I use streaming with Herma?',
 ];
-
-// 4-pointed sparkle icon matching Google Gemini aesthetic
-function Sparkle({ size = 16, color = 'var(--accent-primary)' }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0 }}>
-      <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-    </svg>
-  );
-}
 
 function WaitingDots() {
   return (
     <span className="inline-flex items-center gap-[3px]">
       {[0, 1, 2].map((i) => (
-        <span key={i} style={{
-          width: 4, height: 4, borderRadius: '50%',
-          background: 'var(--accent-primary)', display: 'inline-block',
-          opacity: 0.4,
-          animation: `heroDot 1.2s ease-in-out ${i * 0.18}s infinite`,
-        }} />
+        <span key={i} className="hero-dot" style={{ animationDelay: `${i * 0.18}s` }} />
       ))}
     </span>
+  );
+}
+
+function StarField() {
+  const stars = useRef(
+    Array.from({ length: 60 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 55,
+      size: Math.random() * 1.8 + 0.4,
+      opacity: Math.random() * 0.6 + 0.15,
+      delay: Math.random() * 4,
+    }))
+  ).current;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {stars.map((s) => (
+        <div
+          key={s.id}
+          className="hero-star"
+          style={{
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: s.size,
+            height: s.size,
+            opacity: s.opacity,
+            animationDelay: `${s.delay}s`,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -141,7 +130,6 @@ export default function Hero() {
   const scrollRef = useRef(null);
   const hasMessages = messages.length > 0;
 
-  // Rotate placeholder when idle
   useEffect(() => {
     if (inputFocused || inputValue) return;
     const t = setInterval(() => {
@@ -154,7 +142,6 @@ export default function Hero() {
     return () => clearInterval(t);
   }, [inputFocused, inputValue]);
 
-  // Auto-scroll response
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
@@ -179,69 +166,299 @@ export default function Hero() {
   return (
     <>
       <style>{`
-        @keyframes heroDot {
+        .hero-dark {
+          position: relative;
+          min-height: 100vh;
+          background: var(--hero-bg);
+          overflow: hidden;
+        }
+
+        /* Atmospheric layers */
+        .hero-atmosphere {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        /* Desert ground */
+        .hero-atmosphere::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 45%;
+          background:
+            radial-gradient(ellipse 120% 60% at 70% 100%, #2a1f3d 0%, transparent 70%),
+            radial-gradient(ellipse 80% 50% at 30% 100%, #1e1830 0%, transparent 65%),
+            radial-gradient(ellipse 140% 40% at 50% 100%, #251d38 0%, transparent 55%);
+        }
+
+        /* Horizon glow */
+        .hero-atmosphere::after {
+          content: '';
+          position: absolute;
+          bottom: 28%;
+          left: 0;
+          right: 0;
+          height: 30%;
+          background:
+            radial-gradient(ellipse 70% 45% at 65% 80%, rgba(232,181,71,0.12) 0%, transparent 70%),
+            radial-gradient(ellipse 90% 30% at 50% 90%, rgba(232,181,71,0.06) 0%, transparent 60%);
+        }
+
+        /* Cloud layer */
+        .hero-clouds {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            radial-gradient(ellipse 50% 40% at 15% 25%, rgba(30,20,50,0.9) 0%, transparent 70%),
+            radial-gradient(ellipse 60% 35% at 10% 40%, rgba(25,18,42,0.7) 0%, transparent 65%),
+            radial-gradient(ellipse 40% 25% at 75% 20%, rgba(40,30,60,0.4) 0%, transparent 60%),
+            radial-gradient(ellipse 35% 20% at 85% 35%, rgba(35,25,55,0.3) 0%, transparent 55%);
+        }
+
+        /* Dune ridges */
+        .hero-dunes {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 35%;
+          pointer-events: none;
+        }
+
+        .hero-dunes::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: -5%;
+          width: 70%;
+          height: 100%;
+          background: radial-gradient(ellipse 100% 80% at 50% 100%, #1c1628 0%, transparent 65%);
+          border-radius: 50% 50% 0 0;
+        }
+
+        .hero-dunes::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          right: -10%;
+          width: 80%;
+          height: 120%;
+          background: radial-gradient(ellipse 100% 70% at 50% 100%, #211a30 0%, transparent 60%);
+          border-radius: 50% 50% 0 0;
+        }
+
+        /* Gold ridge highlight */
+        .hero-ridge {
+          position: absolute;
+          bottom: 32%;
+          right: 10%;
+          width: 45%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, rgba(232,181,71,0.2) 30%, rgba(232,181,71,0.08) 70%, transparent 100%);
+          transform: rotate(-3deg);
+        }
+
+        .hero-ridge-2 {
+          position: absolute;
+          bottom: 38%;
+          right: 25%;
+          width: 30%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, rgba(232,181,71,0.12) 40%, rgba(232,181,71,0.04) 80%, transparent 100%);
+          transform: rotate(-5deg);
+        }
+
+        /* Moon */
+        .hero-moon {
+          position: absolute;
+          top: 8%;
+          right: 38%;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--hero-moon);
+          box-shadow: 0 0 20px 6px rgba(216,201,232,0.15), 0 0 60px 20px rgba(216,201,232,0.05);
+        }
+
+        /* Star twinkle */
+        .hero-star {
+          position: absolute;
+          border-radius: 50%;
+          background: var(--hero-fg);
+          animation: heroTwinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes heroTwinkle {
+          0%, 100% { opacity: var(--tw-opacity, 0.3); }
+          50% { opacity: 0.05; }
+        }
+
+        /* Dot loading */
+        .hero-dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: var(--hero-gold);
+          display: inline-block;
+          opacity: 0.4;
+          animation: heroDotPulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes heroDotPulse {
           0%, 60%, 100% { opacity: 0.2; transform: scale(0.85); }
           30% { opacity: 1; transform: scale(1); }
         }
+
+        /* Card entrance */
         @keyframes heroCardIn {
           from { opacity: 0; transform: translateY(6px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+
+        /* Cursor blink */
         @keyframes heroCursor {
           0%, 100% { opacity: 1; } 50% { opacity: 0; }
         }
-        .hero-pill:focus-within {
-          border-color: rgba(67,56,202,0.4) !important;
-          box-shadow: 0 0 0 3px rgba(67,56,202,0.08), 0 2px 20px rgba(0,0,0,0.07) !important;
+
+        /* Chat glass card */
+        .hero-chat-card {
+          background: rgba(22,19,30,0.85);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid var(--hero-border);
+          border-radius: 16px;
+          box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+          animation: heroCardIn 240ms ease;
+          overflow: hidden;
         }
-        .hero-action-btn:hover { background: var(--bg-hover) !important; }
-        .hero-send-active:hover { background: var(--accent-hover) !important; }
-        .hero-markdown p { margin: 0 0 8px 0; }
-        .hero-markdown p:last-child { margin-bottom: 0; }
-        .hero-markdown ul, .hero-markdown ol { margin: 4px 0 8px; padding-left: 18px; }
-        .hero-markdown li { margin: 2px 0; }
-        .hero-markdown code { background: rgba(67,56,202,0.08); border-radius: 4px; padding: 1px 5px; font-family: var(--font-code); font-size: 0.88em; }
-        .hero-markdown pre { background: rgba(0,0,0,0.05); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin: 6px 0; }
-        .hero-markdown pre code { background: none; padding: 0; }
-        .hero-markdown strong { font-weight: 600; }
+
+        /* Chat pill input */
+        .hero-chat-pill {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 8px 8px 16px;
+          background: rgba(22,19,30,0.7);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1.5px solid var(--hero-border);
+          border-radius: 9999px;
+          transition: border-color 200ms ease, box-shadow 200ms ease;
+        }
+
+        .hero-chat-pill:focus-within {
+          border-color: var(--hero-gold) !important;
+          box-shadow: 0 0 0 3px rgba(232,181,71,0.1), 0 2px 20px rgba(0,0,0,0.2) !important;
+        }
+
+        /* Markdown in dark mode */
+        .hero-md-dark p { margin: 0 0 8px 0; }
+        .hero-md-dark p:last-child { margin-bottom: 0; }
+        .hero-md-dark ul, .hero-md-dark ol { margin: 4px 0 8px; padding-left: 18px; }
+        .hero-md-dark li { margin: 2px 0; }
+        .hero-md-dark code {
+          background: rgba(232,181,71,0.1);
+          border-radius: 4px;
+          padding: 1px 5px;
+          font-family: var(--font-code);
+          font-size: 0.88em;
+          color: var(--hero-gold);
+        }
+        .hero-md-dark pre {
+          background: rgba(0,0,0,0.3);
+          border-radius: 8px;
+          padding: 10px 12px;
+          overflow-x: auto;
+          margin: 6px 0;
+          border: 1px solid var(--hero-border);
+        }
+        .hero-md-dark pre code { background: none; padding: 0; color: var(--hero-fg); }
+        .hero-md-dark strong { font-weight: 600; color: var(--hero-fg); }
+        .hero-md-dark a { color: var(--hero-gold); text-decoration: underline; }
+
+        /* Hero content fade-in */
+        .hero-fade-1 { animation: heroFadeUp 600ms ease both; }
+        .hero-fade-2 { animation: heroFadeUp 600ms ease 100ms both; }
+        .hero-fade-3 { animation: heroFadeUp 600ms ease 200ms both; }
+        .hero-fade-4 { animation: heroFadeUp 600ms ease 300ms both; }
+        .hero-fade-5 { animation: heroFadeUp 600ms ease 400ms both; }
+
+        @keyframes heroFadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Action btn hover */
+        .hero-action-btn:hover { background: rgba(255,255,255,0.06) !important; }
       `}</style>
 
-      <div id="hero-section" className="relative w-full bg-[var(--bg-primary)] overflow-hidden">
-        <section className="relative w-full min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20">
+      <div id="hero-section" className="hero-dark">
+        {/* Atmospheric background */}
+        <div className="hero-atmosphere" />
+        <div className="hero-clouds" />
+        <StarField />
+        <div className="hero-dunes" />
+        <div className="hero-ridge" />
+        <div className="hero-ridge-2" />
+        <div className="hero-moon" />
 
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[-8%] right-[-4%] w-80 h-80 rounded-full bg-[var(--accent-primary)]/5 blur-3xl" />
-            <div className="absolute bottom-[10%] left-[-6%] w-96 h-96 rounded-full bg-[var(--accent-primary)]/4 blur-3xl" />
-          </div>
+        {/* Content */}
+        <section className="relative z-10 w-full min-h-screen flex items-center pt-20 pb-16">
+          <div className="container mx-auto max-w-4xl px-6 sm:px-8 lg:px-12">
+            <div className="flex flex-col items-start">
 
-          <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col items-center text-center">
-
-              <h1
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-5 leading-[1.1] tracking-tight animate-hero"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
-                <span className="text-[var(--text-primary)]">The AI Gateway</span>
-                <br />
-                <span className="gradient-text-hero">for cost-effective agents</span>
-              </h1>
-
+              {/* Label */}
               <p
-                className="text-base sm:text-lg md:text-xl text-[var(--text-secondary)] mb-8 font-normal max-w-2xl mx-auto leading-relaxed px-2 sm:px-0 animate-hero-delayed"
-                style={{ fontFamily: 'var(--font-body)' }}
+                className="hero-fade-1 text-xs sm:text-sm tracking-[0.2em] uppercase mb-6"
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--hero-fg-dim)' }}
               >
-                Switch your AI calls to Herma and we'll automatically route every request
-                to the most cost-effective model — without losing quality.
+                Herma &middot; Intelligent Model Router
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3 animate-hero-delayed-more">
+              {/* Headline */}
+              <h1 className="hero-fade-2 mb-6 leading-[1.02] tracking-[-0.01em]" style={{ fontFamily: 'var(--font-serif)' }}>
+                <span
+                  className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium italic"
+                  style={{ color: 'var(--hero-gold)' }}
+                >
+                  Same quality.
+                </span>
+                <span
+                  className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium"
+                  style={{ color: 'var(--hero-fg)' }}
+                >
+                  65% less cost.
+                </span>
+              </h1>
+
+              {/* Subtext */}
+              <p
+                className="hero-fade-3 text-base sm:text-lg md:text-xl max-w-xl mb-8 leading-relaxed"
+                style={{ fontFamily: 'var(--font-body)', color: 'var(--hero-fg-muted)' }}
+              >
+                Route every AI call to the cheapest model that matches frontier quality.
+                Drop-in OpenAI compatible. No code changes.
+              </p>
+
+              {/* CTA buttons */}
+              <div className="hero-fade-4 flex flex-col sm:flex-row items-start gap-3 mb-10">
                 <button
                   onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login?signup=true')}
-                  className="px-8 py-3.5 bg-[var(--accent-primary)] text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)] transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/30 focus:ring-offset-2 text-base"
-                  style={{ fontFamily: 'var(--font-heading)' }}
+                  className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    background: 'var(--hero-gold)',
+                    color: 'var(--hero-bg)',
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = 'var(--hero-gold-hover)'}
+                  onMouseLeave={(e) => e.target.style.background = 'var(--hero-gold)'}
                 >
                   <span className="flex items-center gap-2">
-                    {isAuthenticated ? 'Go to Dashboard' : 'Get Started with Herma'}
+                    {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -250,13 +467,18 @@ export default function Hero() {
 
                 <button
                   onClick={handleCopySetup}
-                  className="px-8 py-3.5 border-2 border-[var(--accent-primary)]/40 text-[var(--accent-primary)] font-semibold rounded-xl hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/20 focus:ring-offset-2 text-base"
-                  style={{ fontFamily: 'var(--font-heading)' }}
+                  className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    background: 'transparent',
+                    color: 'var(--hero-fg)',
+                    border: '1px solid var(--hero-border-strong)',
+                  }}
                 >
                   <span className="flex items-center gap-2">
                     {copied ? (
                       <>
-                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#5BAF8A' }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                         </svg>
                         Copied!
@@ -266,72 +488,52 @@ export default function Hero() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
-                        Have your AI setup Herma
+                        Prompt for LLMs
                       </>
                     )}
                   </span>
                 </button>
               </div>
 
-              <p className="text-xs text-[var(--text-tertiary)] mb-8 animate-hero-delayed-more" style={{ fontFamily: 'var(--font-ui)' }}>
-                Free credits to start &middot; No credit card required
-              </p>
+              {/* Ask Herma chat */}
+              <div className="hero-fade-5 w-full max-w-xl">
 
-              {/* ── Inline chat ── */}
-              <div className="w-full max-w-2xl animate-hero-delayed-more">
-
-                {/* Response card — Gemini style */}
+                {/* Response card */}
                 {hasMessages && (
-                  <div
-                    style={{
-                      background: '#fff',
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      borderRadius: 16,
-                      boxShadow: '0 4px 24px rgba(0,0,0,0.09)',
-                      marginBottom: 8,
-                      overflow: 'hidden',
-                      animation: 'heroCardIn 240ms ease',
-                    }}
-                  >
-                    {/* Card header */}
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '10px 14px',
-                      borderBottom: '1px solid rgba(0,0,0,0.06)',
-                    }}>
-                      <Sparkle size={14} />
-                      <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  <div className="hero-chat-card mb-2">
+                    <div
+                      className="flex items-center gap-2 px-4 py-2.5"
+                      style={{ borderBottom: '1px solid var(--hero-border)' }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--hero-gold)" style={{ flexShrink: 0 }}>
+                        <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
+                      </svg>
+                      <span style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 600, color: 'var(--hero-fg)' }}>
                         Herma
                       </span>
                       {isStreaming && (
-                        <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-tertiary)' }}>
-                          thinking…
-                        </span>
+                        <span style={{ fontSize: 11, color: 'var(--hero-fg-dim)' }}>thinking...</span>
                       )}
-                      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 2 }}>
-                        {/* Close button */}
-                        <button
-                          className="hero-action-btn"
-                          onClick={clear}
-                          aria-label="Close"
-                          style={{
-                            width: 28, height: 28, borderRadius: 8, border: 'none',
-                            background: 'transparent', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: 'var(--text-tertiary)', transition: 'all 150ms',
-                          }}
-                        >
-                          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
+                      <button
+                        className="hero-action-btn ml-auto"
+                        onClick={clear}
+                        aria-label="Close"
+                        style={{
+                          width: 28, height: 28, borderRadius: 8, border: 'none',
+                          background: 'transparent', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'var(--hero-fg-dim)', transition: 'all 150ms',
+                        }}
+                      >
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
 
-                    {/* Messages */}
                     <div
                       ref={scrollRef}
-                      style={{ maxHeight: 260, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}
+                      style={{ maxHeight: 240, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}
                     >
                       {messages.map((msg) => {
                         const isUser = msg.role === 'user';
@@ -340,28 +542,28 @@ export default function Hero() {
                             {isUser ? (
                               <div style={{
                                 maxWidth: '80%',
-                                background: 'var(--accent-primary)',
-                                color: '#fff',
+                                background: 'var(--hero-gold)',
+                                color: 'var(--hero-bg)',
                                 borderRadius: '16px 16px 4px 16px',
                                 padding: '7px 12px',
                                 fontFamily: 'var(--font-ui)', fontSize: 13,
-                                lineHeight: 1.5, wordBreak: 'break-word',
+                                lineHeight: 1.5, wordBreak: 'break-word', fontWeight: 500,
                               }}>
                                 {msg.content}
                               </div>
                             ) : (
-                              <div style={{ maxWidth: '90%', fontFamily: 'var(--font-ui)', fontSize: 14, lineHeight: 1.7, color: 'var(--text-primary)' }}>
+                              <div style={{ maxWidth: '90%', fontFamily: 'var(--font-ui)', fontSize: 14, lineHeight: 1.7, color: 'var(--hero-fg)' }}>
                                 {msg.content === '' && msg.streaming ? (
                                   <WaitingDots />
                                 ) : (
                                   <>
-                                    <div className="hero-markdown" style={{ wordBreak: 'break-word' }}>
+                                    <div className="hero-md-dark" style={{ wordBreak: 'break-word' }}>
                                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                                     </div>
                                     {msg.streaming && msg.content && (
                                       <span style={{
                                         display: 'inline-block', width: 2, height: '1em',
-                                        background: 'var(--accent-primary)', marginLeft: 2,
+                                        background: 'var(--hero-gold)', marginLeft: 2,
                                         verticalAlign: 'text-bottom',
                                         animation: 'heroCursor 1s step-end infinite',
                                       }} />
@@ -377,14 +579,14 @@ export default function Hero() {
                       {error && (
                         <div role="alert" style={{
                           padding: '7px 11px', borderRadius: 8,
-                          background: error === 'rate_limit' ? 'var(--bg-hover)' : '#FEF2F2',
-                          border: error === 'rate_limit' ? '1px solid var(--border-primary)' : '1px solid #FECACA',
+                          background: 'rgba(220,38,38,0.1)',
+                          border: '1px solid rgba(220,38,38,0.2)',
                           fontFamily: 'var(--font-ui)', fontSize: 13,
-                          color: error === 'rate_limit' ? 'var(--text-secondary)' : '#DC2626',
+                          color: '#f87171',
                         }}>
                           {error === 'rate_limit' ? (
                             <>Demo limit reached.{' '}
-                              <button onClick={() => navigate('/login?signup=true')} style={{ color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-ui)', padding: 0, textDecoration: 'underline' }}>
+                              <button onClick={() => navigate('/login?signup=true')} style={{ color: 'var(--hero-gold)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-ui)', padding: 0, textDecoration: 'underline' }}>
                                 Sign up free
                               </button>
                               {' '}for unlimited access.</>
@@ -395,22 +597,12 @@ export default function Hero() {
                   </div>
                 )}
 
-                {/* Pill input bar */}
-                <div
-                  className="hero-pill"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '8px 8px 8px 16px',
-                    background: '#fff',
-                    border: '1.5px solid rgba(67,56,202,0.15)',
-                    borderRadius: 9999,
-                    boxShadow: '0 2px 20px rgba(0,0,0,0.07)',
-                    transition: 'border-color 200ms ease, box-shadow 200ms ease',
-                  }}
-                >
-                  <Sparkle size={15} />
+                {/* Input pill */}
+                <div className="hero-chat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--hero-gold)" style={{ flexShrink: 0 }}>
+                    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
+                  </svg>
 
-                  {/* Input with rotating placeholder */}
                   <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
                     <input
                       ref={inputRef}
@@ -426,13 +618,13 @@ export default function Hero() {
                         width: '100%', border: 'none', outline: 'none',
                         background: 'transparent',
                         fontFamily: 'var(--font-ui)', fontSize: 14,
-                        color: 'var(--text-primary)',
+                        color: 'var(--hero-fg)',
                       }}
                     />
                     {!inputValue && !inputFocused && (
                       <span style={{
                         position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
-                        color: 'var(--text-tertiary)',
+                        color: 'var(--hero-fg-dim)',
                         fontFamily: 'var(--font-ui)', fontSize: 14,
                         opacity: phVisible ? 1 : 0,
                         transition: 'opacity 280ms ease',
@@ -445,17 +637,16 @@ export default function Hero() {
                     )}
                   </div>
 
-                  {/* Circular send / stop button */}
                   {isStreaming ? (
                     <button
                       onClick={stop}
                       aria-label="Stop generating"
                       style={{
                         width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                        border: '1.5px solid var(--border-secondary)',
+                        border: '1.5px solid var(--hero-border-strong)',
                         background: 'transparent', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--text-secondary)', transition: 'all 150ms',
+                        color: 'var(--hero-fg-muted)', transition: 'all 150ms',
                       }}
                     >
                       <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24">
@@ -464,15 +655,14 @@ export default function Hero() {
                     </button>
                   ) : (
                     <button
-                      className={canSend ? 'hero-send-active' : ''}
                       onClick={() => submit(inputValue)}
                       disabled={!canSend}
                       aria-label="Send"
                       style={{
                         width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                         border: 'none',
-                        background: canSend ? 'var(--accent-primary)' : '#E5E7EB',
-                        color: canSend ? '#fff' : '#9CA3AF',
+                        background: canSend ? 'var(--hero-gold)' : 'var(--hero-border)',
+                        color: canSend ? 'var(--hero-bg)' : 'var(--hero-fg-dim)',
                         cursor: canSend ? 'pointer' : 'default',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'all 150ms ease',
@@ -484,13 +674,20 @@ export default function Hero() {
                     </button>
                   )}
                 </div>
-
               </div>
-              {/* ───────────────────────────── */}
 
             </div>
           </div>
         </section>
+
+        {/* Bottom bar */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-10 px-6 sm:px-8 lg:px-12 py-5 flex justify-between items-center"
+          style={{ color: 'var(--hero-fg-dim)', fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
+        >
+          <span>OpenAI compatible</span>
+          <span>&copy; 2026 Herma AI</span>
+        </div>
       </div>
     </>
   );

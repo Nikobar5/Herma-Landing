@@ -92,6 +92,19 @@
   --duration-fast: 150ms;
   --duration-normal: 200ms;
   --duration-slow: 300ms;
+
+  /* Dark Hero — "Future Medieval" palette */
+  --hero-bg: #0e0c14;
+  --hero-bg-elev: #16131e;
+  --hero-fg: #ece6d8;
+  --hero-fg-muted: #a59cb1;
+  --hero-fg-dim: #6e6479;
+  --hero-border: #2a2438;
+  --hero-border-strong: #3a3350;
+  --hero-gold: #e8b547;
+  --hero-gold-hover: #f0c35e;
+  --hero-moon: #d8c9e8;
+  --font-serif: 'Playfair Display', Georgia, serif;
 }
 
 body {

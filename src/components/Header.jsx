@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import MenuOverlay from './MenuOverlay';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
@@ -7,138 +7,107 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated } = useHermaAuth();
+
+  const isHome = location.pathname === '/';
+  const isOverDark = isHome && !scrolled;
 
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
+      const isScrolled = window.scrollY > 60;
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setMenuOpen(false);
-      }
+      if (window.innerWidth >= 768) setMenuOpen(false);
     };
-
     window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, []);
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
+  useEffect(() => { setMenuOpen(false); }, []);
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-sm transition-all duration-300 w-full border-b
-        ${scrolled
-            ? 'py-2 bg-[var(--bg-primary)]/95 shadow-lg border-[var(--border-primary)]'
-            : 'py-4 bg-[var(--bg-primary)]/80 border-transparent'
-          }`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 w-full border-b ${
+          isOverDark
+            ? 'py-4 bg-transparent border-transparent'
+            : scrolled
+              ? 'py-2 bg-[var(--bg-primary)]/95 backdrop-blur-sm shadow-lg border-[var(--border-primary)]'
+              : 'py-4 bg-[var(--bg-primary)]/80 backdrop-blur-sm border-transparent'
+        }`}
       >
         <div className="w-full px-6 sm:px-8 lg:px-12">
           <div className="flex justify-between items-center">
-            {/* Logo */}
             <div className="flex items-center relative z-10">
-              <Link
-                to="/"
-                className="flex items-center group"
-                aria-label="Home"
-              >
+              <Link to="/" className="flex items-center group" aria-label="Home">
                 <div className={`h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-lg mr-2 sm:mr-3 transition-all duration-300
-                  group-hover:shadow-lg ${scrolled ? 'scale-90' : ''}`}>
-                  <img
-                    src="/herma-logo.png"
-                    alt="Herma Logo"
-                    className="h-full w-full object-cover"
-                  />
+                  group-hover:shadow-lg ${scrolled ? 'scale-90' : ''} ${isOverDark ? 'brightness-[10]' : ''}`}>
+                  <img src="/herma-logo.png" alt="Herma Logo" className="h-full w-full object-cover" />
                 </div>
-                <div className="flex flex-col items-start">
-                  <span className={`herma-wordmark transition-all duration-300
-                    ${scrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}`}>
-                    <span className="text-[var(--text-primary)]">HΞRMΛ</span>
-                  </span>
-                </div>
+                <span className={`herma-wordmark transition-all duration-300 ${scrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}`}>
+                  <span style={{ color: isOverDark ? 'var(--hero-fg)' : 'var(--text-primary)' }}>HΞRMΛ</span>
+                </span>
               </Link>
             </div>
 
-            {/* Desktop Navigation and Mobile Menu Toggle */}
             <div className="flex items-center gap-2">
-              {/* Auth-aware nav links (desktop) */}
-              <nav className="hidden sm:flex items-center gap-2">
-                <Link
-                  to="/docs"
-                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                  style={{ fontFamily: 'var(--font-ui)' }}
-                >
-                  Docs
-                </Link>
-                <Link
-                  to="/about"
-                  className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                  style={{ fontFamily: 'var(--font-ui)' }}
-                >
-                  About
-                </Link>
-                {!isAuthenticated && (
+              <nav className="hidden sm:flex items-center gap-1">
+                {[
+                  { to: '/docs', label: 'Docs' },
+                  { to: '/about', label: 'About' },
+                  ...(!isAuthenticated ? [{ to: '/upgrade', label: 'Pricing' }] : []),
+                  ...(isAuthenticated ? [{ to: '/chat', label: 'Chat' }] : []),
+                ].map(({ to, label }) => (
                   <Link
-                    to="/upgrade"
-                    className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
+                    key={to}
+                    to={to}
+                    className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+                      isOverDark
+                        ? 'text-[var(--hero-fg-muted)] hover:text-[var(--hero-fg)] hover:bg-white/5'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                    }`}
                     style={{ fontFamily: 'var(--font-ui)' }}
                   >
-                    Pricing
+                    {label}
                   </Link>
-                )}
-                {isAuthenticated && (
-                  <Link
-                    to="/chat"
-                    className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors"
-                    style={{ fontFamily: 'var(--font-ui)' }}
-                  >
-                    Chat
-                  </Link>
-                )}
+                ))}
               </nav>
 
-              {/* CTA Button */}
               <button
                 onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
-                className="hidden sm:flex px-5 py-2 bg-[var(--accent-primary)] text-[var(--text-inverse)] font-medium rounded-full shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)] transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group"
-                style={{ fontFamily: 'var(--font-ui)' }}
+                className={`hidden sm:flex px-5 py-2 font-medium rounded-full transition-all duration-300 hover:-translate-y-0.5 items-center gap-2 group ${
+                  isOverDark
+                    ? 'text-[var(--hero-bg)] shadow-md hover:shadow-lg'
+                    : 'bg-[var(--accent-primary)] text-[var(--text-inverse)] shadow-md hover:shadow-lg hover:bg-[var(--accent-hover)]'
+                }`}
+                style={{
+                  fontFamily: 'var(--font-ui)',
+                  ...(isOverDark ? { background: 'var(--hero-gold)' } : {}),
+                }}
               >
-                <span className="text-sm">
-                  {isAuthenticated ? 'Try it out' : 'Login'}
-                </span>
+                <span className="text-sm">{isAuthenticated ? 'Dashboard' : 'Login'}</span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
 
-              {/* Mobile Menu Button */}
               <button
-                onClick={toggleMenu}
-                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] transition-colors focus:outline-none"
+                onClick={() => setMenuOpen(!menuOpen)}
+                className={`md:hidden w-10 h-10 flex items-center justify-center rounded-full transition-colors focus:outline-none ${
+                  isOverDark
+                    ? 'bg-white/10 text-[var(--hero-fg-muted)] hover:bg-white/15'
+                    : 'bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)]'
+                }`}
                 aria-expanded={menuOpen}
                 aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               >
@@ -151,11 +120,7 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Menu Overlay */}
-      <MenuOverlay
-        isOpen={menuOpen}
-        onClose={closeMenu}
-      />
+      <MenuOverlay isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </>
   );
 };
