@@ -744,10 +744,9 @@ export default function Hero() {
 
         {/* Bottom bar */}
         <div
-          className="absolute bottom-0 left-0 right-0 z-10 px-6 sm:px-8 lg:px-12 py-5 flex justify-between items-center"
+          className="absolute bottom-0 left-0 right-0 z-10 px-6 sm:px-8 lg:px-12 py-5 flex justify-end items-center"
           style={{ color: 'var(--hero-fg-dim)', fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
         >
-          <span>OpenAI compatible</span>
           <span>&copy; 2026 Herma AI</span>
         </div>
       </div>

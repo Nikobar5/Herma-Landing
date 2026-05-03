@@ -112,6 +112,18 @@ Drop a configuration file into your project root so your AI coding assistant aut
 - Codex / Devin / other agents (AGENTS.md): https://hermaai.com/integration/AGENTS.md
 - Environment variables (.env.example): https://hermaai.com/integration/.env.example
 
+## Machine-Readable Content
+
+All content pages are available as raw markdown. Append ?raw to any page URL, or fetch the source file directly.
+
+| Page | Rendered | Raw (URL param) | Raw (static file) |
+|------|----------|-----------------|-------------------|
+| Docs | /docs | /docs?raw | /content/docs.md |
+| About | /about | /about?raw | /content/about.md |
+| FAQ | /faq | /faq?raw | /content/faq.md |
+| Privacy Policy | /privacy-policy | /privacy-policy?raw | /content/privacy-policy.md |
+| Terms of Service | /terms-of-service | /terms-of-service?raw | /content/terms-of-service.md |
+
 ## Links
 - Website: https://hermaai.com
 - Documentation: https://hermaai.com/docs

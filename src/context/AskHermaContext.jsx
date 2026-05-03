@@ -1,21 +1,11 @@
-import React, { createContext, useContext, useState, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
 import { streamDemoChat } from '../services/hermaApi';
 
-const SYSTEM_MESSAGE = {
-  role: 'system',
-  content: `You are Herma's AI assistant on hermaai.com. Your sole purpose is to answer questions about Herma.
+const BASE_SYSTEM_CONTENT = `You are Herma's AI assistant on hermaai.com. Your sole purpose is to answer questions about Herma.
 
 If a user asks anything not related to Herma, do not answer it. Say you can only help with Herma questions and ask what they'd like to know about Herma.
 
-About Herma (the only topics you cover):
-- What it is: an OpenAI-compatible AI gateway that automatically routes every LLM request to the most cost-effective model, saving 60–90% on AI costs while maintaining frontier quality
-- Setup: base URL https://api.hermaai.com/v1, model "herma-auto" — just change the base URL and API key in any OpenAI SDK
-- Pricing: flat $2/M input tokens and $8/M output tokens regardless of which model is used underneath
-- Works with the OpenAI SDK for Python, Node.js, and any OpenAI-compatible library or tool
-- Free credits to start, no credit card required
-
-At the end of every response, add a brief natural CTA encouraging the user to sign up — e.g. "Sign up free at hermaai.com to try it with your own API calls" or "Create a free account to get your API key — no credit card needed." Keep it one sentence, conversational, not salesy.`,
-};
+At the end of every response, add a brief natural CTA encouraging the user to sign up — e.g. "Sign up free at hermaai.com to try it with your own API calls" or "Create a free account to get your API key — no credit card needed." Keep it one sentence, conversational, not salesy.`;
 
 const AskHermaContext = createContext(null);
 
@@ -25,6 +15,14 @@ export function AskHermaProvider({ children }) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
   const abortRef = useRef(null);
+  const knowledgeRef = useRef('');
+
+  useEffect(() => {
+    fetch('/content/knowledge-base.md')
+      .then(r => r.ok ? r.text() : '')
+      .then(text => { knowledgeRef.current = text; })
+      .catch(() => {});
+  }, []);
 
   const submit = useCallback(async (text) => {
     const trimmed = (text || '').trim();
@@ -42,9 +40,13 @@ export function AskHermaProvider({ children }) {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const systemContent = knowledgeRef.current
+      ? `${BASE_SYSTEM_CONTENT}\n\n---\n\n${knowledgeRef.current}`
+      : BASE_SYSTEM_CONTENT;
+
     // Build API messages: system + prior turns (skip empty assistant messages) + new user msg
     const apiMessages = [
-      SYSTEM_MESSAGE,
+      { role: 'system', content: systemContent },
       ...messages
         .filter((m) => !(m.role === 'assistant' && !m.content))
         .map((m) => ({ role: m.role, content: m.content })),

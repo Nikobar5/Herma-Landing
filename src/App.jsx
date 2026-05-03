@@ -6,8 +6,6 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
-import BenchmarkTrust from './components/BenchmarkTrust';
-import FAQAccordion from './components/FAQAccordion';
 import MobileStickyCTA from './components/MobileStickyCTA';
 import AskHermaWidget from './components/AskHermaWidget';
 import { AskHermaProvider } from './context/AskHermaContext';
@@ -37,6 +35,7 @@ const FAQPage = lazy(() => import('./pages/FAQPage'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const Attributions = lazy(() => import('./pages/Attributions'));
+const Benchmarks = lazy(() => import('./pages/Benchmarks'));
 const BlogIndex = lazy(() => import('./pages/blog/BlogIndex'));
 const CostQualityMatrix = lazy(() => import('./pages/blog/CostQualityMatrix'));
 const ShadowRouting = lazy(() => import('./pages/blog/ShadowRouting'));
@@ -165,8 +164,6 @@ const Home = () => {
       <Hero />
       <ValueProposition />
       <HowItWorksSection />
-      <BenchmarkTrust />
-      <FAQAccordion />
       <MobileStickyCTA />
     </>
   );
@@ -251,6 +248,7 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/attributions" element={<Attributions />} />
+                <Route path="/benchmarks" element={<Benchmarks />} />
                 <Route path="/success" element={<SuccessPage />} />
                 <Route path="/cancel" element={<Home />} />
                 <Route path="*" element={<NotFound />} />

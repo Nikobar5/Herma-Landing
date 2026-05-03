@@ -15,6 +15,7 @@ const Footer = () => {
         { label: 'Docs', to: '/docs' },
         { label: 'Chat', to: '/chat' },
         { label: 'Pricing', to: '/upgrade' },
+        { label: 'Benchmarks', to: '/benchmarks' },
       ],
     },
     {
