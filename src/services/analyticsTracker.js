@@ -188,6 +188,90 @@ export function trackPayment(amount) {
   });
 }
 
+export function trackLoginAttempt(method) {
+  send({
+    event_type: 'login_attempt',
+    event_name: method,
+    page_path: window.location.pathname || '/',
+    event_data: { method },
+  });
+  if (window.posthog) window.posthog.capture('login_attempted', { method });
+}
+
+export function trackLoginFailed(method, errorType) {
+  send({
+    event_type: 'login_failed',
+    event_name: method,
+    page_path: window.location.pathname || '/',
+    event_data: { method, error_type: errorType },
+  });
+  if (window.posthog) window.posthog.capture('login_failed', { method, error_type: errorType });
+}
+
+export function trackSignupAttempt() {
+  send({
+    event_type: 'signup_attempt',
+    page_path: window.location.pathname || '/',
+  });
+  if (window.posthog) window.posthog.capture('signup_attempted');
+}
+
+export function trackCheckoutPageViewed() {
+  send({
+    event_type: 'checkout_page_view',
+    page_path: '/upgrade',
+  });
+  if (window.posthog) window.posthog.capture('checkout_page_viewed');
+}
+
+export function trackQuickAmountSelected(amount) {
+  send({
+    event_type: 'click',
+    event_name: 'quick_amount_selected',
+    page_path: '/upgrade',
+    event_data: { amount },
+  });
+  if (window.posthog) window.posthog.capture('quick_amount_selected', { amount });
+}
+
+export function trackAutoRechargeToggled(enabled) {
+  send({
+    event_type: 'click',
+    event_name: 'auto_recharge_toggled',
+    page_path: window.location.pathname || '/',
+    event_data: { enabled },
+  });
+  if (window.posthog) window.posthog.capture('auto_recharge_toggled', { enabled });
+}
+
+export function trackAutoRechargeSaved(settings) {
+  send({
+    event_type: 'form_interaction',
+    event_name: 'auto_recharge_saved',
+    page_path: window.location.pathname || '/',
+    event_data: settings,
+  });
+  if (window.posthog) window.posthog.capture('auto_recharge_saved', settings);
+}
+
+export function trackPaywallShown() {
+  send({
+    event_type: 'paywall_shown',
+    page_path: window.location.pathname || '/',
+  });
+  if (window.posthog) window.posthog.capture('paywall_shown');
+}
+
+export function trackPaywallCTA(action) {
+  send({
+    event_type: 'click',
+    event_name: 'paywall_cta',
+    page_path: window.location.pathname || '/',
+    event_data: { action },
+  });
+  if (window.posthog) window.posthog.capture('paywall_cta_clicked', { action });
+}
+
 export function initAnalytics() {
   // Global error handler
   window.addEventListener('error', (e) => {

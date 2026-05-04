@@ -51,11 +51,11 @@ const Header = () => {
             <div className="flex items-center relative z-10">
               <Link to="/" className="flex items-center group" aria-label="Home">
                 <div className={`h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-lg mr-2 sm:mr-3 transition-all duration-300
-                  group-hover:shadow-lg ${scrolled ? 'scale-90' : ''} ${isOverDark ? 'brightness-[10]' : ''}`}>
+                  group-hover:shadow-lg ${scrolled ? 'scale-90' : ''}`}>
                   <img src="/herma-logo.png" alt="Herma Logo" className="h-full w-full object-cover" />
                 </div>
                 <span className={`herma-wordmark transition-all duration-300 ${scrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}`}>
-                  <span style={{ color: isOverDark ? 'var(--hero-fg)' : 'var(--text-primary)' }}>HΞRMΛ</span>
+                  <span style={{ color: 'var(--text-primary)' }}>HΞRMΛ</span>
                 </span>
               </Link>
             </div>

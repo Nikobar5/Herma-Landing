@@ -60,9 +60,9 @@ const CliLogin = () => {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         // If JWT auth failed, fall back to email/password form
-        if (isAuthenticated && !jwtFailed && (res.status === 401 || res.status === 403)) {
+        if (!jwtFailed && (res.status === 401 || res.status === 403)) {
           setJwtFailed(true);
-          setError('Session expired. Please log in with your email and password.');
+          setError('');
           setLoading(false);
           return;
         }

@@ -35,7 +35,7 @@
     <link rel="alternate" type="application/rss+xml" title="Herma AI Blog" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="dns-prefetch" href="https://api.hermaai.com" />
 
     <!-- PostHog: session replay, UTM attribution, funnel analytics -->
@@ -47,6 +47,14 @@
         session_recording: { maskAllInputs: true },
         capture_pageview: true,
         capture_pageleave: true,
+        loaded: function(ph) {
+          try {
+            var u = JSON.parse(localStorage.getItem('herma_user') || 'null');
+            if (u && u.email && u.email.toLowerCase().endsWith('@hermaai.com')) {
+              ph.opt_out_capturing();
+            }
+          } catch(e) {}
+        }
       });
     </script>
 

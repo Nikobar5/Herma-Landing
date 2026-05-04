@@ -5,12 +5,6 @@ import { PLACEHOLDER_QUESTIONS } from './Hero';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-function Sparkle({ size = 16 }) {
-  return (
-    <img src="/herma-logo.png" alt="Herma" style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
-  );
-}
-
 function WaitingDots() {
   return (
     <span className="inline-flex items-center gap-[3px]">
@@ -56,13 +50,13 @@ export default function AskHermaWidget() {
     return () => obs.disconnect();
   }, [location.pathname]);
 
-  // Open panel (and un-minimize) when messages arrive
+  // Expand panel on every new message (including while minimized)
   useEffect(() => {
-    if (hasMessages) {
+    if (messages.length > 0) {
       setPanelOpen(true);
       setMinimized(false);
     }
-  }, [hasMessages]);
+  }, [messages.length]);
 
   // Escape closes panel
   useEffect(() => {
@@ -121,6 +115,7 @@ export default function AskHermaWidget() {
         .widget-markdown pre code { background: none; padding: 0; }
         .widget-markdown strong { font-weight: 600; }
         .widget-messages::-webkit-scrollbar { display: none; }
+        .widget-messages { scrollbar-width: none; -ms-overflow-style: none; }
         .widget-pill:focus-within {
           border-color: rgba(232,149,106,0.4) !important;
           box-shadow: 0 0 0 3px rgba(232,149,106,0.10), 0 4px 24px rgba(0,0,0,0.30) !important;
@@ -322,7 +317,7 @@ export default function AskHermaWidget() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onFocus={() => { setInputFocused(true); setPanelOpen(true); setMinimized(false); }}
+                onFocus={() => setInputFocused(true)}
                 onBlur={() => setInputFocused(false)}
                 placeholder=""
                 disabled={isStreaming}

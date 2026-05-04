@@ -14,11 +14,17 @@ We're building Herma to be the intelligent layer between people and AI — to co
 
 ## Team
 
+![Niko Barciak](/niko-barciak.jpg)
+
 ### Niko Barciak — Co-Founder & CEO
 
 Computer Science at Georgia Tech. Built an AI agent for The Home Depot's enterprise AI team and has previously worked on making privacy-focused open-source LLMs economically feasible. Also involved in the Georgia Tech Angel Network, helping cultivate the Georgia Tech and Atlanta startup ecosystem across AI, deep tech, space, and other areas. At Herma, Niko leads the development of agentic systems and product.
 
 [LinkedIn](https://www.linkedin.com/in/niko-barciak-6a4302248/)
+
+---
+
+![Nicholas Pianfetti](/nick-pianfetti.jpeg)
 
 ### Nicholas Pianfetti — Co-Founder & CTO
 
