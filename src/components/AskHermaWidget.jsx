@@ -33,6 +33,7 @@ export default function AskHermaWidget() {
 
   const [heroVisible, setHeroVisible] = useState(true);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [phIndex, setPhIndex] = useState(0);
   const [phVisible, setPhVisible] = useState(true);
@@ -40,7 +41,7 @@ export default function AskHermaWidget() {
   const inputRef = useRef(null);
 
   const hasMessages = messages.length > 0;
-  const showPanel = panelOpen || hasMessages;
+  const showPanel = (panelOpen || hasMessages) && !minimized;
   const canSend = inputValue.trim() && !isStreaming;
 
   // Hide widget when hero is in view; show it on all other routes
@@ -55,14 +56,17 @@ export default function AskHermaWidget() {
     return () => obs.disconnect();
   }, [location.pathname]);
 
-  // Open panel when messages arrive
+  // Open panel (and un-minimize) when messages arrive
   useEffect(() => {
-    if (hasMessages) setPanelOpen(true);
+    if (hasMessages) {
+      setPanelOpen(true);
+      setMinimized(false);
+    }
   }, [hasMessages]);
 
   // Escape closes panel
   useEffect(() => {
-    const h = (e) => { if (e.key === 'Escape') { setPanelOpen(false); inputRef.current?.blur(); } };
+    const h = (e) => { if (e.key === 'Escape') { setPanelOpen(false); setMinimized(true); inputRef.current?.blur(); } };
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, []);
@@ -72,9 +76,9 @@ export default function AskHermaWidget() {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
 
-  // Rotate placeholder when idle
+  // Rotate placeholder whenever input is empty (regardless of focus state)
   useEffect(() => {
-    if (inputFocused || inputValue || heroVisible) return;
+    if (inputValue || heroVisible) return;
     const t = setInterval(() => {
       setPhVisible(false);
       setTimeout(() => {
@@ -83,7 +87,7 @@ export default function AskHermaWidget() {
       }, 280);
     }, 3000);
     return () => clearInterval(t);
-  }, [inputFocused, inputValue, heroVisible]);
+  }, [inputValue, heroVisible]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -116,6 +120,7 @@ export default function AskHermaWidget() {
         .widget-markdown pre { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin: 6px 0; }
         .widget-markdown pre code { background: none; padding: 0; }
         .widget-markdown strong { font-weight: 600; }
+        .widget-messages::-webkit-scrollbar { display: none; }
         .widget-pill:focus-within {
           border-color: rgba(232,149,106,0.4) !important;
           box-shadow: 0 0 0 3px rgba(232,149,106,0.10), 0 4px 24px rgba(0,0,0,0.30) !important;
@@ -158,7 +163,6 @@ export default function AskHermaWidget() {
                 padding: '10px 14px',
                 borderBottom: '1px solid var(--border-primary)',
               }}>
-                <Sparkle size={14} />
                 <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
                   Herma
                 </span>
@@ -168,11 +172,11 @@ export default function AskHermaWidget() {
                   </span>
                 )}
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {/* Collapse */}
+                  {/* Minimize */}
                   <button
                     className="widget-action"
-                    onClick={() => { setPanelOpen(false); inputRef.current?.blur(); }}
-                    aria-label="Collapse"
+                    onClick={() => { setMinimized(true); setPanelOpen(false); inputRef.current?.blur(); }}
+                    aria-label="Minimize"
                     style={{
                       width: 28, height: 28, borderRadius: 8, border: 'none',
                       background: 'transparent', cursor: 'pointer',
@@ -208,8 +212,9 @@ export default function AskHermaWidget() {
               {/* Messages */}
               <div
                 ref={scrollRef}
+                className="widget-messages"
                 aria-live="polite"
-                style={{ maxHeight: 280, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}
+                style={{ maxHeight: 280, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {!hasMessages && (
                   <p style={{ margin: 0, fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-tertiary)' }}>
@@ -292,6 +297,24 @@ export default function AskHermaWidget() {
               transition: 'border-color 200ms ease, box-shadow 200ms ease',
             }}
           >
+            {/* Expand button — shown when minimized with existing messages */}
+            {minimized && hasMessages && (
+              <button
+                className="widget-action"
+                onClick={() => { setMinimized(false); setPanelOpen(true); }}
+                aria-label="Expand conversation"
+                style={{
+                  width: 28, height: 28, borderRadius: 8, border: 'none',
+                  background: 'transparent', cursor: 'pointer', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--accent-primary)', transition: 'all 150ms',
+                }}
+              >
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+            )}
             {/* Input with rotating placeholder */}
             <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
               <input
@@ -299,7 +322,7 @@ export default function AskHermaWidget() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onFocus={() => { setInputFocused(true); setPanelOpen(true); }}
+                onFocus={() => { setInputFocused(true); setPanelOpen(true); setMinimized(false); }}
                 onBlur={() => setInputFocused(false)}
                 placeholder=""
                 disabled={isStreaming}
@@ -311,7 +334,7 @@ export default function AskHermaWidget() {
                   color: 'var(--text-primary)',
                 }}
               />
-              {!inputValue && !inputFocused && (
+              {!inputValue && (
                 <span style={{
                   position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
                   color: 'var(--text-tertiary)',

@@ -12,7 +12,6 @@ import EmptyState from '../components/chat/EmptyState';
 import PaywallModal from '../components/chat/PaywallModal';
 import ScrollToBottom from '../components/chat/ScrollToBottom';
 import LowBalanceBanner from '../components/chat/LowBalanceBanner';
-import OnboardingModal, { ONBOARDING_KEY } from '../components/OnboardingModal';
 import { useHermaAuth } from '../context/HermaAuthContext';
 
 const ChatPage = () => {
@@ -51,16 +50,6 @@ const ChatPage = () => {
   const [subscription, setSubscription] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => !!user && !localStorage.getItem(ONBOARDING_KEY)
-  );
-
-  // Edge case: user hydrates after ChatPage mounts (e.g. Google login → dashboard → /chat)
-  useEffect(() => {
-    if (user && !localStorage.getItem(ONBOARDING_KEY)) {
-      setShowOnboarding(true);
-    }
-  }, [user]);
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -134,10 +123,6 @@ const ChatPage = () => {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         collapsed={sidebarCollapsed}
-        onShowGuide={() => {
-          localStorage.removeItem(ONBOARDING_KEY);
-          setShowOnboarding(true);
-        }}
       />
 
       <div className="flex-1 flex flex-col min-w-0 relative h-full">
@@ -250,11 +235,6 @@ const ChatPage = () => {
       </div>
 
       <PaywallModal isOpen={showPaywall} onClose={dismissPaywall} />
-      <OnboardingModal
-        isOpen={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-        userName={user?.name}
-      />
     </div>
   );
 };
