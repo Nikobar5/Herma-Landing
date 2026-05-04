@@ -396,6 +396,33 @@ export default function Hero() {
 
         /* Action btn hover */
         .hero-action-btn:hover { background: rgba(255,255,255,0.06) !important; }
+
+        /* Mobile layout overrides */
+        @media (max-width: 767px) {
+          .hero-layout {
+            flex-direction: column !important;
+            gap: 0 !important;
+          }
+          .hero-left-col {
+            width: 100%;
+          }
+          .hero-right-col {
+            width: 100%;
+            transform: translateY(20px) !important;
+          }
+          .hero-right-col.has-messages {
+            transform: translateY(0) !important;
+          }
+          .hero-desert-overlay {
+            background: rgba(30,18,48,0.72) !important;
+          }
+          .hero-chat-card {
+            max-height: 55vh !important;
+          }
+          /* Input pill appears before CTA buttons on mobile */
+          .hero-input-pill-wrap { order: 1; margin-bottom: 20px; }
+          .hero-cta-btns { order: 2; }
+        }
       `}</style>
 
       <div id="hero-section" className="hero-dark">
@@ -416,10 +443,10 @@ export default function Hero() {
         {/* Content */}
         <section className="relative z-10 w-full min-h-screen flex items-center pt-20 pb-16">
           <div className="px-6 sm:px-8 lg:px-16 w-full">
-            <div className="flex items-start" style={{ gap: 48 }}>
+            <div className="hero-layout flex items-start" style={{ gap: 48 }}>
 
               {/* Left column — fixed, never shrinks */}
-              <div className="flex flex-col items-start" style={{ flex: 'none' }}>
+              <div className="hero-left-col flex flex-col items-start" style={{ flex: 'none' }}>
 
                 {/* Label */}
                 <p
@@ -454,7 +481,7 @@ export default function Hero() {
                 </p>
 
                 {/* CTA buttons */}
-                <div className="hero-fade-4 flex flex-col sm:flex-row items-start gap-3 mb-10">
+                <div className="hero-cta-btns hero-fade-4 flex flex-col sm:flex-row items-start gap-3 mb-10">
                   <button
                     onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login?signup=true')}
                     className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
@@ -505,7 +532,7 @@ export default function Hero() {
                 </div>
 
                 {/* Ask Herma input pill — only shown in left col before first message */}
-                <div className="hero-fade-5 w-full max-w-xl" style={{ display: hasMessages ? 'none' : undefined }}>
+                <div className="hero-input-pill-wrap hero-fade-5 w-full max-w-xl" style={{ display: hasMessages ? 'none' : undefined }}>
                   <div className="hero-chat-pill">
 
                     <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
@@ -584,7 +611,7 @@ export default function Hero() {
               </div>{/* end left column */}
 
               {/* Right column — slides into the empty space, never displaces left content */}
-              <div style={{
+              <div className={`hero-right-col${hasMessages ? ' has-messages' : ''}`} style={{
                 flex: '1 1 0',
                 minWidth: 0,
                 opacity: hasMessages ? 1 : 0,

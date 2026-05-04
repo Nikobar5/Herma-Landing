@@ -40,9 +40,7 @@ export function HermaAuthProvider({ children }) {
       if (token && stored) {
         const parsed = JSON.parse(stored);
         setUser(parsed);
-        if (window.posthog && isInternalUser(parsed.email)) {
-          window.posthog.opt_out_capturing();
-        }
+        posthogIdentify(parsed.customer_id, parsed.email, parsed.name, 'session_restore');
       }
     } catch {
       try {

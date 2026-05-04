@@ -63,20 +63,22 @@ export default function CliInstall() {
           </div>
 
           {/* Command line */}
-          <div className="flex items-center justify-between px-5 py-5">
-            <code
-              className="text-sm sm:text-base"
-              style={{ fontFamily: 'var(--font-code)' }}
-            >
-              <span style={{ color: 'var(--accent-primary)' }}>$ </span>
-              <span style={{ color: 'var(--text-primary)' }}>{INSTALL_COMMAND}</span>
-            </code>
+          <div className="flex items-center gap-3 px-5 py-5">
+            <div className="overflow-x-auto min-w-0 flex-1">
+              <code
+                className="text-sm sm:text-base whitespace-nowrap"
+                style={{ fontFamily: 'var(--font-code)' }}
+              >
+                <span style={{ color: 'var(--accent-primary)' }}>$ </span>
+                <span style={{ color: 'var(--text-primary)' }}>{INSTALL_COMMAND}</span>
+              </code>
+            </div>
 
             {/* Copy button */}
             <button
               onClick={handleCopy}
               aria-label="Copy install command"
-              className="ml-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150"
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150"
               style={{
                 fontFamily: 'var(--font-ui)',
                 background: copied ? 'rgba(91, 175, 138, 0.15)' : 'var(--accent-muted)',

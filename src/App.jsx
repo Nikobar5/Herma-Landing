@@ -76,6 +76,7 @@ const RouteTracker = () => {
   // Track page views on route change
   useEffect(() => {
     trackPageView();
+    if (window.posthog) window.posthog.capture('$pageview');
     if (!location.hash) {
       window.scrollTo(0, 0);
     }

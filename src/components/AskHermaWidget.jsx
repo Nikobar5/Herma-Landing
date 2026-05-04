@@ -120,11 +120,15 @@ export default function AskHermaWidget() {
           border-color: rgba(232,149,106,0.4) !important;
           box-shadow: 0 0 0 3px rgba(232,149,106,0.10), 0 4px 24px rgba(0,0,0,0.30) !important;
         }
+        @media (max-width: 767px) {
+          .widget-hide-mobile { display: none !important; }
+        }
       `}</style>
 
       {/* Fixed centered wrapper — pointerEvents: none so the full-width div never
           blocks sidebar/page elements; only the inner content pill captures clicks */}
       <div
+        className={location.pathname.startsWith('/dashboard') ? 'widget-hide-mobile' : undefined}
         style={{
           position: 'fixed',
           bottom: 0, left: 0, right: 0,
