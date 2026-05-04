@@ -5,6 +5,39 @@ import remarkGfm from 'remark-gfm';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
 import './MarkdownPage.css';
 
+function extractText(node) {
+  if (typeof node === 'string') return node;
+  if (Array.isArray(node)) return node.map(extractText).join('');
+  if (node?.props?.children) return extractText(node.props.children);
+  return '';
+}
+
+function PreBlock({ children }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      const text = extractText(children).replace(/\n$/, '');
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* noop */ }
+  };
+
+  return (
+    <div className="markdown-pre-wrapper">
+      <button
+        onClick={handleCopy}
+        className={`markdown-copy-btn${copied ? ' copied' : ''}`}
+        aria-label="Copy code"
+      >
+        {copied ? '✓ Copied' : 'Copy'}
+      </button>
+      <pre>{children}</pre>
+    </div>
+  );
+}
+
 export default function MarkdownPage({ src, meta }) {
   const [markdown, setMarkdown] = useState('');
   const [loading, setLoading] = useState(true);
@@ -80,7 +113,7 @@ export default function MarkdownPage({ src, meta }) {
         <pre className="markdown-raw-pre">{markdown}</pre>
       ) : (
         <div className="markdown-prose">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ pre: PreBlock }}>{markdown}</ReactMarkdown>
         </div>
       )}
     </main>

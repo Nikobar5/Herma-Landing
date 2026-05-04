@@ -123,6 +123,18 @@ export async function loginWithGoogle(credential) {
   return data;
 }
 
+// --- Session logout ---
+
+export function logoutSession() {
+  const token = getToken();
+  if (!token) return;
+  // Fire-and-forget — don't block the client-side logout on network
+  fetch(`${API_URL}/auth/logout`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  }).catch(() => {});
+}
+
 // --- Email verification ---
 
 export async function verifyEmail(token) {

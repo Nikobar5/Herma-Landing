@@ -210,7 +210,24 @@ export default function Hero() {
           pointer-events: none;
           background:
             linear-gradient(to right, rgba(30,18,48,0.85) 0%, rgba(30,18,48,0.75) 20%, rgba(30,18,48,0.40) 40%, rgba(30,18,48,0.10) 60%, rgba(30,18,48,0.0) 100%),
-            linear-gradient(to bottom, rgba(30,18,48,0.25) 0%, transparent 20%, transparent 75%, rgba(30,18,48,0.45) 100%);
+            linear-gradient(to bottom, rgba(30,18,48,0.25) 0%, transparent 20%, transparent 70%, rgba(30,18,48,0.3) 85%, rgba(30,18,48,0.0) 100%);
+        }
+
+        /* Soften the bottom of the image — bridge in App.jsx finishes the seam */
+        .hero-bottom-fade {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 280px;
+          pointer-events: none;
+          background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(30,18,48,0.5) 50%,
+            rgba(30,18,48,0.9) 100%
+          );
+          z-index: 5;
         }
 
         /* Warm golden hour haze */
@@ -286,6 +303,8 @@ export default function Hero() {
 
         /* Hide scrollbar in chat panel */
         .hero-chat-card div::-webkit-scrollbar { display: none; }
+        .hero-chat-messages { scrollbar-width: none; -ms-overflow-style: none; }
+        .hero-chat-messages::-webkit-scrollbar { display: none; }
 
         /* Chat glass card */
         .hero-chat-card {
@@ -377,6 +396,33 @@ export default function Hero() {
 
         /* Action btn hover */
         .hero-action-btn:hover { background: rgba(255,255,255,0.06) !important; }
+
+        /* Mobile layout overrides */
+        @media (max-width: 767px) {
+          .hero-layout {
+            flex-direction: column !important;
+            gap: 0 !important;
+          }
+          .hero-left-col {
+            width: 100%;
+          }
+          .hero-right-col {
+            width: 100%;
+            transform: translateY(20px) !important;
+          }
+          .hero-right-col.has-messages {
+            transform: translateY(0) !important;
+          }
+          .hero-desert-overlay {
+            background: rgba(30,18,48,0.72) !important;
+          }
+          .hero-chat-card {
+            max-height: 55vh !important;
+          }
+          /* Input pill appears before CTA buttons on mobile */
+          .hero-input-pill-wrap { order: 1; margin-bottom: 20px; }
+          .hero-cta-btns { order: 2; }
+        }
       `}</style>
 
       <div id="hero-section" className="hero-dark">
@@ -391,179 +437,181 @@ export default function Hero() {
         <div className="hero-atmosphere" />
         <div className="hero-clouds" />
 
+        {/* Bottom fade into next section */}
+        <div className="hero-bottom-fade" />
+
         {/* Content */}
         <section className="relative z-10 w-full min-h-screen flex items-center pt-20 pb-16">
           <div className="px-6 sm:px-8 lg:px-16 w-full">
-            <div className="flex items-start" style={{ gap: 48 }}>
+            <div className="hero-layout flex items-start" style={{ gap: 48 }}>
 
               {/* Left column — fixed, never shrinks */}
-              <div className="flex flex-col items-start" style={{ flex: 'none' }}>
+              <div className="hero-left-col flex flex-col items-start" style={{ flex: 'none' }}>
 
-              {/* Label */}
-              <p
-                className="hero-fade-1 text-xs sm:text-sm tracking-[0.2em] uppercase mb-6"
-                style={{ fontFamily: 'var(--font-heading)', color: 'var(--hero-fg-dim)' }}
-              >
-                Herma &middot; Intelligent Model Router
-              </p>
-
-              {/* Headline */}
-              <h1 className="hero-fade-2 mb-6 leading-[1.02] tracking-[-0.01em]" style={{ fontFamily: 'var(--font-serif)' }}>
-                <span
-                  className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium italic"
-                  style={{ color: 'var(--hero-glow)' }}
+                {/* Label */}
+                <p
+                  className="hero-fade-1 text-xs sm:text-sm tracking-[0.2em] uppercase mb-6"
+                  style={{ fontFamily: 'var(--font-heading)', color: 'var(--hero-fg-dim)' }}
                 >
-                  Same quality.
-                </span>
-                <span
-                  className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium"
-                  style={{ color: 'var(--hero-fg)' }}
-                >
-                  65% less cost.
-                </span>
-              </h1>
+                  Herma &middot; Intelligent Model Router
+                </p>
 
-              {/* Subtext */}
-              <p
-                className="hero-fade-3 text-base sm:text-lg md:text-xl max-w-xl mb-8 leading-relaxed"
-                style={{ fontFamily: 'var(--font-body)', color: 'var(--hero-fg-muted)' }}
-              >
-                Route every AI call to the cheapest model that matches frontier quality.
-                Drop-in OpenAI compatible. No code changes.
-              </p>
-
-              {/* CTA buttons */}
-              <div className="hero-fade-4 flex flex-col sm:flex-row items-start gap-3 mb-10">
-                <button
-                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login?signup=true')}
-                  className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    background: 'var(--hero-glow)',
-                    color: 'var(--hero-bg)',
-                  }}
-                  onMouseEnter={(e) => e.target.style.background = 'var(--hero-glow-hover)'}
-                  onMouseLeave={(e) => e.target.style.background = 'var(--hero-glow)'}
-                >
-                  <span className="flex items-center gap-2">
-                    {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
+                {/* Headline */}
+                <h1 className="hero-fade-2 mb-6 leading-[1.05] tracking-[0.01em]" style={{ fontFamily: 'var(--font-serif)' }}>
+                  <span
+                    className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium italic"
+                    style={{ color: 'var(--hero-glow)' }}
+                  >
+                    Same AI quality.
                   </span>
-                </button>
+                  <span
+                    className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-semibold"
+                    style={{ color: 'var(--hero-fg)' }}
+                  >
+                    65% less cost.
+                  </span>
+                </h1>
 
-                <button
-                  onClick={handleCopySetup}
-                  className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    background: 'transparent',
-                    color: 'var(--hero-fg)',
-                    border: '1px solid var(--hero-border-strong)',
-                  }}
+                {/* Subtext */}
+                <p
+                  className="hero-fade-3 text-base sm:text-lg md:text-xl max-w-xl mb-8 leading-relaxed"
+                  style={{ fontFamily: 'var(--font-body)', color: 'var(--hero-fg-muted)' }}
                 >
-                  <span className="flex items-center gap-2">
-                    {copied ? (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#5BAF8A' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  Herma routes every AI call to the most cost effective model for every task without loosing frontier quality.
+                </p>
+
+                {/* CTA buttons */}
+                <div className="hero-cta-btns hero-fade-4 flex flex-col sm:flex-row items-start gap-3 mb-10">
+                  <button
+                    onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login?signup=true')}
+                    className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      background: 'var(--hero-glow)',
+                      color: 'var(--hero-bg)',
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = 'var(--hero-glow-hover)'}
+                    onMouseLeave={(e) => e.target.style.background = 'var(--hero-glow)'}
+                  >
+                    <span className="flex items-center gap-2">
+                      {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={handleCopySetup}
+                    className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      background: 'transparent',
+                      color: 'var(--hero-fg)',
+                      border: '1px solid var(--hero-border-strong)',
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      {copied ? (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#5BAF8A' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Prompt for Agents
+                        </>
+                      )}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Ask Herma input pill — only shown in left col before first message */}
+                <div className="hero-input-pill-wrap hero-fade-5 w-full max-w-xl" style={{ display: hasMessages ? 'none' : undefined }}>
+                  <div className="hero-chat-pill">
+
+                    <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
+                      <input
+                        ref={inputRef}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        onFocus={() => setInputFocused(true)}
+                        onBlur={() => setInputFocused(false)}
+                        placeholder=""
+                        disabled={isStreaming}
+                        aria-label="Ask Herma a question"
+                        style={{
+                          width: '100%', border: 'none', outline: 'none',
+                          background: 'transparent',
+                          fontFamily: 'var(--font-ui)', fontSize: 14,
+                          color: 'var(--hero-fg)',
+                        }}
+                      />
+                      {!inputValue && !inputFocused && (
+                        <span style={{
+                          position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
+                          color: 'var(--hero-fg-dim)',
+                          fontFamily: 'var(--font-ui)', fontSize: 14,
+                          opacity: phVisible ? 1 : 0,
+                          transition: 'opacity 280ms ease',
+                          pointerEvents: 'none',
+                          whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: '100%',
+                          userSelect: 'none',
+                        }}>
+                          {PLACEHOLDER_QUESTIONS[phIndex]}
+                        </span>
+                      )}
+                    </div>
+
+                    {isStreaming ? (
+                      <button
+                        onClick={stop}
+                        aria-label="Stop generating"
+                        style={{
+                          width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                          border: '1.5px solid var(--hero-border-strong)',
+                          background: 'transparent', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'var(--hero-fg-muted)', transition: 'all 150ms',
+                        }}
+                      >
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24">
+                          <rect x="3" y="3" width="18" height="18" rx="3" />
                         </svg>
-                        Copied!
-                      </>
+                      </button>
                     ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      <button
+                        onClick={() => submit(inputValue)}
+                        disabled={!canSend}
+                        aria-label="Send"
+                        style={{
+                          width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                          border: 'none',
+                          background: canSend ? 'var(--hero-glow)' : 'var(--hero-border)',
+                          color: canSend ? 'var(--hero-bg)' : 'var(--hero-fg-dim)',
+                          cursor: canSend ? 'pointer' : 'default',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'all 150ms ease',
+                        }}
+                      >
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19V5M5 12l7-7 7 7" />
                         </svg>
-                        Prompt for Agents
-                      </>
-                    )}
-                  </span>
-                </button>
-              </div>
-
-              {/* Ask Herma input pill — only shown in left col before first message */}
-              <div className="hero-fade-5 w-full max-w-xl" style={{ display: hasMessages ? 'none' : undefined }}>
-                <div className="hero-chat-pill">
-
-                  <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
-                    <input
-                      ref={inputRef}
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      onFocus={() => setInputFocused(true)}
-                      onBlur={() => setInputFocused(false)}
-                      placeholder=""
-                      disabled={isStreaming}
-                      aria-label="Ask Herma a question"
-                      style={{
-                        width: '100%', border: 'none', outline: 'none',
-                        background: 'transparent',
-                        fontFamily: 'var(--font-ui)', fontSize: 14,
-                        color: 'var(--hero-fg)',
-                      }}
-                    />
-                    {!inputValue && !inputFocused && (
-                      <span style={{
-                        position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
-                        color: 'var(--hero-fg-dim)',
-                        fontFamily: 'var(--font-ui)', fontSize: 14,
-                        opacity: phVisible ? 1 : 0,
-                        transition: 'opacity 280ms ease',
-                        pointerEvents: 'none',
-                        whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: '100%',
-                        userSelect: 'none',
-                      }}>
-                        {PLACEHOLDER_QUESTIONS[phIndex]}
-                      </span>
+                      </button>
                     )}
                   </div>
-
-                  {isStreaming ? (
-                    <button
-                      onClick={stop}
-                      aria-label="Stop generating"
-                      style={{
-                        width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                        border: '1.5px solid var(--hero-border-strong)',
-                        background: 'transparent', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--hero-fg-muted)', transition: 'all 150ms',
-                      }}
-                    >
-                      <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="18" height="18" rx="3" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => submit(inputValue)}
-                      disabled={!canSend}
-                      aria-label="Send"
-                      style={{
-                        width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                        border: 'none',
-                        background: canSend ? 'var(--hero-glow)' : 'var(--hero-border)',
-                        color: canSend ? 'var(--hero-bg)' : 'var(--hero-fg-dim)',
-                        cursor: canSend ? 'pointer' : 'default',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 150ms ease',
-                      }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19V5M5 12l7-7 7 7" />
-                      </svg>
-                    </button>
-                  )}
                 </div>
-              </div>
 
               </div>{/* end left column */}
 
               {/* Right column — slides into the empty space, never displaces left content */}
-              <div style={{
+              <div className={`hero-right-col${hasMessages ? ' has-messages' : ''}`} style={{
                 flex: '1 1 0',
                 minWidth: 0,
                 opacity: hasMessages ? 1 : 0,
@@ -612,7 +660,8 @@ export default function Hero() {
                     <div
                       ref={scrollRef}
                       aria-live="polite"
-                      style={{ flex: 1, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 16, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                      className="hero-chat-messages"
+                      style={{ flex: 1, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}
                     >
                       {messages.map((msg) => {
                         const isUser = msg.role === 'user';
@@ -677,7 +726,7 @@ export default function Hero() {
                     {/* Input pill — moves here once chat is open */}
                     <div style={{ padding: '10px 12px', borderTop: '1px solid var(--hero-border)', flexShrink: 0 }}>
                       <div className="hero-chat-pill" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                              <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
+                        <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
                           <input
                             ref={inputRef}
                             value={inputValue}
@@ -742,13 +791,6 @@ export default function Hero() {
           </div>
         </section>
 
-        {/* Bottom bar */}
-        <div
-          className="absolute bottom-0 left-0 right-0 z-10 px-6 sm:px-8 lg:px-12 py-5 flex justify-end items-center"
-          style={{ color: 'var(--hero-fg-dim)', fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
-        >
-          <span>&copy; 2026 Herma AI</span>
-        </div>
       </div>
 
     </>

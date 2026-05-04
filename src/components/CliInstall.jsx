@@ -14,124 +14,119 @@ export default function CliInstall() {
   };
 
   return (
-    <section
-      className="relative w-full flex flex-col items-center px-6 py-20 sm:py-24"
-      style={{ background: 'var(--hero-bg, #0e0c14)' }}
-    >
-      {/* Heading */}
-      <h2
-        className="text-2xl sm:text-3xl font-medium mb-8 tracking-tight"
-        style={{
-          fontFamily: "var(--font-serif, 'Playfair Display', serif)",
-          color: 'var(--hero-fg, #ece6d8)',
-        }}
-      >
-        Get Started
-      </h2>
+    <section className="py-16 sm:py-20 bg-[var(--bg-primary)]">
+      <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
 
-      {/* Terminal block */}
-      <div
-        className="relative w-full max-w-[600px] rounded-xl overflow-hidden"
-        style={{
-          background: '#0a0a0f',
-          border: '1px solid var(--hero-border, #2a2438)',
-        }}
-      >
-        {/* Terminal top bar */}
-        <div
-          className="flex items-center gap-1.5 px-4 py-2.5"
-          style={{ borderBottom: '1px solid var(--hero-border, #2a2438)' }}
+        {/* Eyebrow */}
+        <p
+          className="text-xs sm:text-sm tracking-[0.2em] uppercase mb-4"
+          style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-tertiary)' }}
         >
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ffbd2e' }} />
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#28c840' }} />
-          <span
-            className="ml-3 text-xs"
-            style={{
-              fontFamily: "var(--font-code, 'Inconsolata', monospace)",
-              color: 'var(--hero-fg-muted, #a59cb1)',
-            }}
+          Herma CLI
+        </p>
+
+        {/* Heading */}
+        <h2
+          className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight"
+          style={{ fontFamily: 'var(--font-heading)' }}
+        >
+          Get started in 30 seconds
+        </h2>
+
+        {/* Subtext */}
+        <p
+          className="text-base sm:text-lg text-[var(--text-secondary)] mb-10 max-w-xl mx-auto leading-relaxed"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Configure all your coding agents to use intelligent routing in one command.
+        </p>
+
+        {/* Terminal block */}
+        <div
+          className="relative w-full max-w-2xl mx-auto rounded-2xl overflow-hidden border border-[var(--border-secondary)] shadow-lg"
+          style={{ background: 'var(--hero-bg-elev, #16131e)' }}
+        >
+          {/* Top bar */}
+          <div
+            className="flex items-center gap-1.5 px-4 py-3"
+            style={{ borderBottom: '1px solid var(--border-primary)' }}
           >
-            terminal
-          </span>
+            <span className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#ffbd2e' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <span
+              className="ml-3 text-xs"
+              style={{ fontFamily: 'var(--font-code)', color: 'var(--text-tertiary)' }}
+            >
+              terminal
+            </span>
+          </div>
+
+          {/* Command line */}
+          <div className="flex items-center gap-3 px-5 py-5">
+            <div className="overflow-x-auto min-w-0 flex-1">
+              <code
+                className="text-sm sm:text-base whitespace-nowrap"
+                style={{ fontFamily: 'var(--font-code)' }}
+              >
+                <span style={{ color: 'var(--accent-primary)' }}>$ </span>
+                <span style={{ color: 'var(--text-primary)' }}>{INSTALL_COMMAND}</span>
+              </code>
+            </div>
+
+            {/* Copy button */}
+            <button
+              onClick={handleCopy}
+              aria-label="Copy install command"
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150"
+              style={{
+                fontFamily: 'var(--font-ui)',
+                background: copied ? 'rgba(91, 175, 138, 0.15)' : 'var(--accent-muted)',
+                color: copied ? '#5BAF8A' : 'var(--text-secondary)',
+                border: `1px solid ${copied ? 'rgba(91, 175, 138, 0.3)' : 'var(--border-secondary)'}`,
+              }}
+              onMouseEnter={(e) => {
+                if (!copied) {
+                  e.currentTarget.style.color = 'var(--accent-primary)';
+                  e.currentTarget.style.borderColor = 'var(--border-accent)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!copied) {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.borderColor = 'var(--border-secondary)';
+                }
+              }}
+            >
+              {copied ? (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Command line */}
-        <div className="flex items-center justify-between px-5 py-4">
-          <code
-            className="text-sm sm:text-base"
-            style={{ fontFamily: "var(--font-code, 'Inconsolata', monospace)" }}
-          >
-            <span style={{ color: 'var(--hero-glow, #e8956a)' }}>$ </span>
-            <span style={{ color: 'var(--hero-fg, #ece6d8)' }}>{INSTALL_COMMAND}</span>
-          </code>
+        {/* Learn more */}
+        <a
+          href="/docs"
+          className="inline-block mt-6 text-sm font-medium transition-opacity duration-150 hover:opacity-80"
+          style={{ fontFamily: 'var(--font-ui)', color: 'var(--accent-primary)' }}
+        >
+          View documentation &rarr;
+        </a>
 
-          {/* Copy button */}
-          <button
-            onClick={handleCopy}
-            aria-label="Copy install command"
-            className="ml-4 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-            style={{
-              fontFamily: "var(--font-ui, 'DM Sans', sans-serif)",
-              background: copied ? 'rgba(91, 175, 138, 0.15)' : 'rgba(255,255,255,0.05)',
-              color: copied ? '#5BAF8A' : 'var(--hero-fg-muted, #a59cb1)',
-              border: `1px solid ${copied ? 'rgba(91, 175, 138, 0.3)' : 'var(--hero-border, #2a2438)'}`,
-            }}
-            onMouseEnter={(e) => {
-              if (!copied) {
-                e.currentTarget.style.color = 'var(--hero-glow, #e8956a)';
-                e.currentTarget.style.borderColor = 'var(--hero-glow, #e8956a)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!copied) {
-                e.currentTarget.style.color = 'var(--hero-fg-muted, #a59cb1)';
-                e.currentTarget.style.borderColor = 'var(--hero-border, #2a2438)';
-              }
-            }}
-          >
-            {copied ? (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                Copied!
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copy
-              </>
-            )}
-          </button>
-        </div>
       </div>
-
-      {/* Description */}
-      <p
-        className="mt-6 text-sm sm:text-base text-center max-w-md"
-        style={{
-          fontFamily: "var(--font-ui, 'DM Sans', sans-serif)",
-          color: 'var(--hero-fg-muted, #a59cb1)',
-          lineHeight: 1.6,
-        }}
-      >
-        Configure all your coding agents to use intelligent routing in 30 seconds.
-      </p>
-
-      {/* CTA link */}
-      <a
-        href="/docs"
-        className="mt-4 text-sm font-medium transition-opacity duration-150 hover:opacity-80"
-        style={{
-          fontFamily: "var(--font-ui, 'DM Sans', sans-serif)",
-          color: 'var(--hero-glow, #e8956a)',
-        }}
-      >
-        Learn more &rarr;
-      </a>
     </section>
   );
 }

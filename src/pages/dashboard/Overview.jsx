@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getBalance, getUsageSummary, getDailySavings, getFrontierModels } from '../../services/hermaApi';
 import { useHermaAuth } from '../../context/HermaAuthContext';
-import OnboardingModal, { ONBOARDING_KEY } from '../../components/OnboardingModal';
 import {
   AreaChart,
   Area,
@@ -334,9 +333,6 @@ const Overview = () => {
   const [usage, setUsage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => !!user && !localStorage.getItem(ONBOARDING_KEY)
-  );
 
   useEffect(() => {
     let cancelled = false;
@@ -495,12 +491,6 @@ const Overview = () => {
 
       {/* Savings Visualization */}
       < SavingsChart />
-
-      <OnboardingModal
-        isOpen={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-        userName={user?.name}
-      />
     </div>
   );
 };

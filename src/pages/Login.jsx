@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useHermaAuth } from '../context/HermaAuthContext';
+import { trackClick, trackLoginAttempt, trackLoginFailed, trackSignupAttempt } from '../services/analyticsTracker';
 
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 const Login = () => {
@@ -58,6 +59,7 @@ const Login = () => {
 
     try {
       if (isLogin) {
+        trackLoginAttempt('email');
         await login({ email: formData.email, password: formData.password });
       } else {
         if (formData.password !== formData.confirmPassword) {
@@ -71,6 +73,7 @@ const Login = () => {
           navigate('/verify-email', { replace: true });
           return;
         }
+        trackSignupAttempt();
         const signupData = await signup({
           name: formData.name,
           email: formData.email,
@@ -83,6 +86,7 @@ const Login = () => {
       }
       handlePostAuthRedirect(false);
     } catch (err) {
+      trackLoginFailed(isLogin ? 'email' : 'signup', 'invalid_credentials');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -96,6 +100,7 @@ const Login = () => {
     const handleGoogleResponse = async (response) => {
       setGoogleLoading(true);
       setError('');
+      trackLoginAttempt('google');
       try {
         const data = await loginWithGoogle(response.credential);
         if (data.email_verified === false) {
@@ -104,6 +109,7 @@ const Login = () => {
         }
         handlePostAuthRedirect(data.is_new_user);
       } catch (err) {
+        trackLoginFailed('google', 'invalid_credentials');
         setError(err.message);
       } finally {
         setGoogleLoading(false);
@@ -336,6 +342,7 @@ const Login = () => {
           <div className="mt-6 text-center">
             <button
               onClick={() => {
+                trackClick('auth_tab_switched', { to: isLogin ? 'signup' : 'login' });
                 setIsLogin(!isLogin);
                 setError('');
               }}

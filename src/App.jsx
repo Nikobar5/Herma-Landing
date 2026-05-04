@@ -76,6 +76,7 @@ const RouteTracker = () => {
   // Track page views on route change
   useEffect(() => {
     trackPageView();
+    if (window.posthog) window.posthog.capture('$pageview');
     if (!location.hash) {
       window.scrollTo(0, 0);
     }
@@ -172,6 +173,15 @@ const Home = () => {
   return (
     <>
       <Hero />
+      {/* Seam-cover: sits over the hero/CliInstall boundary, erases the overflow:hidden clip edge */}
+      <div style={{
+        marginTop: -200,
+        height: 200,
+        background: 'linear-gradient(to bottom, transparent 0%, #1e1230 70%)',
+        position: 'relative',
+        zIndex: 15,
+        pointerEvents: 'none',
+      }} />
       <CliInstall />
       <ValueProposition />
       <HowItWorksSection />

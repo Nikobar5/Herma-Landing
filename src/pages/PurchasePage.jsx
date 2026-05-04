@@ -7,7 +7,7 @@ import {
   updateAutoRechargeSettings,
 } from '../services/hermaApi';
 import { setPageMeta, resetPageMeta } from '../utils/seo';
-import { trackClick } from '../services/analyticsTracker';
+import { trackClick, trackCheckoutPageViewed, trackQuickAmountSelected, trackAutoRechargeToggled, trackAutoRechargeSaved } from '../services/analyticsTracker';
 
 const QUICK_AMOUNTS = [5, 25, 50, 100, 200];
 
@@ -86,6 +86,7 @@ const PurchasePage = () => {
       'Herma pricing: $2/M input tokens, $8/M output tokens. No minimums, no hidden fees. Pay as you go. Free $1 to start.',
       { url: 'https://hermaai.com/upgrade' }
     );
+    trackCheckoutPageViewed();
     return () => resetPageMeta();
   }, []);
 
@@ -189,6 +190,7 @@ const PurchasePage = () => {
       setArSettingsBase({ ...arSettings });
       setArMsg('Settings saved.');
       setTimeout(() => setArMsg(''), 4000);
+      trackAutoRechargeSaved({ threshold: threshold, restore_to: restore, charge_amount: chargeAmt });
     } catch (err) {
       setArError(err.message);
     } finally {
@@ -254,6 +256,7 @@ const PurchasePage = () => {
                   <Toggle
                     checked={arSettings.enabled}
                     onChange={(val) => {
+                      trackAutoRechargeToggled(val);
                       setArSettings((prev) => ({
                         ...prev,
                         enabled: val,
@@ -294,7 +297,7 @@ const PurchasePage = () => {
             {QUICK_AMOUNTS.map((val) => (
               <button
                 key={val}
-                onClick={() => setAmount(String(val))}
+                onClick={() => { setAmount(String(val)); trackQuickAmountSelected(val); }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
                   amount === String(val)
                     ? 'bg-[var(--accent-primary)] text-[var(--text-inverse)] border-[var(--accent-primary)]'
