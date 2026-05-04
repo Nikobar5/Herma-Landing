@@ -5,6 +5,7 @@ import './App.css';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CliInstall from './components/CliInstall';
+import WhatIsHerma from './components/WhatIsHerma';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import MobileStickyCTA from './components/MobileStickyCTA';
@@ -182,6 +183,7 @@ const Home = () => {
         zIndex: 15,
         pointerEvents: 'none',
       }} />
+      <WhatIsHerma />
       <CliInstall />
       <ValueProposition />
       <HowItWorksSection />

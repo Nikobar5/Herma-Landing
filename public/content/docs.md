@@ -4,6 +4,44 @@ Herma provides an OpenAI-compatible API. Change two lines of code and you're up 
 
 **Pricing:** $2/M input tokens · $8/M output tokens · no minimums
 
+---
+
+## Setup Options
+
+Three ways to start routing. Pick what works for you.
+
+### Option 1: Herma CLI (Recommended)
+
+An AI agent changing out its own model is like a human performing surgery on themselves. Let the Herma installer agent handle it.
+
+```bash
+npm install -g @herma-ai/cli
+herma
+```
+
+The CLI logs you in, then type `/setup` to automatically detect and configure your coding agents (Claude Code, Codex, Cursor, OpenClaw, and others).
+
+### Option 2: Paste into your agent
+
+Copy this into any coding agent and it will configure itself:
+
+```
+Configure this agent to use Herma for all AI model calls. Herma is an OpenAI-compatible model router.
+
+API details:
+- Base URL: https://herma.up.railway.app/v1
+- Model: herma-auto
+- API Key: get one at hermaai.com/dashboard (starts with herma_sk_)
+
+Read the full setup docs at hermaai.com/docs for agent-specific instructions (env vars, config files, etc). Figure out the correct configuration method for this specific agent and apply it.
+```
+
+### Option 3: Manual setup
+
+Follow the step-by-step guides below for Claude Code, Codex, Cursor, OpenClaw, and any OpenAI-compatible agent.
+
+---
+
 ## Quick Start
 
 **1. Create an account**

@@ -502,31 +502,23 @@ export default function Hero() {
                   </button>
 
                   <button
-                    onClick={handleCopySetup}
+                    onClick={() => document.getElementById('what-is-herma')?.scrollIntoView({ behavior: 'smooth' })}
                     className="px-7 py-3 rounded-full font-medium text-sm transition-all duration-200 hover:scale-[1.02]"
                     style={{
                       fontFamily: 'var(--font-heading)',
-                      background: 'transparent',
+                      background: 'rgba(255,255,255,0.06)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
                       color: 'var(--hero-fg)',
                       border: '1px solid var(--hero-border-strong)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                     }}
                   >
                     <span className="flex items-center gap-2">
-                      {copied ? (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#5BAF8A' }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                          </svg>
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                          Prompt for Agents
-                        </>
-                      )}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                      How It Works
                     </span>
                   </button>
                 </div>
@@ -556,7 +548,7 @@ export default function Hero() {
                       {!inputValue && !inputFocused && (
                         <span style={{
                           position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
-                          color: 'var(--hero-fg-dim)',
+                          color: 'var(--hero-fg-muted)',
                           fontFamily: 'var(--font-ui)', fontSize: 14,
                           opacity: phVisible ? 1 : 0,
                           transition: 'opacity 280ms ease',
