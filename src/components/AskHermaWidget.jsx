@@ -122,7 +122,8 @@ export default function AskHermaWidget() {
         }
       `}</style>
 
-      {/* Fixed centered wrapper */}
+      {/* Fixed centered wrapper — pointerEvents: none so the full-width div never
+          blocks sidebar/page elements; only the inner content pill captures clicks */}
       <div
         style={{
           position: 'fixed',
@@ -131,13 +132,13 @@ export default function AskHermaWidget() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'flex-end',
-          pointerEvents: heroVisible ? 'none' : 'auto',
+          pointerEvents: 'none',
           opacity: heroVisible ? 0 : 1,
           transform: heroVisible ? 'translateY(16px)' : 'translateY(0)',
           transition: 'opacity 280ms ease, transform 280ms ease',
         }}
       >
-        <div style={{ width: '100%', maxWidth: 680, margin: '0 16px 20px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: '100%', maxWidth: 680, margin: '0 16px 20px', display: 'flex', flexDirection: 'column', pointerEvents: heroVisible ? 'none' : 'auto' }}>
 
           {/* ── Response card (Gemini style) ── */}
           {showPanel && (
