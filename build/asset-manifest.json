@@ -1,18 +1,31 @@
 {
   "files": {
+<<<<<<< Updated upstream
     "main.css": "/static/css/main.59835b29.css",
     "main.js": "/static/js/main.481a7a60.js",
+=======
+    "main.css": "/static/css/main.28e8f500.css",
+    "main.js": "/static/js/main.aac240ab.js",
+>>>>>>> Stashed changes
     "static/js/14.7fb8ce05.chunk.js": "/static/js/14.7fb8ce05.chunk.js",
     "static/js/776.9318e305.chunk.js": "/static/js/776.9318e305.chunk.js",
     "static/js/663.59637fba.chunk.js": "/static/js/663.59637fba.chunk.js",
     "static/js/941.a832ca9e.chunk.js": "/static/js/941.a832ca9e.chunk.js",
     "static/js/679.0020d97b.chunk.js": "/static/js/679.0020d97b.chunk.js",
     "static/js/117.da0b4c17.chunk.js": "/static/js/117.da0b4c17.chunk.js",
+<<<<<<< Updated upstream
     "static/js/120.a99f3597.chunk.js": "/static/js/120.a99f3597.chunk.js",
     "static/js/809.f4c2ef58.chunk.js": "/static/js/809.f4c2ef58.chunk.js",
     "static/js/558.ba8c7d4b.chunk.js": "/static/js/558.ba8c7d4b.chunk.js",
     "static/js/579.02188f73.chunk.js": "/static/js/579.02188f73.chunk.js",
     "static/js/113.df23a4a8.chunk.js": "/static/js/113.df23a4a8.chunk.js",
+=======
+    "static/js/120.3e2ce88b.chunk.js": "/static/js/120.3e2ce88b.chunk.js",
+    "static/js/809.f4c2ef58.chunk.js": "/static/js/809.f4c2ef58.chunk.js",
+    "static/js/627.28b8b8b9.chunk.js": "/static/js/627.28b8b8b9.chunk.js",
+    "static/js/579.fbff02be.chunk.js": "/static/js/579.fbff02be.chunk.js",
+    "static/js/113.dfbce3c2.chunk.js": "/static/js/113.dfbce3c2.chunk.js",
+>>>>>>> Stashed changes
     "static/js/879.e1453f24.chunk.js": "/static/js/879.e1453f24.chunk.js",
     "static/js/235.7adb707f.chunk.js": "/static/js/235.7adb707f.chunk.js",
     "static/js/638.a6e8f73b.chunk.js": "/static/js/638.a6e8f73b.chunk.js",
@@ -41,22 +54,39 @@
     "static/js/69.56f2e475.chunk.js": "/static/js/69.56f2e475.chunk.js",
     "static/js/191.cb767f23.chunk.js": "/static/js/191.cb767f23.chunk.js",
     "static/js/741.aaf076c0.chunk.js": "/static/js/741.aaf076c0.chunk.js",
+<<<<<<< Updated upstream
     "static/js/964.d11fb3da.chunk.js": "/static/js/964.d11fb3da.chunk.js",
     "static/js/896.6f636565.chunk.js": "/static/js/896.6f636565.chunk.js",
     "index.html": "/index.html",
     "main.59835b29.css.map": "/static/css/main.59835b29.css.map",
     "main.481a7a60.js.map": "/static/js/main.481a7a60.js.map",
+=======
+    "static/js/312.67fb16b5.chunk.js": "/static/js/312.67fb16b5.chunk.js",
+    "static/js/964.d11fb3da.chunk.js": "/static/js/964.d11fb3da.chunk.js",
+    "static/js/896.6f636565.chunk.js": "/static/js/896.6f636565.chunk.js",
+    "index.html": "/index.html",
+    "main.28e8f500.css.map": "/static/css/main.28e8f500.css.map",
+    "main.aac240ab.js.map": "/static/js/main.aac240ab.js.map",
+>>>>>>> Stashed changes
     "14.7fb8ce05.chunk.js.map": "/static/js/14.7fb8ce05.chunk.js.map",
     "776.9318e305.chunk.js.map": "/static/js/776.9318e305.chunk.js.map",
     "663.59637fba.chunk.js.map": "/static/js/663.59637fba.chunk.js.map",
     "941.a832ca9e.chunk.js.map": "/static/js/941.a832ca9e.chunk.js.map",
     "679.0020d97b.chunk.js.map": "/static/js/679.0020d97b.chunk.js.map",
     "117.da0b4c17.chunk.js.map": "/static/js/117.da0b4c17.chunk.js.map",
+<<<<<<< Updated upstream
     "120.a99f3597.chunk.js.map": "/static/js/120.a99f3597.chunk.js.map",
     "809.f4c2ef58.chunk.js.map": "/static/js/809.f4c2ef58.chunk.js.map",
     "558.ba8c7d4b.chunk.js.map": "/static/js/558.ba8c7d4b.chunk.js.map",
     "579.02188f73.chunk.js.map": "/static/js/579.02188f73.chunk.js.map",
     "113.df23a4a8.chunk.js.map": "/static/js/113.df23a4a8.chunk.js.map",
+=======
+    "120.3e2ce88b.chunk.js.map": "/static/js/120.3e2ce88b.chunk.js.map",
+    "809.f4c2ef58.chunk.js.map": "/static/js/809.f4c2ef58.chunk.js.map",
+    "627.28b8b8b9.chunk.js.map": "/static/js/627.28b8b8b9.chunk.js.map",
+    "579.fbff02be.chunk.js.map": "/static/js/579.fbff02be.chunk.js.map",
+    "113.dfbce3c2.chunk.js.map": "/static/js/113.dfbce3c2.chunk.js.map",
+>>>>>>> Stashed changes
     "879.e1453f24.chunk.js.map": "/static/js/879.e1453f24.chunk.js.map",
     "235.7adb707f.chunk.js.map": "/static/js/235.7adb707f.chunk.js.map",
     "638.a6e8f73b.chunk.js.map": "/static/js/638.a6e8f73b.chunk.js.map",
@@ -85,11 +115,20 @@
     "69.56f2e475.chunk.js.map": "/static/js/69.56f2e475.chunk.js.map",
     "191.cb767f23.chunk.js.map": "/static/js/191.cb767f23.chunk.js.map",
     "741.aaf076c0.chunk.js.map": "/static/js/741.aaf076c0.chunk.js.map",
+<<<<<<< Updated upstream
+=======
+    "312.67fb16b5.chunk.js.map": "/static/js/312.67fb16b5.chunk.js.map",
+>>>>>>> Stashed changes
     "964.d11fb3da.chunk.js.map": "/static/js/964.d11fb3da.chunk.js.map",
     "896.6f636565.chunk.js.map": "/static/js/896.6f636565.chunk.js.map"
   },
   "entrypoints": [
+<<<<<<< Updated upstream
     "static/css/main.59835b29.css",
     "static/js/main.481a7a60.js"
+=======
+    "static/css/main.28e8f500.css",
+    "static/js/main.aac240ab.js"
+>>>>>>> Stashed changes
   ]
 }

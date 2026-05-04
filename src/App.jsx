@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import './App.css';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import CliInstall from './components/CliInstall';
 import ValueProposition from './components/ValueProposition';
 import HowItWorksSection from './components/HowItWorksSection';
 import MobileStickyCTA from './components/MobileStickyCTA';
@@ -54,6 +55,8 @@ const GPT5VsClaudeOpus = lazy(() => import('./pages/blog/GPT5VsClaudeOpus'));
 const Gemini25VsGPT5 = lazy(() => import('./pages/blog/Gemini25VsGPT5'));
 const BestAIForCoding = lazy(() => import('./pages/blog/BestAIForCoding'));
 const DeepSeekVsGPT5 = lazy(() => import('./pages/blog/DeepSeekVsGPT5'));
+
+const CliLogin = lazy(() => import('./pages/CliLogin'));
 
 const NotFound = lazy(() => Promise.resolve({
   default: () => (
@@ -118,14 +121,21 @@ const RouteTracker = () => {
 // Conditionally render Header (hide on chat page — chat has its own top bar)
 const ConditionalHeader = () => {
   const location = useLocation();
-  if (location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname.startsWith('/admin')) return null;
+  if (location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname === '/cli-login' || location.pathname.startsWith('/admin')) return null;
   return <Header />;
+};
+
+// Conditionally render AskHerma widget (hide on cli-login, chat, admin)
+const ConditionalWidget = () => {
+  const location = useLocation();
+  if (location.pathname === '/cli-login' || location.pathname === '/chat' || location.pathname.startsWith('/admin')) return null;
+  return <AskHermaWidget />;
 };
 
 // Conditionally render Footer (hide on dashboard and login pages)
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password';
+  const hideFooter = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/chat' || location.pathname === '/verify-email' || location.pathname === '/reset-password' || location.pathname === '/cli-login';
   if (hideFooter) return null;
   return <Footer />;
 };
@@ -162,6 +172,7 @@ const Home = () => {
   return (
     <>
       <Hero />
+      <CliInstall />
       <ValueProposition />
       <HowItWorksSection />
       <MobileStickyCTA />
@@ -192,6 +203,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/cli-login" element={<CliLogin />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
@@ -255,7 +267,7 @@ function App() {
               </Routes>
             </Suspense>
             <ConditionalFooter />
-            <AskHermaWidget />
+            <ConditionalWidget />
           </div>
         </ErrorBoundary>
         </AskHermaProvider>
