@@ -15,18 +15,21 @@ const tabs = [
   {
     id: 'cli',
     label: 'Herma CLI',
+    mobileLabel: 'CLI',
     badge: 'Recommended',
     description: 'An AI agent changing out its own model is like a human performing surgery on themselves — not a great idea. Let the Herma installer agent handle it.',
   },
   {
     id: 'prompt',
     label: 'Paste into Agent',
+    mobileLabel: 'Paste',
     badge: null,
     description: 'Have your agent handle the setup and switch out models of its subagents.',
   },
   {
     id: 'manual',
     label: 'Manual Setup',
+    mobileLabel: 'Manual',
     badge: null,
     description: 'For those who still like to do things by hand.',
   },
@@ -104,12 +107,12 @@ export default function CliInstall() {
         </p>
 
         {/* Tabs */}
-        <div className="flex justify-center gap-1 mb-8">
+        <div className="flex justify-center gap-1 mb-8 overflow-x-auto px-2 -mx-2" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setCopied(false); }}
-              className="relative px-4 sm:px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+              className="relative px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0"
               style={{
                 fontFamily: 'var(--font-ui)',
                 background: activeTab === tab.id ? 'var(--accent-muted)' : 'transparent',
@@ -117,10 +120,11 @@ export default function CliInstall() {
                 border: activeTab === tab.id ? '1px solid var(--border-accent, rgba(232,149,106,0.2))' : '1px solid transparent',
               }}
             >
-              {tab.label}
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.mobileLabel}</span>
               {tab.badge && (
                 <span
-                  className="ml-2 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider"
+                  className="ml-1.5 sm:ml-2 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] uppercase tracking-wider"
                   style={{
                     background: 'var(--accent-primary)',
                     color: 'var(--bg-primary)',
@@ -159,9 +163,9 @@ export default function CliInstall() {
                 terminal
               </span>
             </div>
-            <div className="flex items-center gap-3 px-5 py-5">
-              <div className="overflow-x-auto min-w-0 flex-1 text-center">
-                <code className="text-sm sm:text-base whitespace-nowrap" style={{ fontFamily: 'var(--font-code)' }}>
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-5">
+              <div className="overflow-x-auto min-w-0 flex-1">
+                <code className="text-xs sm:text-base whitespace-nowrap" style={{ fontFamily: 'var(--font-code)' }}>
                   <span style={{ color: 'var(--accent-primary)' }}>$ </span>
                   <span style={{ color: 'var(--text-primary)' }}>{INSTALL_COMMAND}</span>
                 </code>

@@ -128,7 +128,7 @@ export default function AskHermaWidget() {
       {/* Fixed centered wrapper — pointerEvents: none so the full-width div never
           blocks sidebar/page elements; only the inner content pill captures clicks */}
       <div
-        className={location.pathname.startsWith('/dashboard') ? 'widget-hide-mobile' : undefined}
+        className={location.pathname.startsWith('/dashboard') || location.pathname === '/login' || location.pathname === '/reset-password' ? 'widget-hide-mobile' : undefined}
         style={{
           position: 'fixed',
           bottom: 0, left: 0, right: 0,

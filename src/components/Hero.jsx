@@ -399,6 +399,13 @@ export default function Hero() {
 
         /* Mobile layout overrides */
         @media (max-width: 767px) {
+          .hero-dark {
+            min-height: auto !important;
+          }
+          .hero-dark > section {
+            min-height: auto !important;
+            padding-bottom: 3rem !important;
+          }
           .hero-layout {
             flex-direction: column !important;
             gap: 0 !important;
@@ -418,6 +425,9 @@ export default function Hero() {
           }
           .hero-chat-card {
             max-height: 55vh !important;
+          }
+          .hero-bottom-fade {
+            height: 120px !important;
           }
           /* Input pill appears before CTA buttons on mobile */
           .hero-input-pill-wrap { order: 1; margin-bottom: 20px; }

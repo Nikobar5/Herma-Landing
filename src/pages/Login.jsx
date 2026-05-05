@@ -123,11 +123,12 @@ const Login = () => {
         callback: handleGoogleResponse,
       });
       if (googleButtonRef.current) {
+        const containerWidth = googleButtonRef.current.offsetWidth || 300;
         window.google.accounts.id.renderButton(googleButtonRef.current, {
           type: 'standard',
           theme: 'outline',
           size: 'large',
-          width: 400,
+          width: Math.min(containerWidth, 400),
           text: 'continue_with',
         });
       }

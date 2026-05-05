@@ -175,7 +175,7 @@ const Home = () => {
     <>
       <Hero />
       {/* Seam-cover: sits over the hero/CliInstall boundary, erases the overflow:hidden clip edge */}
-      <div style={{
+      <div className="seam-cover" style={{
         marginTop: -200,
         height: 200,
         background: 'linear-gradient(to bottom, transparent 0%, #1e1230 70%)',

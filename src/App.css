@@ -145,6 +145,11 @@ html::-webkit-scrollbar {
   .container {
     padding: 0 var(--margin-s);
   }
+
+  .seam-cover {
+    margin-top: -80px !important;
+    height: 80px !important;
+  }
 }
 
 /* === Admin Dashboard Utilities === */
