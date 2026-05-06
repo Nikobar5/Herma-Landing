@@ -487,7 +487,7 @@ export default function Hero() {
                   className="hero-fade-3 text-base sm:text-lg md:text-xl max-w-xl mb-8 leading-relaxed"
                   style={{ fontFamily: 'var(--font-body)', color: 'var(--hero-fg-muted)' }}
                 >
-                  Herma routes every AI call to the most cost effective model for every task without loosing frontier quality.
+                  Herma routes every AI call to the most cost effective model for every task without losing frontier quality.
                 </p>
 
                 {/* CTA buttons */}
